@@ -13,19 +13,6 @@ stages:
     - pip install -e .
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
 
-test-python36:
-  <<: *unit
-  image: python:3.6
-  variables:
-    TOXENV: py36
-
-test-python37:
-  <<: *unit
-  image: python:3.7
-  variables:
-  script:
-    - tox --skip-missing-interpreters -p auto -- -rf
-
 test-python38:
   <<: *unit
   image: python:3.8
@@ -34,19 +21,19 @@ test-python38:
 
 test-python39:
   <<: *unit
-  image: python:3.9-rc
+  image: python:3.9
   variables:
     TOXENV: py39
-  
+
 test-pypy3:
   <<: *unit
   image: pypy:3
   variables:
     TOXENV: pypy3
-    
+
 test-coverage:
   <<: *unit
-  image: python:3.7
+  image: python:3.8
   script:
     - export GIT_ID=$(hg tip --template '{node}\n')
     - export GIT_AUTHOR_NAME=$(hg tip --template '{author|person}\n')
