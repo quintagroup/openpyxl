@@ -1,3 +1,14 @@
+3.2.0 (unreleased)
+==================
+
+
+New Features
+------------
+
+* Support Active X elements
+* Support Form Controls
+
+
 3.1.0 (unreleased)
 ==================
 
