@@ -260,6 +260,12 @@ class WorksheetWriter:
             self.xf.send(legacy.to_tree("legacyDrawing"))
 
 
+    def write_controls(self):
+        controls = self.ws.controls
+        if controls:
+            self.xf.send(controls.to_tree())
+
+
     def write_tables(self):
         tables = TablePartList()
 
@@ -348,6 +354,7 @@ class WorksheetWriter:
         self.write_breaks()
         self.write_drawings()
         self.write_legacy()
+        self.write_controls()
         self.write_tables()
 
 
