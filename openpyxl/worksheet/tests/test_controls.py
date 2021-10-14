@@ -84,10 +84,10 @@ def Control():
 class TestControl:
 
     def test_ctor(self, Control):
-        ctrl = Control()
+        ctrl = Control(shapeId=1)
         xml = tostring(ctrl.to_tree())
         expected = """
-        <root />
+        <control shapeId="1"/>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -95,11 +95,11 @@ class TestControl:
 
     def test_from_xml(self, Control):
         src = """
-        <root />
+         <control xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" shapeId="47120" r:id="rId8" name="RefProjectButton" />
         """
         node = fromstring(src)
         ctrl = Control.from_tree(node)
-        assert ctrl == Control()
+        assert ctrl == Control(shapeId=47120, name="RefProjectButton")
 
 
 @pytest.fixture
@@ -114,7 +114,7 @@ class TestControlList:
         ctrls = ControlList()
         xml = tostring(ctrls.to_tree())
         expected = """
-        <root />
+        <controls />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -122,7 +122,7 @@ class TestControlList:
 
     def test_from_xml(self, ControlList):
         src = """
-        <root />
+        <controls />
         """
         node = fromstring(src)
         ctrls = ControlList.from_tree(node)
