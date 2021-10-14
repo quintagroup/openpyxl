@@ -29,6 +29,7 @@ from openpyxl.utils import (
 from openpyxl.utils.datetime import from_excel, from_ISO8601, WINDOWS_EPOCH
 from openpyxl.descriptors.excel import ExtensionList
 
+from .controls import ControlList
 from .formula import DataTableFormula, ArrayFormula
 from .filters import AutoFilter
 from .header_footer import HeaderFooter
@@ -74,6 +75,7 @@ SCENARIOS_TAG = '{%s}scenarios' % SHEET_MAIN_NS
 DATA_TAG = '{%s}sheetData' % SHEET_MAIN_NS
 DIMENSION_TAG = '{%s}dimension' % SHEET_MAIN_NS
 CUSTOM_VIEWS_TAG = '{%s}customSheetViews' % SHEET_MAIN_NS
+CONTROLS_TAG = "{%s}controls" % SHEET_MAIN_NS
 
 
 def _cast_number(value):
@@ -108,6 +110,7 @@ class WorkSheetParser(object):
         self.merged_cells = None
         self.row_breaks = RowBreak()
         self.col_breaks = ColBreak()
+        self.controls = None
 
 
     def parse(self):
@@ -136,7 +139,7 @@ class WorkSheetParser(object):
             TABLE_TAG: ('tables', TablePartList),
             HYPERLINK_TAG: ('hyperlinks', HyperlinkList),
             MERGE_TAG: ('merged_cells', MergeCells),
-
+            CONTROLS_TAG: ("controls", ControlList),
         }
 
         it = iterparse(self.source) # add a finaliser to close the source when this becomes possible
@@ -440,7 +443,7 @@ class WorksheetReader(object):
                   'HeaderFooter', 'auto_filter', 'data_validations',
                   'sheet_properties', 'views', 'sheet_format',
                   'row_breaks', 'col_breaks', 'scenarios', 'legacy_drawing',
-                  'protection',
+                  'protection', "controls"
                   ):
             v = getattr(self.parser, k, None)
             if v is not None:

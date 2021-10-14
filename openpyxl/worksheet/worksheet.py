@@ -136,7 +136,7 @@ class Worksheet(_WorkbookChild):
         self.sheet_properties = WorksheetProperties()
         self.sheet_format = SheetFormatProperties()
         self.scenarios = ScenarioList()
-        self._controls = ControlList
+        self.controls = ControlList()
 
 
     @property
