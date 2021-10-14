@@ -122,8 +122,28 @@ class TestControlList:
 
     def test_from_xml(self, ControlList):
         src = """
-        <controls />
+          <controls xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
+          xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+              <control shapeId="47120" r:id="rId8" name="RefProjectButton">
+                <controlPr defaultSize="0" autoLine="0" r:id="rId9">
+                  <anchor moveWithCells="1">
+                    <from>
+                      <xdr:col>3</xdr:col>
+                      <xdr:colOff>161925</xdr:colOff>
+                      <xdr:row>24</xdr:row>
+                      <xdr:rowOff>95250</xdr:rowOff>
+                    </from>
+                    <to>
+                      <xdr:col>6</xdr:col>
+                      <xdr:colOff>171450</xdr:colOff>
+                      <xdr:row>27</xdr:row>
+                      <xdr:rowOff>95250</xdr:rowOff>
+                    </to>
+                  </anchor>
+                </controlPr>
+              </control>
+        </controls>
         """
         node = fromstring(src)
         ctrls = ControlList.from_tree(node)
-        assert ctrls == ControlList()
+        assert len(ctrls.control) == 1
