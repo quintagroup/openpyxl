@@ -92,7 +92,7 @@ class Control(Serialisable):
         self.name = name
 
 
-class Controls(Serialisable):
+class ControlList(Serialisable):
 
     tagname = "controls"
 

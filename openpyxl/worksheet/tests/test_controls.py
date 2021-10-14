@@ -4,7 +4,7 @@ import pytest
 from openpyxl.xml.functions import fromstring, tostring
 from openpyxl.tests.helper import compare_xml
 
-from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
+from openpyxl.drawing.anchor import AnchorMarker
 from openpyxl.worksheet.ole import ObjectAnchor
 
 
@@ -73,3 +73,57 @@ class TestControlProperty:
         to = AnchorMarker(col=4, colOff=1190625, row=61, rowOff=47625)
         anchor = ObjectAnchor(_from=_from, to=to, moveWithCells=True)
         assert prop == ControlProperty(anchor=anchor, autoLine=False)
+
+
+@pytest.fixture
+def Control():
+    from ..controls import Control
+    return Control
+
+
+class TestControl:
+
+    def test_ctor(self, Control):
+        ctrl = Control()
+        xml = tostring(ctrl.to_tree())
+        expected = """
+        <root />
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_from_xml(self, Control):
+        src = """
+        <root />
+        """
+        node = fromstring(src)
+        ctrl = Control.from_tree(node)
+        assert ctrl == Control()
+
+
+@pytest.fixture
+def ControlList():
+    from ..controls import ControlList
+    return ControlList
+
+
+class TestControlList:
+
+    def test_ctor(self, ControlList):
+        ctrls = ControlList()
+        xml = tostring(ctrls.to_tree())
+        expected = """
+        <root />
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_from_xml(self, ControlList):
+        src = """
+        <root />
+        """
+        node = fromstring(src)
+        ctrls = ControlList.from_tree(node)
+        assert ctrls == ControlList()

@@ -10,7 +10,7 @@ from openpyxl.descriptors import (
     Sequence,
 )
 
-from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
+from openpyxl.drawing.anchor import AnchorMarker
 from openpyxl.xml.constants import SHEET_DRAWING_NS
 
 

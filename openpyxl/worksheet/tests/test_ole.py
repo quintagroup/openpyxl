@@ -5,7 +5,7 @@ import pytest
 from openpyxl.xml.functions import fromstring, tostring
 from openpyxl.tests.helper import compare_xml
 
-from openpyxl.drawing.spreadsheet_drawing import AnchorMarker
+from openpyxl.drawing.anchor import AnchorMarker
 
 
 @pytest.fixture
