@@ -79,6 +79,7 @@ class Control(Serialisable):
     controlPr = Typed(expected_type=ControlProperty, allow_none=True)
     shapeId = Integer()
     name = String(allow_none=True)
+    id = Relation()
 
     __elements__ = ('controlPr',)
 
@@ -86,10 +87,12 @@ class Control(Serialisable):
                  controlPr=None,
                  shapeId=None,
                  name=None,
+                 id=None,
                 ):
         self.controlPr = controlPr
         self.shapeId = shapeId
         self.name = name
+        self.id = id
 
 
 class ControlList(Serialisable):

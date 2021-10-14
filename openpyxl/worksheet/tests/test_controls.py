@@ -99,7 +99,7 @@ class TestControl:
         """
         node = fromstring(src)
         ctrl = Control.from_tree(node)
-        assert ctrl == Control(shapeId=47120, name="RefProjectButton")
+        assert ctrl == Control(shapeId=47120, name="RefProjectButton", id="rId8")
 
 
 @pytest.fixture
