@@ -124,7 +124,9 @@ class TestControlList:
         src = """
           <controls xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
           xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-              <control shapeId="47120" r:id="rId8" name="RefProjectButton">
+            <mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+              <mc:Choice Requires="x14">
+              <control shapeId="47120" r:id="rId8" name="RefWECProjectButton">
                 <controlPr defaultSize="0" autoLine="0" r:id="rId9">
                   <anchor moveWithCells="1">
                     <from>
@@ -142,6 +144,11 @@ class TestControlList:
                   </anchor>
                 </controlPr>
               </control>
+            </mc:Choice>
+            <mc:Fallback>
+              <control shapeId="47120" r:id="rId8" name="RefWECProjectButton"/>
+            </mc:Fallback>
+          </mc:AlternateContent>
         </controls>
         """
         node = fromstring(src)

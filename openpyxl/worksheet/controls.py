@@ -95,16 +95,46 @@ class Control(Serialisable):
         self.id = id
 
 
+class Choice(Serialisable):
+    """Markup compatiblity choice"""
+
+    tagname = "choice"
+
+    control = Typed(expected_type=Control)
+    Requires = String()
+
+
+    def __init__(self, control=None, Requires=None):
+        self.control = control
+
+
+class AlternateContent(Serialisable):
+    """Markup AlternateContent
+    """
+
+    tagname = "AlternateContent"
+
+    Choice = Typed(expected_type=Choice)
+
+
+    def __init__(self, Choice=None):
+        self.Choice = Choice
+
+
 class ControlList(Serialisable):
 
     tagname = "controls"
 
+    AlternateContent = Sequence(expected_type=AlternateContent)
     control = Sequence(expected_type=Control)
 
     __elements__ = ('control',)
 
     def __init__(self,
+                 AlternateContent=None,
                  control=(),
                 ):
+        if AlternateContent:
+            control = [ac.Choice.control for ac in AlternateContent]
         self.control = control
 
