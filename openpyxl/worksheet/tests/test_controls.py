@@ -153,4 +153,4 @@ class TestControlList:
         """
         node = fromstring(src)
         ctrls = ControlList.from_tree(node)
-        assert len(ctrls.control) == 1
+        assert len(ctrls) == 1
