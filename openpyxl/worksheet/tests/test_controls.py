@@ -153,3 +153,30 @@ class TestControlList:
         node = fromstring(src)
         ctrls = ControlList.from_tree(node)
         assert len(ctrls) == 1
+
+
+@pytest.fixture
+def FormControl():
+    from ..controls import FormControl
+    return FormControl
+
+
+class TestFormControl:
+
+    def test_ctor(self, FormControl):
+        ctrl = FormControl(objectType="Button", lockText=True)
+        xml = tostring(ctrl.to_tree())
+        expected = """
+        <formControlPr xmlns="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" objectType="Button" lockText="1"/>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_from_xml(self, FormControl):
+        src = """
+        <formControlPr xmlns="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" objectType="Button" lockText="1"/>
+        """
+        node = fromstring(src)
+        ctrl = FormControl.from_tree(node)
+        assert ctrl == FormControl(objectType="Button", lockText=True)

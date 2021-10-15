@@ -10,6 +10,7 @@ from openpyxl.descriptors import (
 )
 
 from openpyxl.descriptors.excel import Relation
+from openpyxl.xml.constants import XL_2009
 from .ole import ObjectAnchor
 
 
@@ -141,3 +142,17 @@ class ControlList(Serialisable):
 
     def __len__(self):
         return len(self.control)
+
+
+class FormControl(Serialisable):
+
+    tagname = "formControlPr"
+    content_type = "application/vnd.ms-excel.controlproperties+xml"
+    namespace = XL_2009
+
+    objectType = String()
+    lockText = Bool()
+
+    def __init__(self, objectType=None, lockText=None):
+        self.objectType = objectType
+        self.lockText = lockText

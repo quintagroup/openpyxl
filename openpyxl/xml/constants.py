@@ -75,6 +75,9 @@ CHART_DRAWING_NS = "http://schemas.openxmlformats.org/drawingml/2006/chartDrawin
 
 CUSTOMUI_NS = 'http://schemas.microsoft.com/office/2006/relationships/ui/extensibility'
 MARKUP_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006"
+ACTIVEX_NS = "http://schemas.microsoft.com/office/2006/activeX"
+
+XL_2009 = "http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"
 
 NAMESPACES = {
     'cp': COREPROPS_NS,
@@ -86,7 +89,8 @@ NAMESPACES = {
     'xml': XML_NS,
     'main': SHEET_MAIN_NS,
     'cust': CUSTPROPS_NS,
-    "mc": MARKUP_NS
+    "mc": MARKUP_NS,
+    "ax": ACTIVEX_NS
 }
 
 ## Mime types
