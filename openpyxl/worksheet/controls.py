@@ -10,7 +10,10 @@ from openpyxl.descriptors import (
 )
 
 from openpyxl.descriptors.excel import Relation
-from openpyxl.xml.constants import XL_2009
+from openpyxl.xml.constants import (
+    XL_2009,
+    ACTIVEX_NS,
+)
 from .ole import ObjectAnchor
 
 
@@ -156,3 +159,17 @@ class FormControl(Serialisable):
     def __init__(self, objectType=None, lockText=None):
         self.objectType = objectType
         self.lockText = lockText
+
+
+class ActiveXControl(Serialisable):
+
+    tagname = "ocx"
+    namespace = ACTIVEX_NS
+    content_type = "application/vnd.ms-office.activeX+xml"
+
+    id = Relation()
+    classid = String(namespace=ACTIVEX_NS)
+
+    def __init__(self, id=None, classid=None):
+        self.id = id
+        self.classid = "{8BD21D50-EC42-11CE-9E0D-00AA006002F3}"
