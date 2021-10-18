@@ -5,8 +5,6 @@ import posixpath
 
 from openpyxl.descriptors import (
     String,
-    Set,
-    NoneSet,
     Alias,
     Sequence,
 )
@@ -16,7 +14,6 @@ from openpyxl.xml.constants import REL_NS, PKG_REL_NS
 from openpyxl.xml.functions import (
     Element,
     fromstring,
-    tostring
 )
 
 
@@ -105,6 +102,20 @@ class RelationshipList(Serialisable):
             tree.append(rel.to_tree())
 
         return tree
+
+
+    def get_types(self):
+        """Return a set of types contained"""
+        known_types = set()
+        for r in self.Relationship:
+            simple = r.Type.split("/")[-1]
+            if simple not in known_types:
+                known_types.add(simple)
+                collection = []
+                setattr(self, simple, collection)
+            else:
+                collection = getattr(self, simple)
+            collection.append(r)
 
 
 def get_rels_path(path):
