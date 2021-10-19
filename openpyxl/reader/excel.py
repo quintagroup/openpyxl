@@ -207,7 +207,7 @@ class ExcelReader:
 
 
     def read_worksheets(self):
-        comment_warning = """Cell '{0}':{1} is part of a merged range but has a comment which will be removed because merged cells cannot contain any data."""
+
         for sheet, rel in self.parser.find_sheets():
             if rel.target not in self.valid_files:
                 continue
@@ -216,11 +216,9 @@ class ExcelReader:
                 self.read_chartsheet(sheet, rel)
                 continue
 
-            rels_path = get_rels_path(rel.target)
-            rels = RelationshipList()
-            if rels_path in self.valid_files:
-                rels = get_dependents(self.archive, rels_path)
-            rels.get_types()
+            processor = WorksheetProcessor(None, self.archive)
+            processor.find_children(get_rels_path(rel.target))
+            rels = processor.rels
 
             if self.read_only:
                 ws = ReadOnlyWorksheet(self.wb, sheet.name, rel.target, self.shared_strings)
@@ -230,23 +228,15 @@ class ExcelReader:
             else:
                 fh = self.archive.open(rel.target)
                 ws = self.wb.create_sheet(sheet.name)
-                ws._rels = rels
                 ws_parser = WorksheetReader(ws, fh, self.shared_strings, self.data_only)
                 ws_parser.bind_all()
+                processor.ws = ws
+                ws.sheet_state = sheet.state
 
             # assign any comments to cells
-            comments = getattr(rels, "comments", [])
-            for rel in comments:
-                src = self.archive.read(rel.target)
-                comment_sheet = CommentSheet.from_tree(fromstring(src))
-                for ref, comment in comment_sheet.comments:
-                    try:
-                        ws[ref].comment = comment
-                    except AttributeError:
-                        c = ws[ref]
-                        if isinstance(c, MergedCell):
-                            warnings.warn(comment_warning.format(ws.title, c.coordinate))
-                            continue
+            processor.get_comments()
+            processor.get_drawings()
+            processor.get_pivots(self.parser.pivot_caches)
 
             # preserve link to VML file if VBA
             if self.wb.vba_archive and ws.legacy_drawing:
@@ -259,25 +249,6 @@ class ExcelReader:
                 xml = fromstring(src)
                 table = Table.from_tree(xml)
                 ws.add_table(table)
-
-            drawings = getattr(rels, "drawings", [])
-            for rel in drawings:
-                charts, images = find_images(self.archive, rel.target)
-                for c in charts:
-                    ws.add_chart(c, c.anchor)
-                for im in images:
-                    ws.add_image(im, im.anchor)
-
-            pivots = getattr(rels, "pivotTable", [])
-            for rel in pivots:
-                pivot_path = rel.Target
-                src = self.archive.read(pivot_path)
-                tree = fromstring(src)
-                pivot = TableDefinition.from_tree(tree)
-                pivot.cache = self.parser.pivot_caches[pivot.cacheId]
-                ws.add_pivot(pivot)
-
-            ws.sheet_state = sheet.state
 
 
     def read(self):
@@ -292,6 +263,89 @@ class ExcelReader:
         if not self.read_only:
             self.archive.close()
 
+
+class WorksheetProcessor:
+
+    """
+    Collect and assign child objects
+    """
+
+    def __init__(self, ws, archive):
+        self.ws = ws
+        self.archive = archive
+
+
+    def find_children(self, path):
+        """
+        Find relevant and group child objects
+        """
+        rels_path = get_rels_path(path)
+        rels = RelationshipList()
+        for attr in ["comments", "pivotTable", "drawings"]:
+            setattr(rels, attr, [])
+
+        if rels_path in self.archive.namelist():
+            rels = get_dependents(self.archive, rels_path)
+            rels.get_types()
+
+        self.rels = rels
+
+
+    def get_comments(self):
+        """Assign comments"""
+
+        comment_warning = """Cell '{0}':{1} is part of a merged range but has a comment which will be removed because merged cells cannot contain any data."""
+
+        for rel in self.rels.comments:
+            src = self.archive.read(rel.target)
+            comment_sheet = CommentSheet.from_tree(fromstring(src))
+            for ref, comment in comment_sheet.comments:
+                try:
+                    self.ws[ref].comment = comment
+                except AttributeError:
+                    c = self.ws[ref]
+                    if isinstance(c, MergedCell):
+                        warnings.warn(comment_warning.format(self.ws.title, c.coordinate))
+                        continue
+
+
+    def get_drawings(self):
+        for rel in self.rels.drawings:
+            charts, images = find_images(self.archive, rel.target)
+            for c in charts:
+                self.ws.add_chart(c, c.anchor)
+            for im in images:
+                self.ws.add_image(im, im.anchor)
+
+
+    def get_pivots(self, pivot_caches):
+        for rel in self.rels.pivotTable:
+            pivot_path = rel.Target
+            src = self.archive.read(pivot_path)
+            tree = fromstring(src)
+            pivot = TableDefinition.from_tree(tree)
+            pivot.cache = pivot_caches[pivot.cacheId]
+            self.ws.add_pivot(pivot)
+
+
+    def get_tables(self):
+        pass
+
+
+    def get_controls(self):
+        pass
+
+
+    def get_activex(self):
+        pass
+
+
+    def get_legacy(self):
+        pass
+
+
+    def get_images(self):
+        pass
 
 
 def load_workbook(filename, read_only=False, keep_vba=KEEP_VBA,
