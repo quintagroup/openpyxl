@@ -3,9 +3,11 @@
 
 """Read an xlsx file into Python"""
 
-# Python stdlib imports
-from zipfile import ZipFile, ZIP_DEFLATED, BadZipfile
-from sys import exc_info
+# Python stdlib
+from zipfile import (
+    ZipFile,
+    ZIP_DEFLATED
+)
 from io import BytesIO
 import os.path
 import warnings
@@ -22,15 +24,12 @@ except ImportError:
 # package imports
 from openpyxl.utils.exceptions import InvalidFileException
 from openpyxl.xml.constants import (
-    ARC_SHARED_STRINGS,
     ARC_CORE,
     ARC_CUSTOM,
     ARC_CONTENT_TYPES,
     ARC_WORKBOOK,
     ARC_THEME,
-    COMMENTS_REL,
     SHARED_STRINGS,
-    EXTERNAL_LINK,
     XLTM,
     XLTX,
     XLSM,
@@ -57,7 +56,10 @@ from openpyxl.worksheet._read_only import ReadOnlyWorksheet
 from openpyxl.worksheet._reader import WorksheetReader
 from openpyxl.chartsheet import Chartsheet
 from openpyxl.worksheet.table import Table
-from openpyxl.worksheet.controls import FormControl, ActiveXControl
+from openpyxl.worksheet.controls import (
+    FormControl,
+    ActiveXControl
+)
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 
 from openpyxl.xml.functions import fromstring
@@ -232,8 +234,8 @@ class ExcelReader:
             processor.find_children((rel.target))
             rels = processor.rels
             processor.get_comments()
-            #processor.get_pivots(self.parser.pivot_caches)
-            #processor.get_drawings()
+            processor.get_pivots(self.parser.pivot_caches)
+            processor.get_drawings()
 
             # preserve link to VML file if VBA
             if self.wb.vba_archive and ws.legacy_drawing:
@@ -308,7 +310,7 @@ class WorksheetProcessor:
 
 
     def get_drawings(self):
-        for rel in self.rels.drawings:
+        for rel in self.rels.drawing:
             charts, images = find_images(self.archive, rel.target)
             for c in charts:
                 self.ws.add_chart(c, c.anchor)
