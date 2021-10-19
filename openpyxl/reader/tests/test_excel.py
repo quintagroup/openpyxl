@@ -15,6 +15,7 @@ from openpyxl.xml.constants import (
     XLTM,
     XLTX,
 )
+from openpyxl.workbook import Workbook
 
 import pytest
 
@@ -232,3 +233,22 @@ class TestExcelReader:
 
         reader.read_chartsheet(sheet, rel)
         assert reader.wb['chart'].title == "chart"
+
+
+@pytest.fixture
+def WorksheetProcessor():
+    from .. excel import WorksheetProcessor
+    return WorksheetProcessor
+
+
+class TestWorksheetProcessor:
+
+
+    def test_findchildren(self, datadir, WorksheetProcessor):
+        datadir.chdir()
+        archive = ZipFile("legacy_drawing.xlsm")
+        wb = Workbook()
+        ws = wb.create_sheet()
+        processor = WorksheetProcessor(ws, archive)
+        processor.find_children("xl/worksheets/sheet1.xml")
+        assert len(processor.rels.vmlDrawing) == 1

@@ -216,27 +216,24 @@ class ExcelReader:
                 self.read_chartsheet(sheet, rel)
                 continue
 
-            processor = WorksheetProcessor(None, self.archive)
-            processor.find_children(get_rels_path(rel.target))
-            rels = processor.rels
-
             if self.read_only:
                 ws = ReadOnlyWorksheet(self.wb, sheet.name, rel.target, self.shared_strings)
                 ws.sheet_state = sheet.state
                 self.wb._sheets.append(ws)
                 continue
-            else:
-                fh = self.archive.open(rel.target)
-                ws = self.wb.create_sheet(sheet.name)
-                ws_parser = WorksheetReader(ws, fh, self.shared_strings, self.data_only)
-                ws_parser.bind_all()
-                processor.ws = ws
-                ws.sheet_state = sheet.state
 
-            # assign any comments to cells
+            fh = self.archive.open(rel.target)
+            ws = self.wb.create_sheet(sheet.name)
+            ws_parser = WorksheetReader(ws, fh, self.shared_strings, self.data_only)
+            ws_parser.bind_all()
+            ws.sheet_state = sheet.state
+
+            processor = WorksheetProcessor(ws, self.archive)
+            processor.find_children((rel.target))
+            rels = processor.rels
             processor.get_comments()
-            processor.get_drawings()
-            processor.get_pivots(self.parser.pivot_caches)
+            #processor.get_pivots(self.parser.pivot_caches)
+            #processor.get_drawings()
 
             # preserve link to VML file if VBA
             if self.wb.vba_archive and ws.legacy_drawing:
@@ -281,13 +278,14 @@ class WorksheetProcessor:
         """
         rels_path = get_rels_path(path)
         rels = RelationshipList()
-        for attr in ["comments", "pivotTable", "drawings"]:
-            setattr(rels, attr, [])
 
         if rels_path in self.archive.namelist():
             rels = get_dependents(self.archive, rels_path)
-            rels.get_types()
 
+        for attr in ["comments", "pivotTable", "drawing"]:
+            setattr(rels, attr, [])
+
+        rels.get_types()
         self.rels = rels
 
 
