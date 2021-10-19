@@ -28,7 +28,7 @@ from openpyxl.xml.constants import (
     ARC_CONTENT_TYPES,
     ARC_WORKBOOK,
     ARC_THEME,
-    COMMENTS_NS,
+    COMMENTS_REL,
     SHARED_STRINGS,
     EXTERNAL_LINK,
     XLTM,
@@ -57,6 +57,7 @@ from openpyxl.worksheet._read_only import ReadOnlyWorksheet
 from openpyxl.worksheet._reader import WorksheetReader
 from openpyxl.chartsheet import Chartsheet
 from openpyxl.worksheet.table import Table
+from openpyxl.worksheet.controls import FormControl, ActiveXControl
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 
 from openpyxl.xml.functions import fromstring
@@ -219,6 +220,7 @@ class ExcelReader:
             rels = RelationshipList()
             if rels_path in self.valid_files:
                 rels = get_dependents(self.archive, rels_path)
+            rels.get_types()
 
             if self.read_only:
                 ws = ReadOnlyWorksheet(self.wb, sheet.name, rel.target, self.shared_strings)
@@ -233,8 +235,9 @@ class ExcelReader:
                 ws_parser.bind_all()
 
             # assign any comments to cells
-            for r in rels.find(COMMENTS_NS):
-                src = self.archive.read(r.target)
+            comments = getattr(rels, "comments", [])
+            for rel in comments:
+                src = self.archive.read(rel.target)
                 comment_sheet = CommentSheet.from_tree(fromstring(src))
                 for ref, comment in comment_sheet.comments:
                     try:
@@ -257,7 +260,7 @@ class ExcelReader:
                 table = Table.from_tree(xml)
                 ws.add_table(table)
 
-            drawings = rels.find(SpreadsheetDrawing._rel_type)
+            drawings = getattr(rels, "drawings", [])
             for rel in drawings:
                 charts, images = find_images(self.archive, rel.target)
                 for c in charts:
@@ -265,9 +268,9 @@ class ExcelReader:
                 for im in images:
                     ws.add_image(im, im.anchor)
 
-            pivot_rel = rels.find(TableDefinition.rel_type)
-            for r in pivot_rel:
-                pivot_path = r.Target
+            pivots = getattr(rels, "pivotTable", [])
+            for rel in pivots:
+                pivot_path = rel.Target
                 src = self.archive.read(pivot_path)
                 tree = fromstring(src)
                 pivot = TableDefinition.from_tree(tree)
@@ -288,6 +291,7 @@ class ExcelReader:
         self.parser.assign_names()
         if not self.read_only:
             self.archive.close()
+
 
 
 def load_workbook(filename, read_only=False, keep_vba=KEEP_VBA,
