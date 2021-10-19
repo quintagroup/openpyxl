@@ -13,6 +13,7 @@ from openpyxl.descriptors.excel import Relation
 from openpyxl.xml.constants import (
     XL_2009,
     ACTIVEX_NS,
+    REL_NS,
 )
 from .ole import ObjectAnchor
 
@@ -150,7 +151,8 @@ class ControlList(Serialisable):
 class FormControl(Serialisable):
 
     tagname = "formControlPr"
-    content_type = "application/vnd.ms-excel.controlproperties+xml"
+    mime_type = "application/vnd.ms-excel.controlproperties+xml"
+    rel_type = f"{REL_NS}/ctrlProp"
     namespace = XL_2009
 
     objectType = String()
@@ -165,7 +167,8 @@ class ActiveXControl(Serialisable):
 
     tagname = "ocx"
     namespace = ACTIVEX_NS
-    content_type = "application/vnd.ms-office.activeX+xml"
+    mime_type = "application/vnd.ms-office.activeX+xml"
+    rel_type = f"{REL_NS}/control"
 
     id = Relation()
     classid = String(namespace=ACTIVEX_NS)
