@@ -284,7 +284,7 @@ class WorksheetProcessor:
         if rels_path in self.archive.namelist():
             rels = get_dependents(self.archive, rels_path)
 
-        for attr in ["comments", "pivotTable", "drawing"]:
+        for attr in ["comments", "pivotTable", "drawing", "ctrlProp", "control", "image"]:
             setattr(rels, attr, [])
 
         rels.get_types()
@@ -329,22 +329,33 @@ class WorksheetProcessor:
 
 
     def get_controls(self):
-        for control in self.ws.controls.control:
+        """
+        Get related objects for ctrlProps
+        """
+        ctrlProps = {}
 
-            rel = self.rels[control.id]
+        for rel in self.rels.ctrlProp:
             src = self.archive.read(rel.target)
-
             tree = fromstring(src)
-            if rel.Type == FormControl.rel_type:
-                cls = FormControl
-            elif rel.Type == ActiveXControl.rel_type:
-                cls = ActiveXControl
-            obj = cls.from_tree(tree)
-            control.shape = obj
+            ctrlProps[rel.id] = FormControl.from_tree(tree)
+
+        for control in self.ws.controls.control:
+            control.shape = ctrlProps.get(control.id)
 
 
     def get_activex(self):
-        pass
+        """
+        Get related objects for ActiveX Controls
+        """
+        active = {}
+
+        for rel in self.rels.control:
+            src = self.archive.read(rel.target)
+            tree = fromstring(src)
+            active[rel.id] = ActiveXControl.from_tree(tree)
+
+        for control in self.ws.controls.control:
+            control.shape = active.get(control.id)
 
 
     def get_legacy(self):

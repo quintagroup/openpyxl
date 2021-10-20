@@ -241,6 +241,12 @@ def WorksheetProcessor():
     return WorksheetProcessor
 
 
+from openpyxl.worksheet.controls import (
+    Control,
+    FormControl,
+    ActiveXControl,
+)
+
 class TestWorksheetProcessor:
 
 
@@ -256,15 +262,14 @@ class TestWorksheetProcessor:
 
 
     def test_get_controls(self, datadir, WorksheetProcessor):
-        from openpyxl.worksheet.controls import Control, FormControl, ActiveXControl
+
         ctrl1 = Control(controlPr=None, id="rId18", shapeId=47120)
-        ctrl2 = Control(id="rId10", shapeId=47122 )
 
         datadir.chdir()
         archive = ZipFile("form_controls.xlsm")
         wb = Workbook()
         ws = wb.create_sheet()
-        ws.controls.control = [ctrl1, ctrl2]
+        ws.controls.control = [ctrl1,]
 
         processor = WorksheetProcessor(ws, archive)
         processor.find_children("xl/worksheets/sheet1.xml")
@@ -272,6 +277,22 @@ class TestWorksheetProcessor:
         assert len(processor.rels.control) == 5
         processor.get_controls()
         assert isinstance(ws.controls.control[0].shape, FormControl)
-        assert isinstance(ws.controls.control[1].shape, ActiveXControl)
+
+        archive.close()
+
+
+    def test_get_activex(self, datadir, WorksheetProcessor):
+        ctrl2 = Control(id="rId10", shapeId=47122)
+
+        datadir.chdir()
+        archive = ZipFile("form_controls.xlsm")
+        wb = Workbook()
+        ws = wb.create_sheet()
+        ws.controls.control = [ctrl2]
+
+        processor = WorksheetProcessor(ws, archive)
+        processor.find_children("xl/worksheets/sheet1.xml")
+        processor.get_activex()
+        assert isinstance(ws.controls.control[0].shape, ActiveXControl)
 
         archive.close()
