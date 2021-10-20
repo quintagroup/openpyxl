@@ -244,7 +244,7 @@ def WorksheetProcessor():
 class TestWorksheetProcessor:
 
 
-    def test_findchildren(self, datadir, WorksheetProcessor):
+    def test_find_children(self, datadir, WorksheetProcessor):
         datadir.chdir()
         archive = ZipFile("legacy_drawing.xlsm")
         wb = Workbook()
@@ -252,3 +252,26 @@ class TestWorksheetProcessor:
         processor = WorksheetProcessor(ws, archive)
         processor.find_children("xl/worksheets/sheet1.xml")
         assert len(processor.rels.vmlDrawing) == 1
+        archive.close()
+
+
+    def test_get_controls(self, datadir, WorksheetProcessor):
+        from openpyxl.worksheet.controls import Control, FormControl, ActiveXControl
+        ctrl1 = Control(controlPr=None, id="rId18", shapeId=47120)
+        ctrl2 = Control(id="rId10", shapeId=47122 )
+
+        datadir.chdir()
+        archive = ZipFile("form_controls.xlsm")
+        wb = Workbook()
+        ws = wb.create_sheet()
+        ws.controls.control = [ctrl1, ctrl2]
+
+        processor = WorksheetProcessor(ws, archive)
+        processor.find_children("xl/worksheets/sheet1.xml")
+        assert len(processor.rels.ctrlProp) == 2
+        assert len(processor.rels.control) == 5
+        processor.get_controls()
+        assert isinstance(ws.controls.control[0].shape, FormControl)
+        assert isinstance(ws.controls.control[1].shape, ActiveXControl)
+
+        archive.close()

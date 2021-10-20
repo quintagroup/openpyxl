@@ -328,12 +328,19 @@ class WorksheetProcessor:
             self.ws.add_pivot(pivot)
 
 
-    def get_tables(self):
-        pass
-
-
     def get_controls(self):
-        pass
+        for control in self.ws.controls.control:
+
+            rel = self.rels[control.id]
+            src = self.archive.read(rel.target)
+
+            tree = fromstring(src)
+            if rel.Type == FormControl.rel_type:
+                cls = FormControl
+            elif rel.Type == ActiveXControl.rel_type:
+                cls = ActiveXControl
+            obj = cls.from_tree(tree)
+            control.shape = obj
 
 
     def get_activex(self):
