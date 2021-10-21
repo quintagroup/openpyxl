@@ -528,7 +528,6 @@ class TestWorksheetWriter:
         assert diff is None, diff
 
 
-
     def test_write_tail(self, writer):
 
         writer.write_tail()
