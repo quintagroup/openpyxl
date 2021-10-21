@@ -262,8 +262,20 @@ class WorksheetWriter:
 
     def write_controls(self):
         controls = self.ws.controls
-        if controls:
-            self.xf.send(controls.to_tree())
+        if not controls:
+            return
+
+        for ctrl in controls.control:
+            shape = ctrl.shape
+            rel = Relationship(Type=shape.mime_type, Target="")
+            self._rels.append(rel)
+            ctrl.id = rel.id
+            if hasattr(ctrl.controlPr, "blob"):
+                blob = ctrl.controlPr.blob
+                self._rels.append(blob)
+                ctrl.controlPr.id = blob.id
+
+        self.xf.send(controls.to_tree())
 
 
     def write_tables(self):

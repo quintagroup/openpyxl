@@ -10,12 +10,18 @@ from openpyxl.workbook import Workbook
 from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.formatting.rule import CellIsRule
 from openpyxl.comments import Comment
+from openpyxl.packaging.relationship import Relationship
 
 from ..dimensions import RowDimension
 from ..protection import SheetProtection
 from ..filters import SortState
 from ..scenario import Scenario, InputCells
 from ..table import Table
+from ..controls import (
+    Control,
+    ActiveXControl,
+    FormControl
+)
 
 
 @pytest.fixture
@@ -453,6 +459,23 @@ class TestWorksheetWriter:
           <tableParts count="1" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
              <tablePart r:id="rId1" />
           </tableParts>
+        </worksheet>
+        """
+
+
+    def test_controls(self, writer):
+        ctrl = Control(shapeId=4)
+        ctrl.shape = FormControl(objectType="Button", lockText=True)
+        writer.ws.controls.control = [ctrl]
+        writer.write_controls()
+
+        xml = writer.read()
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+        <controls>
+          <control r:id="rId1" shapeId="4" />
+        </controls>
         </worksheet>
         """
         diff = compare_xml(xml, expected)
