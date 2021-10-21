@@ -298,14 +298,14 @@ class TestWorksheetProcessor:
         processor.get_activex()
         assert isinstance(ws.controls.control[0].shape, ActiveXControl)
 
-        blobs = []
+        embedded = []
         for ctrl in ws.controls.control:
             prop = ctrl.controlPr
             if prop.id:
-                blobs.append(prop.blob)
+                embedded.append(prop.image)
 
-        assert len(blobs) == 5
-        assert blobs[0].Target == "xl/media/image1.emf"
-        assert blobs[0].blob[:10]  == b"\x01\x00\x00\x00l\x00\x00\x00\x01\x00"
+        assert len(embedded) == 5
+        assert embedded[0].Target == "xl/media/image1.emf"
+        assert embedded[0].blob[:10]  == b"\x01\x00\x00\x00l\x00\x00\x00\x01\x00"
 
         archive.close()

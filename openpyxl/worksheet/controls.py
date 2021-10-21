@@ -41,6 +41,8 @@ class ControlProperty(Serialisable):
 
     __elements__ = ('anchor',)
 
+    # image where a related image is stored, the image data stored as a blob attribute
+
     def __init__(self,
                  anchor=None,
                  locked=True,

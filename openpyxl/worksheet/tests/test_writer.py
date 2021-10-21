@@ -19,9 +19,10 @@ from ..scenario import Scenario, InputCells
 from ..table import Table
 from ..controls import (
     Control,
-    ActiveXControl,
-    FormControl
+    FormControl,
+    ControlProperty,
 )
+from ..ole import ObjectAnchor, AnchorMarker
 
 
 @pytest.fixture
@@ -480,6 +481,52 @@ class TestWorksheetWriter:
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
+
+
+    def test_control_with_blob(self, writer):
+        _from = AnchorMarker()
+        to = AnchorMarker()
+        anchor = ObjectAnchor(_from=_from, to=to)
+        prop = ControlProperty(anchor=anchor)
+        prop.image = Relationship(type="image",Target="")
+        prop.image.blob = b"\x01\x00\x00\x00l\x00\x00\x00\x01\x00"
+        ctrl = Control(shapeId=4, controlPr=prop)
+
+        ctrl.shape = FormControl(objectType="Button", lockText=True)
+        writer.ws.controls.control = [ctrl]
+        writer.write_controls()
+
+        xml = writer.read()
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+        xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing">
+        <controls>
+          <control r:id="rId1" shapeId="4">
+            <controlPr r:id="rId2" autoFill="1" autoLine="1" autoPict="1" cf="pict" defaultSize="1" disabled="0" locked="1" print="1"
+        recalcAlways="0" uiObject="0">
+            <anchor moveWithCells="0" sizeWithCells="0">
+            <from>
+              <xdr:col>0</xdr:col>
+              <xdr:colOff>0</xdr:colOff>
+              <xdr:row>0</xdr:row>
+              <xdr:rowOff>0</xdr:rowOff>
+            </from>
+            <to>
+              <xdr:col>0</xdr:col>
+              <xdr:colOff>0</xdr:colOff>
+              <xdr:row>0</xdr:row>
+              <xdr:rowOff>0</xdr:rowOff>
+            </to>
+            </anchor>
+            </controlPr>
+          </control>
+        </controls>
+        </worksheet>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
 
 
     def test_write_tail(self, writer):

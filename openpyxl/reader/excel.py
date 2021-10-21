@@ -360,7 +360,7 @@ class WorksheetProcessor:
             if prop.id:
                 rel = self.rels[prop.id]
                 rel.blob = self.archive.read(rel.Target)
-                prop.blob = rel
+                prop.image = rel
 
 
     def get_legacy(self):

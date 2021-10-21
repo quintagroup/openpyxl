@@ -48,6 +48,8 @@ class WorksheetWriter:
         self.ws = ws
         self.ws._hyperlinks = []
         self.ws._comments = []
+        self.controls = []
+        self.control_blobs = []
         if out is None:
             out = create_temporary_file()
         self.out = out
@@ -267,13 +269,15 @@ class WorksheetWriter:
 
         for ctrl in controls.control:
             shape = ctrl.shape
+            self.controls.append(shape)
             rel = Relationship(Type=shape.mime_type, Target="")
             self._rels.append(rel)
             ctrl.id = rel.id
-            if hasattr(ctrl.controlPr, "blob"):
-                blob = ctrl.controlPr.blob
-                self._rels.append(blob)
-                ctrl.controlPr.id = blob.id
+            embedded = getattr(ctrl.controlPr, "image", None)
+            if embedded:
+                self.control_blobs.append(embedded.blob)
+                self._rels.append(embedded)
+                ctrl.controlPr.id = embedded.id
 
         self.xf.send(controls.to_tree())
 
