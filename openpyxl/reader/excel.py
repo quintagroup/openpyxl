@@ -232,14 +232,13 @@ class ExcelReader:
 
             processor = WorksheetProcessor(ws, self.archive)
             processor.find_children((rel.target))
-            rels = processor.rels
             processor.get_comments()
             processor.get_pivots(self.parser.pivot_caches)
             processor.get_drawings()
 
             # preserve link to VML file if VBA
             if self.wb.vba_archive and ws.legacy_drawing:
-                ws.legacy_drawing = rels[ws.legacy_drawing].target
+                ws.legacy_drawing = processor.rels[ws.legacy_drawing].target
             else:
                 ws.legacy_drawing = None
 
@@ -356,13 +355,15 @@ class WorksheetProcessor:
 
         for control in self.ws.controls.control:
             control.shape = active.get(control.id)
+            # embed any graphics
+            prop = control.controlPr
+            if prop.id:
+                rel = self.rels[prop.id]
+                rel.blob = self.archive.read(rel.Target)
+                prop.blob = rel
 
 
     def get_legacy(self):
-        pass
-
-
-    def get_images(self):
         pass
 
 

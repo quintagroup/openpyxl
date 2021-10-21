@@ -241,8 +241,16 @@ def WorksheetProcessor():
     return WorksheetProcessor
 
 
+@pytest.fixture
+def controls(datadir):
+    datadir.chdir()
+    with open("form_controls.xml", "rb") as src:
+        xml = fromstring(src.read())
+    return ControlList.from_tree(xml)
+
+
 from openpyxl.worksheet.controls import (
-    Control,
+    ControlList,
     FormControl,
     ActiveXControl,
 )
@@ -261,38 +269,43 @@ class TestWorksheetProcessor:
         archive.close()
 
 
-    def test_get_controls(self, datadir, WorksheetProcessor):
-
-        ctrl1 = Control(controlPr=None, id="rId18", shapeId=47120)
-
+    def test_get_controls(self, datadir, WorksheetProcessor, controls):
         datadir.chdir()
         archive = ZipFile("form_controls.xlsm")
         wb = Workbook()
         ws = wb.create_sheet()
-        ws.controls.control = [ctrl1,]
+        ws.controls  = controls
 
         processor = WorksheetProcessor(ws, archive)
         processor.find_children("xl/worksheets/sheet1.xml")
         assert len(processor.rels.ctrlProp) == 2
         assert len(processor.rels.control) == 5
         processor.get_controls()
-        assert isinstance(ws.controls.control[0].shape, FormControl)
+        assert isinstance(ws.controls.control[-1].shape, FormControl)
 
         archive.close()
 
 
-    def test_get_activex(self, datadir, WorksheetProcessor):
-        ctrl2 = Control(id="rId10", shapeId=47122)
-
+    def test_get_activex(self, datadir, WorksheetProcessor, controls):
         datadir.chdir()
         archive = ZipFile("form_controls.xlsm")
         wb = Workbook()
         ws = wb.create_sheet()
-        ws.controls.control = [ctrl2]
+        ws.controls  = controls
 
         processor = WorksheetProcessor(ws, archive)
         processor.find_children("xl/worksheets/sheet1.xml")
         processor.get_activex()
         assert isinstance(ws.controls.control[0].shape, ActiveXControl)
+
+        blobs = []
+        for ctrl in ws.controls.control:
+            prop = ctrl.controlPr
+            if prop.id:
+                blobs.append(prop.blob)
+
+        assert len(blobs) == 5
+        assert blobs[0].Target == "xl/media/image1.emf"
+        assert blobs[0].blob[:10]  == b"\x01\x00\x00\x00l\x00\x00\x00\x01\x00"
 
         archive.close()
