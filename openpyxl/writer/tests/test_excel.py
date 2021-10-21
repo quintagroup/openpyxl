@@ -177,6 +177,63 @@ class TestExcelWriter:
             writer._write_charts()
 
 
+    def test_controls(self, ExcelWriter, archive):
+        from openpyxl.worksheet.controls import ControlList, ActiveXControl
+        from openpyxl.xml.functions import fromstring
+        from openpyxl.packaging.relationship import Relationship
+
+        src = """
+        <controls xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+        <mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+          <mc:Choice Requires="x14">
+            <control shapeId="47129" r:id="rId8" name="MainSVCheckBox">
+              <controlPr defaultSize="0" autoLine="0" r:id="rId9">
+                <anchor moveWithCells="1">
+                  <from>
+                    <xdr:col>12</xdr:col>
+                    <xdr:colOff>219075</xdr:colOff>
+                    <xdr:row>7</xdr:row>
+                    <xdr:rowOff>95250</xdr:rowOff>
+                  </from>
+                  <to>
+                    <xdr:col>12</xdr:col>
+                    <xdr:colOff>400050</xdr:colOff>
+                    <xdr:row>7</xdr:row>
+                    <xdr:rowOff>276225</xdr:rowOff>
+                  </to>
+                </anchor>
+              </controlPr>
+            </control>
+          </mc:Choice>
+          <mc:Fallback>
+            <control shapeId="47129" r:id="rId8" name="MainSVCheckBox"/>
+          </mc:Fallback>
+        </mc:AlternateContent>
+        </controls>
+        """
+        tree = fromstring(src)
+        controls = ControlList.from_tree(tree)
+        ctrl = controls.control[0]
+        ctrl.shape = ActiveXControl()
+        prop = ctrl.controlPr
+        prop.image = Relationship(type="image", Target="")
+        prop.image.blob = b"\001"
+
+        wb = Workbook()
+        ws = wb.active
+        ws.controls = controls
+        writer = ExcelWriter(wb, archive)
+        writer._write_worksheets()
+        writer.write_controls()
+
+        assert archive.namelist() == [
+            'xl/worksheets/sheet1.xml',
+            'xl/worksheets/_rels/sheet1.xml.rels',
+            '/xl/activeX/activeX1.xml'
+        ]
+
+
+
 def test_write_empty_workbook(tmpdir):
     tmpdir.chdir()
     wb = Workbook()

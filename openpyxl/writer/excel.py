@@ -57,6 +57,8 @@ class ExcelWriter(object):
         self._drawings = []
         self._comments = []
         self._pivots = []
+        self._controls = []
+        self._control_blobs = []
 
 
     def write_data(self):
@@ -213,7 +215,16 @@ class ExcelWriter(object):
         ws._rels = writer._rels
         self._archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
+        self._controls.extend(writer.controls)
+        self._control_blobs.extend(writer.control_blobs)
         writer.cleanup()
+
+
+    def write_controls(self):
+        """Serialise form controls"""
+        for idx, ctrl in enumerate(self._controls, 1):
+            path = ctrl.path.format(idx)
+            self._archive.writestr(path, tostring(ctrl.to_tree()))
 
 
     def _write_worksheets(self):

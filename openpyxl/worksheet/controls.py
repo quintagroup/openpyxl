@@ -156,6 +156,7 @@ class FormControl(Serialisable):
     mime_type = "application/vnd.ms-excel.controlproperties+xml"
     rel_type = f"{REL_NS}/ctrlProp"
     namespace = XL_2009
+    path = "/xl/ctrlProps/ctrlProp{0}.xml"
 
     objectType = String()
     lockText = Bool()
@@ -171,9 +172,12 @@ class ActiveXControl(Serialisable):
     namespace = ACTIVEX_NS
     mime_type = "application/vnd.ms-office.activeX+xml"
     rel_type = f"{REL_NS}/control"
+    path = "/xl/activeX/activeX{0}.xml"
 
     id = Relation()
     classid = String(namespace=ACTIVEX_NS)
+
+    # bin = active X binary
 
     def __init__(self, id=None, classid=None):
         self.id = id
