@@ -226,17 +226,19 @@ class ExcelReader:
 
             fh = self.archive.open(rel.target)
             ws = self.wb.create_sheet(sheet.name)
-            ws_parser = WorksheetReader(ws, fh, self.shared_strings, self.data_only)
-            ws_parser.bind_all()
-            ws.sheet_state = sheet.state
 
             processor = WorksheetProcessor(ws, self.archive)
             processor.find_children((rel.target))
             processor.get_comments()
             processor.get_pivots(self.parser.pivot_caches)
             processor.get_drawings()
+            ws._rels = processor.rels
 
-            # preserve link to VML file if VBA
+            ws_parser = WorksheetReader(ws, fh, self.shared_strings, self.data_only)
+            ws_parser.bind_all()
+            ws.sheet_state = sheet.state
+
+             # preserve link to VML file if VBA
             if self.wb.vba_archive and ws.legacy_drawing:
                 ws.legacy_drawing = processor.rels[ws.legacy_drawing].target
             else:
