@@ -22,7 +22,6 @@ from openpyxl.xml.constants import (
 )
 
 
-@pytest.mark.xfail
 def test_read_custom_doc_props(datadir):
     datadir.join("reader").chdir()
     wb = load_workbook('example_vba_and_custom_doc_props.xlsm', read_only=False, keep_vba=True)
