@@ -41,7 +41,7 @@ class ControlProperty(Serialisable):
 
     __elements__ = ('anchor',)
 
-    # image where a related image is stored, the image data stored as a blob attribute
+    image = None # where a related image is stored, the image data stored as a blob attribute
 
     def __init__(self,
                  anchor=None,
@@ -87,6 +87,8 @@ class Control(Serialisable):
     shapeId = Integer()
     name = String(allow_none=True)
     id = Relation()
+
+    shape = None # related element
 
     __elements__ = ('controlPr',)
 
@@ -177,7 +179,7 @@ class ActiveXControl(Serialisable):
     id = Relation()
     classid = String(namespace=ACTIVEX_NS)
 
-    # bin = active X binary
+    bin = None # active X binary
 
     def __init__(self, id=None, classid=None):
         self.id = id
