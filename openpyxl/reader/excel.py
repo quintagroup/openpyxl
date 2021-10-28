@@ -229,14 +229,15 @@ class ExcelReader:
 
             processor = WorksheetProcessor(ws, self.archive)
             processor.find_children((rel.target))
-            processor.get_comments()
-            processor.get_pivots(self.parser.pivot_caches)
-            processor.get_drawings()
             ws._rels = processor.rels
 
             ws_parser = WorksheetReader(ws, fh, self.shared_strings, self.data_only)
             ws_parser.bind_all()
             ws.sheet_state = sheet.state
+
+            processor.get_comments()
+            processor.get_pivots(self.parser.pivot_caches)
+            processor.get_drawings()
 
              # preserve link to VML file if VBA
             if self.wb.vba_archive and ws.legacy_drawing:
@@ -303,7 +304,7 @@ class WorksheetProcessor:
             for ref, comment in comment_sheet.comments:
                 try:
                     self.ws[ref].comment = comment
-                except AttributeError:
+                except AttributeError as e:
                     c = self.ws[ref]
                     if isinstance(c, MergedCell):
                         warnings.warn(comment_warning.format(self.ws.title, c.coordinate))

@@ -309,3 +309,18 @@ class TestWorksheetProcessor:
         assert embedded[0].blob[:10]  == b"\x01\x00\x00\x00l\x00\x00\x00\x01\x00"
 
         archive.close()
+
+
+    def test_get_comments(self, datadir, WorksheetProcessor):
+        datadir.chdir()
+        archive = ZipFile("legacy_drawing.xlsm")
+        wb = Workbook()
+        ws = wb.create_sheet()
+
+        processor = WorksheetProcessor(ws, archive)
+        processor.find_children("xl/worksheets/sheet1.xml")
+        processor.get_comments()
+
+        assert ws._cells != {} # make sure sheet is not empty
+        comment = ws["B5"].comment
+        assert comment.author == "Author"
