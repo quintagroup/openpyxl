@@ -238,6 +238,8 @@ class ExcelReader:
             processor.get_comments()
             processor.get_pivots(self.parser.pivot_caches)
             processor.get_drawings()
+            processor.get_activex()
+            processor.get_controls()
 
              # preserve link to VML file if VBA
             if self.wb.vba_archive and ws.legacy_drawing:
@@ -342,7 +344,8 @@ class WorksheetProcessor:
             ctrlProps[rel.id] = FormControl.from_tree(tree)
 
         for control in self.ws.controls.control:
-            control.shape = ctrlProps.get(control.id)
+            if control.id in ctrlProps:
+                control.shape = ctrlProps[control.id]
 
 
     def get_activex(self):
@@ -357,7 +360,8 @@ class WorksheetProcessor:
             active[rel.id] = ActiveXControl.from_tree(tree)
 
         for control in self.ws.controls.control:
-            control.shape = active.get(control.id)
+            if control.id in active:
+                control.shape = active[control.id]
             # embed any graphics
             prop = control.controlPr
             if prop.id:
