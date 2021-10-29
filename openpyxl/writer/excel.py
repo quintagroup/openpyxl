@@ -86,6 +86,7 @@ class ExcelWriter(object):
             self.manifest.append(custom_override)
 
         self._write_worksheets()
+        self.write_controls()
         self._write_chartsheets()
         self._write_images()
         self._write_charts()

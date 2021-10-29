@@ -268,7 +268,7 @@ class WorksheetWriter:
             return
 
         for ctrl in controls.control:
-            shape = ctrl.shape
+            shape = ctrl.shape # ActiveX or CtrlProp
             self.controls.append(shape)
             rel = Relationship(Type=shape.mime_type, Target="")
             self._rels.append(rel)
