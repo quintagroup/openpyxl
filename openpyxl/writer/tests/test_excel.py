@@ -224,15 +224,12 @@ class TestExcelWriter:
         ws = wb.active
         ws.controls = controls
         writer = ExcelWriter(wb, archive)
-        writer._write_worksheets()
-        writer.write_controls()
+        writer.write_worksheet(ws)
 
         assert archive.namelist() == [
-            'xl/worksheets/sheet1.xml',
-            'xl/worksheets/_rels/sheet1.xml.rels',
-            '/xl/activeX/activeX1.xml'
+            '/xl/activeX/activeX1.xml',
+            'xl/worksheets/sheetNone.xml',
         ]
-
 
 
 def test_write_empty_workbook(tmpdir):

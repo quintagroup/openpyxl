@@ -17,6 +17,8 @@ from openpyxl.xml.constants import (
 )
 from .ole import ObjectAnchor
 
+from openpyxl.xml.functions import tostring
+
 
 class ControlProperty(Serialisable):
 
@@ -175,11 +177,14 @@ class ActiveXControl(Serialisable):
     mime_type = "application/vnd.ms-office.activeX+xml"
     rel_type = f"{REL_NS}/control"
     path = "/xl/activeX/activeX{0}.xml"
+    _rel_id = None # key in worksheet
+    _counter = None # key in workbook
 
     id = Relation()
     classid = String(namespace=ACTIVEX_NS)
 
     bin = None # active X binary
+
 
     def __init__(self, id=None, classid=None):
         self.id = id

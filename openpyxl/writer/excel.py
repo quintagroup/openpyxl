@@ -46,6 +46,7 @@ from .theme import theme_xml
 class ExcelWriter(object):
     """Write a workbook object to an Excel file."""
 
+
     def __init__(self, workbook, archive):
         self._archive = archive
         self.workbook = workbook
@@ -59,6 +60,8 @@ class ExcelWriter(object):
         self._pivots = []
         self._controls = []
         self._control_blobs = []
+        self.activex = 0
+        self.form_controls = 0
 
 
     def write_data(self):
@@ -86,7 +89,6 @@ class ExcelWriter(object):
             self.manifest.append(custom_override)
 
         self._write_worksheets()
-        self.write_controls()
         self._write_chartsheets()
         self._write_images()
         self._write_charts()
@@ -214,17 +216,27 @@ class ExcelWriter(object):
             writer.write()
 
         ws._rels = writer._rels
+        self.write_controls(ws, writer.controls)
+
         self._archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
-        self._controls.extend(writer.controls)
-        self._control_blobs.extend(writer.control_blobs)
+
         writer.cleanup()
 
 
-    def write_controls(self):
-        """Serialise form controls"""
-        for idx, ctrl in enumerate(self._controls, 1):
-            path = ctrl.path.format(idx)
+    def write_controls(self, ws, controls):
+        """Serialise form controls for a specific worksheet"""
+
+        for ctrl in controls:
+            assert ctrl._rel_id is not None
+            if "active" in ctrl.path:
+                counter = self.activex
+            else:
+                counter = self.form_controls
+            counter += 1
+
+            path = ctrl.path.format(counter)
+            ws._rels[ctrl._rel_id].Target = path
             self._archive.writestr(path, tostring(ctrl.to_tree()))
 
 
@@ -233,7 +245,6 @@ class ExcelWriter(object):
         pivot_caches = set()
 
         for idx, ws in enumerate(self.workbook.worksheets, 1):
-
             ws._id = idx
             self.write_worksheet(ws)
 
