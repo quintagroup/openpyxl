@@ -227,7 +227,7 @@ class TestExcelWriter:
         writer.write_worksheet(ws)
 
         assert archive.namelist() == [
-            '/xl/activeX/activeX1.xml',
+            'xl/activeX/activeX1.xml',
             'xl/worksheets/sheetNone.xml',
         ]
 

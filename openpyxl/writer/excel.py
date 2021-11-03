@@ -11,8 +11,6 @@ from zipfile import ZipFile, ZIP_DEFLATED
 from openpyxl.compat import deprecated
 from openpyxl.utils.exceptions import InvalidFileException
 from openpyxl.xml.constants import (
-    ARC_SHARED_STRINGS,
-    ARC_CONTENT_TYPES,
     ARC_ROOT_RELS,
     ARC_WORKBOOK_RELS,
     ARC_APP, ARC_CORE,
@@ -20,15 +18,10 @@ from openpyxl.xml.constants import (
     ARC_THEME,
     ARC_STYLE,
     ARC_WORKBOOK,
-    PACKAGE_WORKSHEETS,
-    PACKAGE_CHARTSHEETS,
-    PACKAGE_DRAWINGS,
-    PACKAGE_CHARTS,
-    PACKAGE_IMAGES,
-    PACKAGE_XL
+
     )
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
-from openpyxl.xml.functions import tostring, fromstring, Element
+from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.packaging.manifest import Manifest
 from openpyxl.packaging.relationship import (
     get_rels_path,
@@ -58,10 +51,8 @@ class ExcelWriter(object):
         self._drawings = []
         self._comments = []
         self._pivots = []
-        self._controls = []
-        self._control_blobs = []
-        self.activex = 0
-        self.form_controls = 0
+        self.activex = []
+        self.form_controls = []
 
 
     def write_data(self):
@@ -93,8 +84,6 @@ class ExcelWriter(object):
         self._write_images()
         self._write_charts()
 
-        #self._archive.writestr(ARC_SHARED_STRINGS,
-                              #write_string_table(self.workbook.shared_strings))
         self._write_external_links()
 
         stylesheet = write_stylesheet(self.workbook)
@@ -228,16 +217,16 @@ class ExcelWriter(object):
         """Serialise form controls for a specific worksheet"""
 
         for ctrl in controls:
-            assert ctrl._rel_id is not None
-            if "active" in ctrl.path:
-                counter = self.activex
+            if "active" in ctrl.path: # ugh!
+                store = self.activex
             else:
-                counter = self.form_controls
-            counter += 1
+                store = self.form_controls
+            store.append(ctrl)
+            ctrl.counter = len(store) # ugh!
 
-            path = ctrl.path.format(counter)
+            path = ctrl.path.format(ctrl.counter)
             ws._rels[ctrl._rel_id].Target = path
-            self._archive.writestr(path, tostring(ctrl.to_tree()))
+            self._archive.writestr(path[1:], tostring(ctrl.to_tree()))
 
 
     def _write_worksheets(self):
