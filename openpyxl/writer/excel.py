@@ -41,7 +41,7 @@ class ExcelWriter(object):
 
 
     def __init__(self, workbook, archive):
-        self._archive = archive
+        self.archive = archive
         self.workbook = workbook
         self.manifest = Manifest()
         self.vba_modified = set()
@@ -58,7 +58,7 @@ class ExcelWriter(object):
     def write_data(self):
         """Write the various xml files into the zip archive."""
         # cleanup all worksheets
-        archive = self._archive
+        archive = self.archive
 
         props = ExtendedProperties()
         archive.writestr(ARC_APP, tostring(props.to_tree()))
@@ -112,13 +112,13 @@ class ExcelWriter(object):
         if self.workbook.vba_archive:
             for name in set(self.workbook.vba_archive.namelist()) - self.vba_modified:
                 if ARC_VBA.match(name):
-                    self._archive.writestr(name, self.workbook.vba_archive.read(name))
+                    self.archive.writestr(name, self.workbook.vba_archive.read(name))
 
 
     def _write_images(self):
         # delegate to object
         for img in self._images:
-            self._archive.writestr(img.path[1:], img._data())
+            self.archive.writestr(img.path[1:], img._data())
 
 
     def _write_charts(self):
@@ -126,7 +126,7 @@ class ExcelWriter(object):
         if len(self._charts) != len(set(self._charts)):
             raise InvalidFileException("The same chart cannot be used in more than one worksheet")
         for chart in self._charts:
-            self._archive.writestr(chart.path[1:], tostring(chart._write()))
+            self.archive.writestr(chart.path[1:], tostring(chart._write()))
             self.manifest.append(chart)
 
 
@@ -143,8 +143,8 @@ class ExcelWriter(object):
             self._images.append(img)
             img._id = len(self._images)
         rels_path = get_rels_path(drawing.path)[1:]
-        self._archive.writestr(drawing.path[1:], tostring(drawing._write()))
-        self._archive.writestr(rels_path, tostring(drawing._write_rels()))
+        self.archive.writestr(drawing.path[1:], tostring(drawing._write()))
+        self.archive.writestr(rels_path, tostring(drawing._write_rels()))
         self.manifest.append(drawing)
 
 
@@ -154,7 +154,7 @@ class ExcelWriter(object):
             sheet._id = idx
             xml = tostring(sheet.to_tree())
 
-            self._archive.writestr(sheet.path[1:], xml)
+            self.archive.writestr(sheet.path[1:], xml)
             self.manifest.append(sheet)
 
             if sheet._drawing:
@@ -166,7 +166,7 @@ class ExcelWriter(object):
                 tree = rels.to_tree()
 
                 rels_path = get_rels_path(sheet.path[1:])
-                self._archive.writestr(rels_path, tostring(tree))
+                self.archive.writestr(rels_path, tostring(tree))
 
 
     def _write_comment(self, ws):
@@ -174,7 +174,7 @@ class ExcelWriter(object):
         cs = CommentSheet.from_comments(ws._comments)
         self._comments.append(cs)
         cs._id = len(self._comments)
-        self._archive.writestr(cs.path[1:], tostring(cs.to_tree()))
+        self.archive.writestr(cs.path[1:], tostring(cs.to_tree()))
         self.manifest.append(cs)
 
         if ws.legacy_drawing is None or self.workbook.vba_archive is None:
@@ -185,7 +185,7 @@ class ExcelWriter(object):
 
         vml = cs.write_shapes(vml)
 
-        self._archive.writestr(ws.legacy_drawing, vml)
+        self.archive.writestr(ws.legacy_drawing, vml)
         self.vba_modified.add(ws.legacy_drawing)
 
         comment_rel = Relationship(Id="comments", type=cs._rel_type, Target=cs.path)
@@ -207,7 +207,7 @@ class ExcelWriter(object):
         ws._rels = writer._rels
         self.write_controls(ws, writer.controls)
 
-        self._archive.write(writer.out, ws.path[1:])
+        self.archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
 
         writer.cleanup()
@@ -217,16 +217,16 @@ class ExcelWriter(object):
         """Serialise form controls for a specific worksheet"""
 
         for ctrl in controls:
-            if "active" in ctrl.path: # ugh!
+            if hasattr(ctrl, "bin"): # ugh!
                 store = self.activex
             else:
                 store = self.form_controls
             store.append(ctrl)
             ctrl.counter = len(store) # ugh!
 
-            path = ctrl.path.format(ctrl.counter)
-            ws._rels[ctrl._rel_id].Target = path
-            self._archive.writestr(path[1:], tostring(ctrl.to_tree()))
+            ws._rels[ctrl._rel_id].Target = ctrl.path
+
+            ctrl._write(self.archive, self.manifest)
 
 
     def _write_worksheets(self):
@@ -255,7 +255,7 @@ class ExcelWriter(object):
             for t in ws._tables.values():
                 self._tables.append(t)
                 t.id = len(self._tables)
-                t._write(self._archive)
+                t._write(self.archive)
                 self.manifest.append(t)
                 ws._rels[t._rel_id].Target = t.path
 
@@ -266,7 +266,7 @@ class ExcelWriter(object):
 
                 self._pivots.append(p)
                 p._id = len(self._pivots)
-                p._write(self._archive, self.manifest)
+                p._write(self.archive, self.manifest)
                 self.workbook._pivots.append(p)
                 r = Relationship(Type=p.rel_type, Target=p.path)
                 ws._rels.append(r)
@@ -274,7 +274,7 @@ class ExcelWriter(object):
             if ws._rels:
                 tree = ws._rels.to_tree()
                 rels_path = get_rels_path(ws.path)[1:]
-                self._archive.writestr(rels_path, tostring(tree))
+                self.archive.writestr(rels_path, tostring(tree))
 
 
     def _write_external_links(self):
@@ -286,17 +286,17 @@ class ExcelWriter(object):
             rels_path = get_rels_path(link.path[1:])
 
             xml = link.to_tree()
-            self._archive.writestr(link.path[1:], tostring(xml))
+            self.archive.writestr(link.path[1:], tostring(xml))
             rels = RelationshipList()
             rels.append(link.file_link)
-            self._archive.writestr(rels_path, tostring(rels.to_tree()))
+            self.archive.writestr(rels_path, tostring(rels.to_tree()))
             self.manifest.append(link)
 
 
     def save(self):
         """Write data into the archive."""
         self.write_data()
-        self._archive.close()
+        self.archive.close()
 
 
 def save_workbook(workbook, filename):

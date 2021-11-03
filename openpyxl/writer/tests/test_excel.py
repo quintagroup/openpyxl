@@ -113,7 +113,7 @@ class TestExcelWriter:
         writer._write_chartsheets()
 
         assert cs.path in writer.manifest.filenames
-        assert cs.path[1:] in writer._archive.namelist()
+        assert cs.path[1:] in writer.archive.namelist()
 
 
     def test_comment(self, ExcelWriter, archive):
@@ -216,6 +216,7 @@ class TestExcelWriter:
         controls = ControlList.from_tree(tree)
         ctrl = controls.control[0]
         ctrl.shape = ActiveXControl()
+        ctrl.shape.bin = b"\001"
         prop = ctrl.controlPr
         prop.image = Relationship(type="image", Target="")
         prop.image.blob = b"\001"
@@ -227,6 +228,8 @@ class TestExcelWriter:
         writer.write_worksheet(ws)
 
         assert archive.namelist() == [
+            "xl/activeX/activeX1.bin",
+            "xl/activeX/_rels/activeX1.xml.rels",
             'xl/activeX/activeX1.xml',
             'xl/worksheets/sheetNone.xml',
         ]

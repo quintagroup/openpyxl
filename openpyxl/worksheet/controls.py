@@ -17,6 +17,11 @@ from openpyxl.xml.constants import (
 )
 from .ole import ObjectAnchor
 
+from openpyxl.packaging.relationship import (
+    RelationshipList,
+    Relationship,
+    get_rels_path,
+)
 from openpyxl.xml.functions import tostring
 
 
@@ -176,16 +181,51 @@ class ActiveXControl(Serialisable):
     namespace = ACTIVEX_NS
     mime_type = "application/vnd.ms-office.activeX+xml"
     rel_type = f"{REL_NS}/control"
-    path = "/xl/activeX/activeX{0}.xml"
+    _path = "/xl/activeX/activeX{0}.xml"
     _rel_id = None # key in worksheet
     _counter = None # key in workbook
+    bin_rel_type = f"{REL_NS}/activeXControlBinary"
 
     id = Relation()
     classid = String(namespace=ACTIVEX_NS)
 
     bin = None # active X binary
-
+    bin = b"\001"
 
     def __init__(self, id=None, classid=None):
         self.id = id
         self.classid = "{8BD21D50-EC42-11CE-9E0D-00AA006002F3}"
+
+
+    @property
+    def path(self):
+        return self._path.format(self.counter)
+
+
+    def _write(self, archive, manifest):
+        """
+        Add to zipfile and update manifest
+        """
+        self._write_rels(archive, manifest)
+        xml = tostring(self.to_tree())
+        archive.writestr(self.path[1:], xml)
+        manifest.append(self)
+
+
+    def _write_rels(self, archive, manifest):
+        """
+        Write the relevant child objects and add links
+        """
+
+        bin_path = f"/xl/activeX/activeX{self.counter}.bin"
+        archive.writestr(bin_path[1:], self.bin)
+
+        rels = RelationshipList()
+        r = Relationship(Type=self.bin_rel_type, Target=bin_path)
+        rels.append(r)
+        self.id = r.id
+
+        path = get_rels_path(self.path.format(self.counter))
+        xml = tostring(rels.to_tree())
+        archive.writestr(path[1:], xml)
+
