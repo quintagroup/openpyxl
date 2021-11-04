@@ -276,7 +276,8 @@ class WorksheetWriter:
             shape._rel_id = rel.id
             embedded = getattr(ctrl.controlPr, "image", None)
             if embedded:
-                self.control_blobs.append(embedded.blob)
+                embedded.id = None
+                self.control_blobs.append(embedded)
                 self._rels.append(embedded)
                 ctrl.controlPr.id = embedded.id
 
