@@ -208,3 +208,17 @@ class Manifest(Serialisable):
                     continue
                 if override.PartName not in filenames:
                     self.Override.append(override)
+
+
+class ManifestObject:
+
+    """
+    API for anything that gets added to to the manifest
+    """
+
+    path = None # absolute path within zip archive
+    mime_type = None
+
+    def __init__(self, path, mime_type):
+        self.path = path
+        self.mime_type = mime_type

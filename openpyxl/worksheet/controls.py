@@ -22,6 +22,7 @@ from openpyxl.packaging.relationship import (
     Relationship,
     get_rels_path,
 )
+from openpyxl.packaging.manifest import ManifestObject
 from openpyxl.xml.functions import tostring
 
 
@@ -184,7 +185,7 @@ class ActiveXControl(Serialisable):
     _path = "/xl/activeX/activeX{0}.xml"
     _rel_id = None # key in worksheet
     _counter = None # key in workbook
-    bin_rel_type = f"{REL_NS}/activeXControlBinary"
+    bin_rel_type = "http://schemas.microsoft.com/office/2006/relationships/activeXControlBinary"
 
     id = Relation()
     classid = String(namespace=ACTIVEX_NS)
@@ -229,3 +230,5 @@ class ActiveXControl(Serialisable):
         xml = tostring(rels.to_tree())
         archive.writestr(path[1:], xml)
 
+        mo = ManifestObject(path, "application/vnd.ms-office.activeX")
+        manifest.append(mo)
