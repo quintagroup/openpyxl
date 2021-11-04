@@ -223,10 +223,9 @@ class ExcelWriter(object):
                 store = self.form_controls
             store.append(ctrl)
             ctrl.counter = len(store) # ugh!
+            ctrl._write(self.archive, self.manifest)
 
             ws._rels[ctrl._rel_id].Target = ctrl.path
-
-            ctrl._write(self.archive, self.manifest)
 
 
     def _write_worksheets(self):
