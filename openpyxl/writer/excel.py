@@ -206,6 +206,7 @@ class ExcelWriter(object):
 
         ws._rels = writer._rels
         self.write_controls(ws, writer.controls)
+        self.write_embedded(ws, writer.control_images)
 
         self.archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
@@ -226,6 +227,14 @@ class ExcelWriter(object):
             ctrl._write(self.archive, self.manifest)
 
             ws._rels[ctrl._rel_id].Target = ctrl.path
+
+
+    def write_embedded(self, ws, control_images):
+        """
+        Serialise embedded images in form controls for a specific worksheet
+        """
+        for embedded in control_images:
+            self.archive.writestr(embedded.Target[1:], embedded.blob)
 
 
     def _write_worksheets(self):

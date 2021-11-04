@@ -49,7 +49,7 @@ class WorksheetWriter:
         self.ws._hyperlinks = []
         self.ws._comments = []
         self.controls = []
-        self.control_blobs = []
+        self.control_images = []
         if out is None:
             out = create_temporary_file()
         self.out = out
@@ -277,7 +277,8 @@ class WorksheetWriter:
             embedded = getattr(ctrl.controlPr, "image", None)
             if embedded:
                 embedded.id = None
-                self.control_blobs.append(embedded)
+                embedded.Target = "/" + embedded.Target
+                self.control_images.append(embedded)
                 self._rels.append(embedded)
                 ctrl.controlPr.id = embedded.id
 

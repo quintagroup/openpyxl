@@ -230,5 +230,5 @@ class ActiveXControl(Serialisable):
         xml = tostring(rels.to_tree())
         archive.writestr(path[1:], xml)
 
-        mo = ManifestObject(path, "application/vnd.ms-office.activeX")
+        mo = ManifestObject(bin_path, "application/vnd.ms-office.activeX")
         manifest.append(mo)
