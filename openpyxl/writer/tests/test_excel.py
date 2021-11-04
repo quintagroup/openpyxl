@@ -220,6 +220,7 @@ class TestExcelWriter:
         prop = ctrl.controlPr
         prop.image = Relationship(type="image", Target="")
         prop.image.blob = b"\001"
+        prop.image.Target = "xl/media/image1.emf"
 
         wb = Workbook()
         ws = wb.active
@@ -231,6 +232,7 @@ class TestExcelWriter:
             "xl/activeX/activeX1.bin",
             "xl/activeX/_rels/activeX1.xml.rels",
             'xl/activeX/activeX1.xml',
+            'xl/media/image1.emf',
             'xl/worksheets/sheetNone.xml',
         ]
 
