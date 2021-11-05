@@ -231,7 +231,6 @@ class TestShape:
             xfrm=Transform2D(off=Point2D(x=1767840, y=1341120),
                              ext=PositiveSize2D(cx=1539240, cy=281940)),
             prstGeom=PresetGeometry2D(prst="roundRect", avLst=GeomGuideList()))
-        props.ln = None
         ln = StyleMatrixReference(idx=2, schemeClr=SchemeColor(val="accent1", shade=50000))
         fill = StyleMatrixReference(idx=1, schemeClr=SchemeColor(val="accent1"))
         effect = StyleMatrixReference(idx=0, schemeClr=SchemeColor(val="accent1"))
@@ -245,6 +244,11 @@ class TestShape:
         body = RichTextProperties(vertOverflow="clip", horzOverflow="clip", rtlCol=False, anchor="t")
         p = Paragraph(endParaRPr=CharacterProperties(lang="en-US", sz="1100"),
                       pPr=ParagraphProperties(algn="l"))
-        p.r = []
+
         text = RichText(bodyPr=body, lstStyle=ListStyle(), p=[p])
-        assert shape == Shape(nvSpPr=meta, spPr=props, style=style, txBody=text, macro="[0]!RoundedRectangle1_Click")
+        shape2 = Shape(nvSpPr=meta, spPr=props, style=style, txBody=text, macro="[0]!RoundedRectangle1_Click")
+        assert shape.meta == shape2.meta
+        assert shape.spPr == shape2.spPr
+        assert shape.style == shape2.style
+        assert shape.txBody == shape2.txBody
+        assert shape.macro == shape2.macro
