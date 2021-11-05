@@ -108,10 +108,10 @@ class NonVisualDrawingShapeProps(Serialisable):
     tagname = "cNvSpPr"
 
     spLocks = Typed(expected_type=GroupLocking, allow_none=True)
-    txBax = Bool(allow_none=True)
+    txBox = Bool(allow_none=True)
     extLst = Typed(expected_type=OfficeArtExtensionList, allow_none=True)
 
-    __elements__ = ("spLocks", "txBax")
+    __elements__ = ("spLocks", "txBox")
 
     def __init__(self,
                  spLocks=None,
