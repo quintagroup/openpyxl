@@ -135,7 +135,7 @@ class NonVisualDrawingProps(Serialisable):
     hlinkHover = Typed(expected_type=Hyperlink, allow_none=True)
     extLst = Typed(expected_type=OfficeArtExtensionList, allow_none=True)
 
-    __elements__ = ["hlinkClick", "hlinkHover"]
+    __elements__ = ("hlinkClick", "hlinkHover")
 
     def __init__(self,
                  id=None,

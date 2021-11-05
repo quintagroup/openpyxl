@@ -462,6 +462,8 @@ class GeomGuide(Serialisable):
 
 class GeomGuideList(Serialisable):
 
+    namespace = DRAWING_NS
+
     gd = Typed(expected_type=GeomGuide, allow_none=True)
 
     def __init__(self,

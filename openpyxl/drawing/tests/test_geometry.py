@@ -5,6 +5,8 @@ import pytest
 from openpyxl.xml.functions import fromstring, tostring
 from openpyxl.tests.helper import compare_xml
 
+from ..geometry import StyleMatrixReference, FontReference
+from ..colors import SchemeColor
 
 @pytest.fixture
 def GradientFillProperties():
@@ -226,9 +228,6 @@ class TestPoint3D:
 def ShapeStyle():
     from ..geometry import ShapeStyle
     return ShapeStyle
-
-from ..geometry import StyleMatrixReference, FontReference
-from ..colors import SchemeColor
 
 
 class TestShapeStyle:
