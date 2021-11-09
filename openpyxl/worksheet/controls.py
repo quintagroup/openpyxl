@@ -166,7 +166,8 @@ class FormControl(Serialisable):
     mime_type = "application/vnd.ms-excel.controlproperties+xml"
     rel_type = f"{REL_NS}/ctrlProp"
     namespace = XL_2009
-    path = "/xl/ctrlProps/ctrlProp{0}.xml"
+    _path = "/xl/ctrlProps/ctrlProp{0}.xml"
+    _counter = None
 
     objectType = String()
     lockText = Bool()
@@ -174,6 +175,20 @@ class FormControl(Serialisable):
     def __init__(self, objectType=None, lockText=None):
         self.objectType = objectType
         self.lockText = lockText
+
+
+    @property
+    def path(self):
+        return self._path.format(self.counter)
+
+
+    def _write(self, archive, manifest):
+        """
+        Add to zipfile and update manifest
+        """
+        xml = tostring(self.to_tree())
+        archive.writestr(self.path[1:], xml)
+        manifest.append(self)
 
 
 class ActiveXControl(Serialisable):

@@ -1,6 +1,9 @@
 # Copyright (c) 2010-2021 openpyxl
 import pytest
 
+from io import BytesIO
+from zipfile import ZipFile
+
 from openpyxl.xml.functions import fromstring, tostring
 from openpyxl.tests.helper import compare_xml
 
@@ -182,6 +185,21 @@ class TestFormControl:
         assert ctrl == FormControl(objectType="Button", lockText=True)
 
 
+    def test_path(self, FormControl):
+        ctrl = FormControl("button")
+        ctrl.counter = 4
+        assert ctrl.path == "/xl/ctrlProps/ctrlProp4.xml"
+
+
+    def test_write(self, FormControl):
+        archive = ZipFile(BytesIO(), "w")
+        ctrl = FormControl("Button")
+        ctrl.counter = 1
+        manifest = []
+        ctrl._write(archive, manifest)
+        assert archive.namelist() == ["xl/ctrlProps/ctrlProp1.xml"]
+
+
 @pytest.fixture
 def ActiveXControl():
     from ..controls import ActiveXControl
@@ -208,3 +226,20 @@ class TestActiveXControl:
         node = fromstring(src)
         ctrl = ActiveXControl.from_tree(node)
         assert ctrl == ActiveXControl(id="rId1")
+
+
+    def test_path(self, ActiveXControl):
+        ctrl = ActiveXControl("rId4")
+        ctrl.counter = 4
+        assert ctrl.path == "/xl/activeX/activeX4.xml"
+
+
+    def test_write(self, ActiveXControl):
+        archive = ZipFile(BytesIO(), "w")
+        ctrl = ActiveXControl("Button")
+        ctrl.counter = 1
+        manifest = []
+        ctrl._write(archive, manifest)
+        assert archive.namelist() == ["xl/activeX/activeX1.bin",
+                                      "xl/activeX/_rels/activeX1.xml.rels",
+                                      "xl/activeX/activeX1.xml"]
