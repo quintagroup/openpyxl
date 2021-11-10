@@ -203,7 +203,7 @@ class ExcelReader:
 
         drawings = rels.find(SpreadsheetDrawing._rel_type)
         for rel in drawings:
-            charts, images = find_images(self.archive, rel.target)
+            charts, images, shapes = find_images(self.archive, rel.target)
             for c in charts:
                 cs.add_chart(c)
 
@@ -315,7 +315,7 @@ class WorksheetProcessor:
 
     def get_drawings(self):
         for rel in self.rels.drawing:
-            charts, images = find_images(self.archive, rel.target)
+            charts, images, shapes = find_images(self.archive, rel.target)
             for c in charts:
                 self.ws.add_chart(c, c.anchor)
             for im in images:

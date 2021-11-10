@@ -36,7 +36,9 @@ def find_images(archive, path):
         drawing = SpreadsheetDrawing.from_tree(tree)
     except TypeError:
         warn("DrawingML support is incomplete and limited to charts and images only. Shapes and drawings will be lost.")
-        return charts, images
+        return charts, images, shapes
+
+    shapes = drawing._shapes
 
     for rel in drawing._chart_rels:
         cs = get_rel(archive, deps, rel.id, ChartSpace)
@@ -45,7 +47,7 @@ def find_images(archive, path):
         charts.append(chart)
 
     if not PILImage: # Pillow not installed, drop images
-        return charts, images
+        return charts, images, shapes
 
     for rel in drawing._blip_rels:
         dep = deps[rel.embed]
@@ -62,4 +64,4 @@ def find_images(archive, path):
                 continue
             image.anchor = rel.anchor
             images.append(image)
-    return charts, images
+    return charts, images, shapes
