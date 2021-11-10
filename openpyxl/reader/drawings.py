@@ -16,10 +16,19 @@ from openpyxl.chart.reader import read_chart
 
 def find_images(archive, path):
     """
-    Given the path to a drawing file extract charts and images
+    Given the path to a drawing file extract charts and images and supported shapes
 
     Ingore errors due to unsupported parts of DrawingML
     """
+
+    charts = []
+    images = []
+    shapes = []
+
+    rels_path = get_rels_path(path)
+    deps = []
+    if rels_path in archive.namelist():
+        deps = get_dependents(archive, rels_path)
 
     src = archive.read(path)
     tree = fromstring(src)
@@ -27,21 +36,14 @@ def find_images(archive, path):
         drawing = SpreadsheetDrawing.from_tree(tree)
     except TypeError:
         warn("DrawingML support is incomplete and limited to charts and images only. Shapes and drawings will be lost.")
-        return [], []
+        return charts, images
 
-    rels_path = get_rels_path(path)
-    deps = []
-    if rels_path in archive.namelist():
-        deps = get_dependents(archive, rels_path)
-
-    charts = []
     for rel in drawing._chart_rels:
         cs = get_rel(archive, deps, rel.id, ChartSpace)
         chart = read_chart(cs)
         chart.anchor = rel.anchor
         charts.append(chart)
 
-    images = []
     if not PILImage: # Pillow not installed, drop images
         return charts, images
 
