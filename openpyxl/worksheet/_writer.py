@@ -244,7 +244,7 @@ class WorksheetWriter:
 
 
     def write_drawings(self):
-        if self.ws._charts or self.ws._images:
+        if self.ws._charts or self.ws._images or self.ws._shapes:
             rel = Relationship(type="drawing", Target="")
             self._rels.append(rel)
             drawing = Related()

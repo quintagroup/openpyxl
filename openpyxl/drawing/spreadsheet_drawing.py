@@ -75,6 +75,7 @@ class SpreadsheetDrawing(Serialisable):
         self.absoluteAnchor = absoluteAnchor
         self.charts = []
         self.images = []
+        self.shapes = []
         self._rels = []
 
 
@@ -86,7 +87,7 @@ class SpreadsheetDrawing(Serialisable):
 
 
     def __bool__(self):
-        return bool(self.charts) or bool(self.images)
+        return bool(self.charts) or bool(self.images) or bool(self.shapes)
 
 
     def _write(self):
@@ -94,7 +95,8 @@ class SpreadsheetDrawing(Serialisable):
         create required structure and the serialise
         """
         anchors = []
-        for idx, obj in enumerate(self.charts + self.images, 1):
+        for idx, obj in enumerate(self.charts + self.images + self.shapes, 1):
+            rel = None
             anchor = _check_anchor(obj)
             if isinstance(obj, ChartBase):
                 rel = Relationship(type="chart", Target=obj.path)
@@ -108,7 +110,8 @@ class SpreadsheetDrawing(Serialisable):
                     child.blipFill.blip.embed = "rId{0}".format(idx)
 
             anchors.append(anchor)
-            self._rels.append(rel)
+            if rel:
+                self._rels.append(rel)
 
         for a in anchors:
             if isinstance(a, OneCellAnchor):

@@ -386,6 +386,21 @@ class TestWorksheetWriter:
         assert diff is None, diff
 
 
+    def test_shapes(self, writer):
+
+        writer.ws._shapes = [1]
+        writer.write_drawings()
+
+        expected = """
+        <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+          <drawing xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1"/>
+        </worksheet>
+        """
+        xml = writer.read()
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
     def test_comments(self, writer):
 
         writer.ws._comments = True

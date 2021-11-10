@@ -196,6 +196,7 @@ class ExcelWriter(object):
         ws._drawing = SpreadsheetDrawing()
         ws._drawing.charts = ws._charts
         ws._drawing.images = ws._images
+        ws._drawing.shapes = ws._shapes
         if self.workbook.write_only:
             if not ws.closed:
                 ws.close()
@@ -247,7 +248,6 @@ class ExcelWriter(object):
 
             if ws._drawing:
                 self._write_drawing(ws._drawing)
-
                 for r in ws._rels.Relationship:
                     if "drawing" in r.Type:
                         r.Target = ws._drawing.path

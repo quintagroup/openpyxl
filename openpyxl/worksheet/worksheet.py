@@ -109,6 +109,7 @@ class Worksheet(_WorkbookChild):
         self._cells = {}
         self._charts = []
         self._images = []
+        self._shapes = []
         self._rels = RelationshipList()
         self._drawing = None
         self._comments = []

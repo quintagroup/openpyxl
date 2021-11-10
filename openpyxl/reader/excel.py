@@ -321,6 +321,8 @@ class WorksheetProcessor:
             for im in images:
                 self.ws.add_image(im, im.anchor)
 
+            self.ws._shapes = shapes
+
 
     def get_pivots(self, pivot_caches):
         for rel in self.rels.pivotTable:
