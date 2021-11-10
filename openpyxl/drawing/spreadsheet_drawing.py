@@ -196,3 +196,16 @@ class SpreadsheetDrawing(Serialisable):
                     rels.append(rel)
 
         return rels
+
+
+    @property
+    def _shapes(self):
+        """Return a list of shapes"""
+        shapes = []
+        anchors = self.absoluteAnchor + self.oneCellAnchor + self.twoCellAnchor
+        for anchor in anchors:
+            if anchor.sp is not None:
+                shape = anchor.sp
+                shape.anchor = anchor
+                shapes.append(shape)
+        return shapes

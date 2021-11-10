@@ -489,6 +489,15 @@ class TestSpreadsheetDrawing:
         assert diff is None, diff
 
 
+    def test_shapes(self, SpreadsheetDrawing, datadir):
+        datadir.chdir
+        with open ("commands.xml", "rb") as src:
+            xml = src.read()
+        tree = fromstring(xml)
+        drawing = SpreadsheetDrawing.from_tree(tree)
+        assert len(drawing._shapes) == 1
+
+
 def test_check_anchor_chart():
     from ..spreadsheet_drawing import _check_anchor
     c = BarChart()
