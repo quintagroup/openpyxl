@@ -495,7 +495,7 @@ class TestSpreadsheetDrawing:
             xml = src.read()
         tree = fromstring(xml)
         drawing = SpreadsheetDrawing.from_tree(tree)
-        assert len(drawing._shapes) == 1
+        assert len(drawing._shapes) == 4
 
 
 def test_check_anchor_chart():

@@ -1,6 +1,11 @@
 # Copyright (c) 2010-2021 openpyxl
 
-from openpyxl.descriptors.serialisable import Serialisable, Sequence
+from openpyxl.descriptors.serialisable import Serialisable
+from openpyxl.descriptors import (
+    Sequence,
+    String,
+    Typed,
+)
 
 from openpyxl.packaging.relationship import (
     Relationship,
@@ -51,6 +56,42 @@ def _check_anchor(obj):
     return anchor
 
 
+
+class Choice(Serialisable):
+    """Markup compatiblity choice"""
+
+    tagname = "choice"
+
+    twoCellAnchor = Typed(expected_type=TwoCellAnchor, allow_none=True)
+    oneCellAnchor = Typed(expected_type=OneCellAnchor, allow_none=True)
+    absoluteAnchor = Typed(expected_type=AbsoluteAnchor, allow_none=True)
+    Requires = String()
+
+
+    def __init__(self,
+                 twoCellAnchor=None,
+                 oneCellAnchor=None,
+                 absoluteAnchor=None,
+                 Requires=None):
+        self.Requires = Requires
+        self.twoCellAnchor = twoCellAnchor
+        self.oneCellAnchor = oneCellAnchor
+        self.absoluteAnchor = absoluteAnchor
+
+
+class AlternateContent(Serialisable):
+    """Markup AlternateContent
+    """
+
+    tagname = "AlternateContent"
+
+    Choice = Typed(expected_type=Choice)
+
+
+    def __init__(self, Choice=None):
+        self.Choice = Choice
+
+
 class SpreadsheetDrawing(Serialisable):
 
     tagname = "wsDr"
@@ -59,16 +100,18 @@ class SpreadsheetDrawing(Serialisable):
     _path = PartName="/xl/drawings/drawing{0}.xml"
     _id = None
 
-    twoCellAnchor = Sequence(expected_type=TwoCellAnchor, allow_none=True)
-    oneCellAnchor = Sequence(expected_type=OneCellAnchor, allow_none=True)
-    absoluteAnchor = Sequence(expected_type=AbsoluteAnchor, allow_none=True)
+    twoCellAnchor = Sequence(expected_type=TwoCellAnchor)
+    oneCellAnchor = Sequence(expected_type=OneCellAnchor)
+    absoluteAnchor = Sequence(expected_type=AbsoluteAnchor)
+    AlternateContent = Sequence(expected_type=AlternateContent)
 
-    __elements__ = ("twoCellAnchor", "oneCellAnchor", "absoluteAnchor")
+    __elements__ = ("twoCellAnchor", "oneCellAnchor", "absoluteAnchor",)
 
     def __init__(self,
                  twoCellAnchor=(),
                  oneCellAnchor=(),
                  absoluteAnchor=(),
+                 AlternateContent=(),
                  ):
         self.twoCellAnchor = twoCellAnchor
         self.oneCellAnchor = oneCellAnchor
@@ -77,6 +120,14 @@ class SpreadsheetDrawing(Serialisable):
         self.images = []
         self.shapes = []
         self._rels = []
+        if AlternateContent:
+            for obj in AlternateContent:
+                if obj.Choice.twoCellAnchor:
+                    self.twoCellAnchor.append(obj.Choice.twoCellAnchor)
+                elif obj.Choice.oneCellAnchor:
+                    self.oneCellAnchor.append(obj.Choice.oneCellAnchor)
+                elif obj.Choice.absoluteAnchor:
+                    self.absoluteAnchor.append(obj.Choice.absoluteAnchor)
 
 
     def __hash__(self):
