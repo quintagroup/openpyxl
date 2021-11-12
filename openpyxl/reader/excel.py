@@ -61,6 +61,7 @@ from openpyxl.worksheet.controls import (
     ActiveXControl
 )
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
+from openpyxl.drawing.legacy import LegacyDrawing
 
 from openpyxl.xml.functions import fromstring
 
@@ -242,10 +243,8 @@ class ExcelReader:
             processor.get_controls()
 
              # preserve link to VML file if VBA
-            if self.wb.vba_archive and ws.legacy_drawing:
+            if ws.legacy_drawing:
                 ws.legacy_drawing = processor.rels[ws.legacy_drawing].target
-            else:
-                ws.legacy_drawing = None
 
             for t in ws_parser.tables:
                 src = self.archive.read(t)
@@ -293,6 +292,21 @@ class WorksheetProcessor:
 
         rels.get_types()
         self.rels = rels
+
+
+    def get_vml(self):
+        """
+        Extract VML if it exists and store as object
+        """
+        if self.ws.legacy_drawing is None:
+            return
+
+        path = self.ws.legacy_drawing.target
+        obj = self.archive.read(path)
+        drawing = LegacyDrawing()
+        drawing.content = obj
+        rels_path = get_rels_path(path)
+        drawing.children =get_dependents(self.archive, rels_path)
 
 
     def get_comments(self):
