@@ -306,7 +306,7 @@ class WorksheetProcessor:
         drawing = LegacyDrawing()
         drawing.content = obj
         rels_path = get_rels_path(path)
-        drawing.children =get_dependents(self.archive, rels_path)
+        drawing.children = get_dependents(self.archive, rels_path)
 
 
     def get_comments(self):
