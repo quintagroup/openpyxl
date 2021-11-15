@@ -52,6 +52,7 @@ class ExcelWriter(object):
         self._comments = []
         self._pivots = []
         self.activex = []
+        self.legacy = []
         self.form_controls = []
 
 
@@ -188,6 +189,21 @@ class ExcelWriter(object):
 
         comment_rel = Relationship(Id="comments", type=cs._rel_type, Target=cs.path)
         ws._rels.append(comment_rel)
+
+
+    def write_legacy(self, ws, archive):
+        """
+        Write VML if we have comments or VBA controls
+        """
+        drawing = ws.legacy_drawing
+        if ws.legacy_drawing is None:
+            return
+
+        self.legacy.append(drawing)
+        drawing.counter = len(self.legacy)
+        rel = Relationship(Type=drawing.rel_type, Target=drawing.path)
+        ws._rels.append(rel)
+        drawing.write(archive)
 
 
     def write_worksheet(self, ws):
