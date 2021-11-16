@@ -11,6 +11,7 @@ from openpyxl.xml.constants import (
 )
 from openpyxl.xml.functions import tostring
 
+
 class LegacyDrawing:
 
     mime_type = "application/vnd.openxmlformats-officedocument.vmlDrawing"
@@ -19,7 +20,7 @@ class LegacyDrawing:
     _rel_id = None
     _path = "/xl/vmlDrawing{0}.xml"
     vml = None
-    children = {} # can have emf as children
+    children = [] # rels from the worksheet
 
     def __init__(self, vml):
         self.vml = vml
@@ -30,18 +31,6 @@ class LegacyDrawing:
         return self._path.format(self._counter)
 
 
-    def _write(self, archive, manifest):
-        if self.children:
-            self._write_rels(archive, manifest=None)
+    def _write(self, archive):
         archive.writestr(self.path[1:], self.vml)
-
-
-    def _write_rels(self, archive, manifest=None):
-        rels = RelationshipList()
-        path = get_rels_path(self.path.format(self._counter))
-        for k, image in self.children:
-            rel = Relationship(Type=IMAGE_NS, Target=image.path)
-            rels.append(rel)
-        tree = rels.to_tree()
-        archive.writestr(path[1:], tostring(tree))
 

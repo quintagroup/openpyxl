@@ -12,6 +12,7 @@ from openpyxl import load_workbook
 from openpyxl.chart import BarChart
 from openpyxl.comments import Comment
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
+from openpyxl.drawing.legacy import LegacyDrawing
 from openpyxl import Workbook
 from openpyxl.worksheet.table import Table
 from openpyxl.utils.exceptions import InvalidFileException
@@ -68,6 +69,16 @@ class TestExcelWriter:
         assert drawing.path == '/xl/drawings/drawing1.xml'
         assert drawing.path[1:] in archive.namelist()
         assert drawing.path in writer.manifest.filenames
+
+
+    def test_legacy(self, ExcelWriter, archive):
+        wb = Workbook()
+        ws = wb.active
+        ws.legacy_drawing = LegacyDrawing("some vml")
+
+        writer = ExcelWriter(wb, archive)
+        writer.write_legacy(ws, archive)
+        assert archive.namelist() == ["xl/vmlDrawing1.xml", "xl/_rels/vmlDrawing1.xml.rels"]
 
 
     def test_write_chart(self, ExcelWriter, archive):

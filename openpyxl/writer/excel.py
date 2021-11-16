@@ -18,8 +18,8 @@ from openpyxl.xml.constants import (
     ARC_THEME,
     ARC_STYLE,
     ARC_WORKBOOK,
-
-    )
+    IMAGE_NS,
+)
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.packaging.manifest import Manifest
@@ -200,10 +200,17 @@ class ExcelWriter(object):
             return
 
         self.legacy.append(drawing)
-        drawing.counter = len(self.legacy)
+        drawing._counter = len(self.legacy)
         rel = Relationship(Type=drawing.rel_type, Target=drawing.path)
         ws._rels.append(rel)
-        drawing.write(archive)
+        drawing._write(archive)
+
+        wmf = RelationshipList()
+        for img in ws._rels.find(IMAGE_NS):
+            wmf.append(img)
+        xml = wmf.to_tree()
+        path = get_rels_path(ws.legacy_drawing.path)
+        self.archive.writestr(path[1:], tostring(xml))
 
 
     def write_worksheet(self, ws):
@@ -222,6 +229,11 @@ class ExcelWriter(object):
         ws._rels = writer._rels
         self.write_controls(ws, writer.controls)
         self.write_embedded(ws, writer.control_images)
+
+        # get wmf files from rels and copy to legacy
+        if ws.legacy_drawing:
+            self.write_legacy(ws, self.archive)
+
 
         self.archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
