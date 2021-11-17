@@ -340,4 +340,4 @@ class TestWorksheetProcessor:
         processor.find_children("xl/worksheets/sheet2.xml")
         processor.get_legacy()
 
-        assert ws.legacy_drawing.path == "/xl/vmlDrawing0.xml"
+        assert ws.legacy_drawing.path == "/xl/drawings/vmlDrawing0.vml"
