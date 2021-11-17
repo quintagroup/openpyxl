@@ -241,10 +241,7 @@ class ExcelReader:
             processor.get_drawings()
             processor.get_activex()
             processor.get_controls()
-
-             # preserve link to VML file if VBA
-            if ws.legacy_drawing:
-                ws.legacy_drawing = processor.rels[ws.legacy_drawing].target
+            processor.get_legacy()
 
             for t in ws_parser.tables:
                 src = self.archive.read(t)
@@ -294,19 +291,21 @@ class WorksheetProcessor:
         self.rels = rels
 
 
-    def get_vml(self):
+    def get_legacy(self):
         """
         Extract VML if it exists and store as object
         """
         if self.ws.legacy_drawing is None:
             return
 
-        path = self.ws.legacy_drawing.target
-        obj = self.archive.read(path)
-        drawing = LegacyDrawing()
-        drawing.content = obj
-        rels_path = get_rels_path(path)
-        drawing.children = get_dependents(self.archive, rels_path)
+        rel = self.rels[self.ws.legacy_drawing]
+        vml = self.archive.read(rel.target)
+        drawing = LegacyDrawing(vml)
+        rels_path = get_rels_path(rel.target)
+        try:
+            drawing.children = get_dependents(self.archive, rels_path)
+        except KeyError:
+            pass # has no images
 
 
     def get_comments(self):
@@ -384,10 +383,6 @@ class WorksheetProcessor:
                 rel = self.rels[prop.id]
                 rel.blob = self.archive.read(rel.Target)
                 prop.image = rel
-
-
-    def get_legacy(self):
-        pass
 
 
 def load_workbook(filename, read_only=False, keep_vba=KEEP_VBA,
