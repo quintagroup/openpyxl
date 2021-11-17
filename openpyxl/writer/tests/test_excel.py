@@ -78,7 +78,7 @@ class TestExcelWriter:
 
         writer = ExcelWriter(wb, archive)
         writer.write_legacy(ws, archive)
-        assert archive.namelist() == ["xl/vmlDrawing1.xml", "xl/_rels/vmlDrawing1.xml.rels"]
+        assert archive.namelist() == ["xl/drawings/vmlDrawing1.vml", "xl/drawings/_rels/vmlDrawing1.vml.rels"]
 
 
     def test_write_chart(self, ExcelWriter, archive):
