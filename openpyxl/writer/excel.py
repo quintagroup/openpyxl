@@ -201,13 +201,14 @@ class ExcelWriter(object):
 
         self.legacy.append(drawing)
         drawing._counter = len(self.legacy)
-        rel = Relationship(Type=drawing.rel_type, Target=drawing.path)
-        ws._rels.append(rel)
+        rel = ws._rels[drawing._rel_id]
+        rel.Target = drawing.path
         drawing._write(archive)
 
         wmf = RelationshipList()
         for img in ws._rels.find(IMAGE_NS):
-            wmf.append(img)
+            new_rel = Relationship(Type=img.Type, Target=img.Target)
+            wmf.append(new_rel)
         xml = wmf.to_tree()
         path = get_rels_path(ws.legacy_drawing.path)
         self.archive.writestr(path[1:], tostring(xml))
@@ -233,7 +234,6 @@ class ExcelWriter(object):
         # get wmf files from rels and copy to legacy
         if ws.legacy_drawing:
             self.write_legacy(ws, self.archive)
-
 
         self.archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
@@ -280,11 +280,6 @@ class ExcelWriter(object):
 
             if ws._comments:
                 self._write_comment(ws)
-
-            if ws.legacy_drawing is not None:
-                shape_rel = Relationship(type="vmlDrawing", Id="anysvml",
-                                         Target="/" + ws.legacy_drawing)
-                ws._rels.append(shape_rel)
 
             for t in ws._tables.values():
                 self._tables.append(t)

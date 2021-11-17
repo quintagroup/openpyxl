@@ -258,7 +258,10 @@ class WorksheetWriter:
         that is no longer in the specification.
         """
         if (self.ws.legacy_drawing is not None or self.ws._comments):
-            legacy = Related(id="anysvml")
+            rel = Relationship(type="vmlDrawing", Target="")
+            self._rels.append(rel)
+            legacy = Related(id=rel.id)
+            self.ws.legacy_drawing._rel_id = rel.id
             self.xf.send(legacy.to_tree("legacyDrawing"))
 
 
