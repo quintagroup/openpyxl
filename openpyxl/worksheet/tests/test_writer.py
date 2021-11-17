@@ -11,6 +11,7 @@ from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.formatting.rule import CellIsRule
 from openpyxl.comments import Comment
 from openpyxl.packaging.relationship import Relationship
+from openpyxl.drawing.legacy import LegacyDrawing
 
 from ..dimensions import RowDimension
 from ..protection import SheetProtection
@@ -408,7 +409,7 @@ class TestWorksheetWriter:
         xml = writer.read()
         expected = """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <legacyDrawing r:id="anysvml" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" />
+          <legacyDrawing r:id="rId1" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" />
         </worksheet>
         """
         diff = compare_xml(xml, expected)
@@ -417,12 +418,12 @@ class TestWorksheetWriter:
 
     def test_legacy(self, writer):
 
-        writer.ws.legacy_drawing = True
+        writer.ws.legacy_drawing = LegacyDrawing(vml="some vml")
         writer.write_legacy()
         xml = writer.read()
         expected = """
         <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-          <legacyDrawing r:id="anysvml" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" />
+          <legacyDrawing r:id="rId1" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" />
         </worksheet>
         """
         diff = compare_xml(xml, expected)
@@ -433,7 +434,7 @@ class TestWorksheetWriter:
 
         ws = writer.ws
         ws.sheet_properties.codeName = "Sheet1"
-        ws.legacy_drawing = "../drawings/vmlDrawing1.vml"
+        ws.legacy_drawing = LegacyDrawing("VBA vml")
         writer.write_top()
         writer.write_rows()
         writer.write_tail()
@@ -455,7 +456,7 @@ class TestWorksheetWriter:
           <sheetFormatPr baseColWidth="8" defaultRowHeight="15"/>
           <sheetData/>
           <pageMargins bottom="1" footer="0.5" header="0.5" left="0.75" right="0.75" top="1"/>
-          <legacyDrawing r:id="anysvml"/>
+          <legacyDrawing r:id="rId1"/>
         </worksheet>
         """
         diff = compare_xml(xml, expected)

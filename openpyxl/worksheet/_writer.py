@@ -11,6 +11,7 @@ from openpyxl.xml.functions import xmlfile
 from openpyxl.xml.constants import SHEET_MAIN_NS
 
 from openpyxl.comments.comment_sheet import CommentRecord
+from openpyxl.drawing.legacy import LegacyDrawing
 from openpyxl.packaging.relationship import Relationship, RelationshipList
 from openpyxl.styles.differential import DifferentialStyle
 
@@ -257,12 +258,16 @@ class WorksheetWriter:
         Comments & VBA controls use VML and require an additional element
         that is no longer in the specification.
         """
-        if (self.ws.legacy_drawing is not None or self.ws._comments):
-            rel = Relationship(type="vmlDrawing", Target="")
-            self._rels.append(rel)
-            legacy = Related(id=rel.id)
-            self.ws.legacy_drawing._rel_id = rel.id
-            self.xf.send(legacy.to_tree("legacyDrawing"))
+        if not self.ws.legacy_drawing and not self.ws._comments:
+            return
+        if not self.ws.legacy_drawing:
+            self.ws.legacy_drawing = LegacyDrawing(vml=None)
+
+        rel = Relationship(type="vmlDrawing", Target="")
+        self._rels.append(rel)
+        legacy = Related(id=rel.id)
+        self.ws.legacy_drawing._rel_id = rel.id
+        self.xf.send(legacy.to_tree("legacyDrawing"))
 
 
     def write_controls(self):

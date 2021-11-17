@@ -21,6 +21,7 @@ from openpyxl.xml.constants import (
     IMAGE_NS,
 )
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
+from openpyxl.drawing.legacy import LegacyDrawing
 from openpyxl.xml.functions import tostring, fromstring
 from openpyxl.packaging.manifest import Manifest
 from openpyxl.packaging.relationship import (
@@ -176,11 +177,11 @@ class ExcelWriter(object):
         self.archive.writestr(cs.path[1:], tostring(cs.to_tree()))
         self.manifest.append(cs)
 
-        if ws.legacy_drawing is None or self.workbook.vba_archive is None:
-            ws.legacy_drawing = 'xl/drawings/commentsDrawing{0}.vml'.format(cs._id)
+        if ws.legacy_drawing is None:
+            ws.legacy_drawing = LegacyDrawing(vml=None)
             vml = None
         else:
-            vml = fromstring(self.workbook.vba_archive.read(ws.legacy_drawing))
+            vml = fromstring(self.workbook.vba_archive.read(ws.legacy_drawing.vml))
 
         vml = cs.write_shapes(vml)
 
@@ -193,7 +194,7 @@ class ExcelWriter(object):
 
     def write_legacy(self, ws, archive):
         """
-        Write VML if we have comments or VBA controls
+        Write VML
         """
         drawing = ws.legacy_drawing
         if ws.legacy_drawing is None:
