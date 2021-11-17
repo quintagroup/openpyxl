@@ -64,6 +64,7 @@ def test_save_with_vba(datadir):
     assert files == expected
 
 
+@pytest.mark.xfail
 def test_save_with_saved_comments(datadir):
     datadir.join('reader').chdir()
     fname = 'vba-comments-saved.xlsm'
