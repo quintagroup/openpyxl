@@ -301,6 +301,7 @@ class WorksheetProcessor:
         rel = self.rels[self.ws.legacy_drawing]
         vml = self.archive.read(rel.target)
         drawing = LegacyDrawing(vml)
+        self.ws.legacy_drawing = drawing
         rels_path = get_rels_path(rel.target)
         try:
             drawing.children = get_dependents(self.archive, rels_path)

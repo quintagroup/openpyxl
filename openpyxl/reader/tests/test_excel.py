@@ -327,3 +327,17 @@ class TestWorksheetProcessor:
         assert ws._cells != {} # make sure sheet is not empty
         comment = ws["B5"].comment
         assert comment.author == "Author"
+
+
+    def test_get_legacy(self, datadir, WorksheetProcessor):
+        datadir.chdir()
+        archive = ZipFile("legacy_drawing.xlsm")
+        wb = Workbook()
+        ws = wb.create_sheet()
+        ws.legacy_drawing = "rId1"
+
+        processor = WorksheetProcessor(ws, archive)
+        processor.find_children("xl/worksheets/sheet2.xml")
+        processor.get_legacy()
+
+        assert ws.legacy_drawing.path == "/xl/vmlDrawing0.xml"
