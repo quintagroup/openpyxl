@@ -1,13 +1,7 @@
 # Copyright (c) 2010-2021 openpyxl
 
-from openpyxl.packaging.relationship import (
-    get_rels_path,
-    RelationshipList,
-    Relationship,
-)
 from openpyxl.xml.constants import (
     VML_NS,
-    IMAGE_NS,
 )
 from openpyxl.xml.functions import tostring
 
@@ -18,7 +12,7 @@ class LegacyDrawing:
     rel_type = VML_NS
     _counter = 0
     _rel_id = None
-    _path = "/xl/vmlDrawing{0}.xml"
+    _path = "/xl/drawings/vmlDrawing{0}.vml"
     vml = None
     children = [] # rels from the worksheet
 
