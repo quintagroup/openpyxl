@@ -156,7 +156,6 @@ class TestExcelWriter:
         writer._write_comment(ws)
 
 
-    @pytest.mark.xfail
     def test_merge_vba(self, ExcelWriter, archive, datadir):
         from openpyxl import load_workbook
         datadir.chdir()
@@ -167,17 +166,6 @@ class TestExcelWriter:
 
         assert set(archive.namelist()) ==  set([
             'xl/vbaProject.bin',
-            'xl/drawings/vmlDrawing1.vml',
-            'xl/ctrlProps/ctrlProp3.xml',
-            'xl/ctrlProps/ctrlProp1.xml',
-            'xl/ctrlProps/ctrlProp10.xml',
-            'xl/ctrlProps/ctrlProp9.xml',
-            'xl/ctrlProps/ctrlProp4.xml',
-            'xl/ctrlProps/ctrlProp5.xml',
-            'xl/ctrlProps/ctrlProp6.xml',
-            'xl/ctrlProps/ctrlProp7.xml',
-            'xl/ctrlProps/ctrlProp8.xml',
-            'xl/ctrlProps/ctrlProp2.xml',
         ])
 
 

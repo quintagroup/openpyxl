@@ -169,12 +169,103 @@ class FormControl(Serialisable):
     _path = "/xl/ctrlProps/ctrlProp{0}.xml"
     _counter = None
 
-    objectType = String()
+    objectType = String(allow_none=True)
+    checked = String(allow_none=True)
+    colored = Bool()
+    dropLines = Integer(allow_none=True)
+    dropStyle = String(allow_none=True)
+    dx = Integer(allow_none=True)
+    firstButton = Bool()
+    fmlaGroup = String(allow_none=True)
+    fmlaLink = String(allow_none=True)
+    fmlaRange = String(allow_none=True)
+    fmlaTxbx = String(allow_none=True)
+    horiz = Bool()
+    inc = Integer(allow_none=True)
+    justLastX = Bool()
     lockText = Bool()
+    max = Integer(allow_none=True)
+    min = Integer(allow_none=True)
+    multiSel = String(allow_none=True)
+    noThreeD = Bool()
+    noThreeD2 = Bool()
+    page = Integer(allow_none=True)
+    sel = Integer(allow_none=True)
+    seltype = String(allow_none=True)
+    textHAlign = String(allow_none=True)
+    textVAlign = String(allow_none=True)
+    val = Integer(allow_none=True)
+    widthMin = Integer(allow_none=True)
+    editVal = String(allow_none=True)
+    multiLine = Bool()
+    verticalBar = Bool()
+    passwordEdit = Bool()
 
-    def __init__(self, objectType=None, lockText=None):
+    def __init__(self,
+                 objectType=None,
+                 checked=None,
+                 colored=None,
+                 dropLines=8,
+                 dropStyle=None,
+                 dx=80,
+                 firstButton=None,
+                 fmlaGroup=None,
+                 fmlaLink=None,
+                 fmlaRange=None,
+                 fmlaTxbx=None,
+                 horiz=None,
+                 inc=None,
+                 justLastX=None,
+                 lockText=None,
+                 max=None,
+                 min=None,
+                 multiSel=None,
+                 noThreeD=None,
+                 noThreeD2=None,
+                 page=None,
+                 sel=None,
+                 seltype=None,
+                 textHAlign=None,
+                 textVAlign=None,
+                 val=None,
+                 widthMin=None,
+                 editVal=None,
+                 multiLine=None,
+                 verticalBar=None,
+                 passwordEdit=None,
+                 extLst=None,
+                 ):
         self.objectType = objectType
+        self.checked = checked
+        self.colored = colored
+        self.dropLines = dropLines
+        self.dropStyle = dropStyle
+        self.dx = dx
+        self.firstButton = firstButton
+        self.fmlaGroup = fmlaGroup
+        self.fmlaLink = fmlaLink
+        self.fmlaRange = fmlaRange
+        self.fmlaTxbx = fmlaTxbx
+        self.horiz = horiz
+        self.inc = inc
+        self.justLastX = justLastX
         self.lockText = lockText
+        self.max = max
+        self.min = min
+        self.multiSel = multiSel
+        self.noThreeD = noThreeD
+        self.noThreeD2 = noThreeD2
+        self.page = page
+        self.sel = sel
+        self.seltype = seltype
+        self.textHAlign = textHAlign
+        self.textVAlign = textVAlign
+        self.val = val
+        self.widthMin = widthMin
+        self.editVal = editVal
+        self.multiLine = multiLine
+        self.verticalBar = verticalBar
+        self.passwordEdit = passwordEdit
 
 
     @property
