@@ -143,6 +143,7 @@ class TestExcelWriter:
         assert archive.namelist() == ['xl/comments/comment1.xml']
         assert '/xl/comments/comment1.xml' in writer.manifest.filenames
         assert ws.legacy_drawing.vml[:15] == b'<xml><ns0:shape'
+        assert len(ws.legacy_drawing.vml) == 489
 
 
     def test_duplicate_comment(self, ExcelWriter, archive):
@@ -154,6 +155,8 @@ class TestExcelWriter:
         writer = ExcelWriter(wb, archive)
         writer._write_comment(ws)
         writer._write_comment(ws)
+
+        assert len(ws.legacy_drawing.vml) == 489
 
 
     def test_merge_vba(self, ExcelWriter, archive, datadir):
