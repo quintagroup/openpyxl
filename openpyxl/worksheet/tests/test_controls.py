@@ -170,7 +170,7 @@ class TestFormControl:
         ctrl = FormControl(objectType="Button", lockText=True)
         xml = tostring(ctrl.to_tree())
         expected = """
-        <formControlPr xmlns="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" objectType="Button" lockText="1"/>
+        <formControlPr xmlns="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" colored="0" dropLines="8" dx="80" firstButton="0" horiz="0" justLastX="0" lockText="1" multiLine="0" noThreeD="0" noThreeD2="0" objectType="Button" passwordEdit="0" verticalBar="0"/>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
