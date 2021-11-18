@@ -201,6 +201,10 @@ class FormControl(Serialisable):
     verticalBar = Bool()
     passwordEdit = Bool()
 
+    itemLst = Sequence(expected_type=String)
+
+    __elements__ = ("itemLst",)
+
     def __init__(self,
                  objectType=None,
                  checked=None,
@@ -233,6 +237,7 @@ class FormControl(Serialisable):
                  multiLine=None,
                  verticalBar=None,
                  passwordEdit=None,
+                 itemLst=(),
                  extLst=None,
                  ):
         self.objectType = objectType
@@ -266,6 +271,7 @@ class FormControl(Serialisable):
         self.multiLine = multiLine
         self.verticalBar = verticalBar
         self.passwordEdit = passwordEdit
+        self.itemLst = itemLst
 
 
     @property
