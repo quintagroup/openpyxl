@@ -177,16 +177,14 @@ class ExcelWriter(object):
         self.archive.writestr(cs.path[1:], tostring(cs.to_tree()))
         self.manifest.append(cs)
 
-        if ws.legacy_drawing is None:
-            ws.legacy_drawing = LegacyDrawing(vml=None)
-            vml = None
+        vml = None
+        if ws.legacy_drawing is not None:
+            vml = ws.legacy_drawing.vml
         else:
-            vml = fromstring(self.workbook.vba_archive.read(ws.legacy_drawing.vml))
+            ws.legacy_drawing = LegacyDrawing(vml)
 
         vml = cs.write_shapes(vml)
-
-        self.archive.writestr(ws.legacy_drawing, vml)
-        self.vba_modified.add(ws.legacy_drawing)
+        ws.legacy_drawing.vml = vml
 
         comment_rel = Relationship(Id="comments", type=cs._rel_type, Target=cs.path)
         ws._rels.append(comment_rel)

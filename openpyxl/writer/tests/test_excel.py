@@ -140,9 +140,9 @@ class TestExcelWriter:
         writer = ExcelWriter(None, archive)
         writer._write_comment(ws)
 
-        assert archive.namelist() == ['xl/comments/comment1.xml', 'xl/drawings/commentsDrawing1.vml']
+        assert archive.namelist() == ['xl/comments/comment1.xml']
         assert '/xl/comments/comment1.xml' in writer.manifest.filenames
-        assert ws.legacy_drawing == 'xl/drawings/commentsDrawing1.vml'
+        assert ws.legacy_drawing.vml[:15] == b'<xml><ns0:shape'
 
 
     def test_duplicate_comment(self, ExcelWriter, archive):
@@ -152,9 +152,8 @@ class TestExcelWriter:
         ws['B5'].comment = Comment("A comment", "The Author")
 
         writer = ExcelWriter(wb, archive)
-        writer.write_worksheet(ws)
-        writer.write_worksheet(ws)
-        assert len(ws._comments) == 1
+        writer._write_comment(ws)
+        writer._write_comment(ws)
 
 
     @pytest.mark.xfail
