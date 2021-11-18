@@ -227,6 +227,9 @@ class ExcelWriter(object):
             writer.write()
 
         ws._rels = writer._rels
+
+        if ws._comments:
+            self._write_comment(ws)
         self.write_controls(ws, writer.controls)
         self.write_embedded(ws, writer.control_images)
 
@@ -276,9 +279,6 @@ class ExcelWriter(object):
                 for r in ws._rels.Relationship:
                     if "drawing" in r.Type:
                         r.Target = ws._drawing.path
-
-            if ws._comments:
-                self._write_comment(ws)
 
             for t in ws._tables.values():
                 self._tables.append(t)
