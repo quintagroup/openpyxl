@@ -275,6 +275,7 @@ class WorksheetWriter:
         if not controls:
             return
 
+        targets = []
         for ctrl in controls.control:
             shape = ctrl.shape # ActiveX or CtrlProp
             self.controls.append(shape)
@@ -283,10 +284,13 @@ class WorksheetWriter:
             ctrl.id = rel.id
             shape._rel_id = rel.id
             embedded = getattr(ctrl.controlPr, "image", None)
+
             if embedded:
                 embedded.id = None
-                self.control_images.append(embedded)
-                self._rels.append(embedded)
+                if embedded.Target not in targets:
+                    self.control_images.append(embedded)
+                    self._rels.append(embedded)
+                    targets.append(embedded.Target)
                 ctrl.controlPr.id = embedded.id
 
         self.xf.send(controls.to_tree())

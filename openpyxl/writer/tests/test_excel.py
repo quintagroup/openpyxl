@@ -235,6 +235,79 @@ class TestExcelWriter:
         ]
 
 
+    def test_controls_with_shared_images(self, ExcelWriter, archive):
+        from openpyxl.worksheet.controls import ControlList, ActiveXControl
+        from openpyxl.xml.functions import fromstring
+        from openpyxl.packaging.relationship import Relationship
+
+        src = """
+        <controls xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" >
+        <control shapeId="47129" r:id="rId8" name="MainSVCheckBox">
+            <controlPr defaultSize="0" autoLine="0" r:id="rId9">
+            <anchor moveWithCells="1">
+                <from>
+                <xdr:col>12</xdr:col>
+                <xdr:colOff>219075</xdr:colOff>
+                <xdr:row>7</xdr:row>
+                <xdr:rowOff>95250</xdr:rowOff>
+                </from>
+                <to>
+                <xdr:col>12</xdr:col>
+                <xdr:colOff>400050</xdr:colOff>
+                <xdr:row>7</xdr:row>
+                <xdr:rowOff>276225</xdr:rowOff>
+                </to>
+            </anchor>
+            </controlPr>
+        </control>
+        <control shapeId="47130" r:id="rId10" name="MainSVCheckBox">
+            <controlPr defaultSize="0" autoLine="0" r:id="rId9">
+            <anchor moveWithCells="1">
+                <from>
+                <xdr:col>12</xdr:col>
+                <xdr:colOff>219075</xdr:colOff>
+                <xdr:row>7</xdr:row>
+                <xdr:rowOff>95250</xdr:rowOff>
+                </from>
+                <to>
+                <xdr:col>12</xdr:col>
+                <xdr:colOff>400050</xdr:colOff>
+                <xdr:row>7</xdr:row>
+                <xdr:rowOff>276225</xdr:rowOff>
+                </to>
+            </anchor>
+            </controlPr>
+        </control>
+        </controls>
+        """
+        tree = fromstring(src)
+        controls = ControlList.from_tree(tree)
+        for ctrl in controls.control:
+            ctrl.shape = ActiveXControl()
+            ctrl.shape.bin = b"\001"
+            prop = ctrl.controlPr
+            prop.image = Relationship(type="image", Target="")
+            prop.image.blob = b"\001"
+            prop.image.Target = "/xl/media/image1.emf"
+
+        wb = Workbook()
+        ws = wb.active
+        ws.controls = controls
+        writer = ExcelWriter(wb, archive)
+        writer.write_worksheet(ws)
+
+        assert archive.namelist() == [
+            "xl/activeX/activeX1.bin",
+            "xl/activeX/_rels/activeX1.xml.rels",
+            'xl/activeX/activeX1.xml',
+            "xl/activeX/activeX2.bin",
+            "xl/activeX/_rels/activeX2.xml.rels",
+            'xl/activeX/activeX2.xml',
+            'xl/media/image1.emf',
+            'xl/worksheets/sheetNone.xml',
+        ]
+
+
 def test_write_empty_workbook(tmpdir):
     tmpdir.chdir()
     wb = Workbook()
