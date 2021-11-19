@@ -285,7 +285,6 @@ class WorksheetWriter:
             embedded = getattr(ctrl.controlPr, "image", None)
             if embedded:
                 embedded.id = None
-                embedded.Target = "/" + embedded.Target
                 self.control_images.append(embedded)
                 self._rels.append(embedded)
                 ctrl.controlPr.id = embedded.id

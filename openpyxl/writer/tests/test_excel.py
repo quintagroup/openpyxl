@@ -225,7 +225,7 @@ class TestExcelWriter:
         prop = ctrl.controlPr
         prop.image = Relationship(type="image", Target="")
         prop.image.blob = b"\001"
-        prop.image.Target = "xl/media/image1.emf"
+        prop.image.Target = "/xl/media/image1.emf"
 
         wb = Workbook()
         ws = wb.active
