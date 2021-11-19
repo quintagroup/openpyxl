@@ -190,31 +190,24 @@ class TestExcelWriter:
 
         src = """
         <controls xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
-        <mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
-          <mc:Choice Requires="x14">
-            <control shapeId="47129" r:id="rId8" name="MainSVCheckBox">
-              <controlPr defaultSize="0" autoLine="0" r:id="rId9">
-                <anchor moveWithCells="1">
-                  <from>
-                    <xdr:col>12</xdr:col>
-                    <xdr:colOff>219075</xdr:colOff>
-                    <xdr:row>7</xdr:row>
-                    <xdr:rowOff>95250</xdr:rowOff>
-                  </from>
-                  <to>
-                    <xdr:col>12</xdr:col>
-                    <xdr:colOff>400050</xdr:colOff>
-                    <xdr:row>7</xdr:row>
-                    <xdr:rowOff>276225</xdr:rowOff>
-                  </to>
-                </anchor>
-              </controlPr>
-            </control>
-          </mc:Choice>
-          <mc:Fallback>
-            <control shapeId="47129" r:id="rId8" name="MainSVCheckBox"/>
-          </mc:Fallback>
-        </mc:AlternateContent>
+        <control shapeId="47129" r:id="rId8" name="MainSVCheckBox">
+            <controlPr defaultSize="0" autoLine="0" r:id="rId9">
+            <anchor moveWithCells="1">
+                <from>
+                <xdr:col>12</xdr:col>
+                <xdr:colOff>219075</xdr:colOff>
+                <xdr:row>7</xdr:row>
+                <xdr:rowOff>95250</xdr:rowOff>
+                </from>
+                <to>
+                <xdr:col>12</xdr:col>
+                <xdr:colOff>400050</xdr:colOff>
+                <xdr:row>7</xdr:row>
+                <xdr:rowOff>276225</xdr:rowOff>
+                </to>
+            </anchor>
+            </controlPr>
+        </control>
         </controls>
         """
         tree = fromstring(src)
