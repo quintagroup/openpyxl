@@ -144,7 +144,7 @@ class GraphicFrame(Serialisable):
     macro = String(allow_none=True)
     fPublished = Bool(allow_none=True)
 
-    __elements__ = ('nvGraphicFramePr', 'xfrm', 'graphic', 'macro', 'fPublished')
+    __elements__ = ('nvGraphicFramePr', 'xfrm', 'graphic', 'fPublished')
 
     def __init__(self,
                  nvGraphicFramePr=None,

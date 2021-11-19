@@ -579,14 +579,14 @@ class GeomGuideList(Serialisable):
     gd = Sequence(expected_type=GeomGuide, allow_none=True)
 
     def __init__(self,
-                 gd=None,
+                 gd=(),
                 ):
         self.gd = gd
 
 
 class PresetTextShape(Serialisable):
 
-    prst = Typed(expected_type=Set(values=(
+    prst = Set(values=(
         ['textNoShape', 'textPlain','textStop', 'textTriangle', 'textTriangleInverted', 'textChevron',
          'textChevronInverted', 'textRingInside', 'textRingOutside', 'textArchUp',
          'textArchDown', 'textCircle', 'textButton', 'textArchUpPour',
@@ -598,7 +598,7 @@ class PresetTextShape(Serialisable):
          'textFadeRight', 'textFadeLeft', 'textFadeUp', 'textFadeDown',
          'textSlantUp', 'textSlantDown', 'textCascadeUp', 'textCascadeDown'
          ]
-    )))
+    ))
     avLst = Typed(expected_type=GeomGuideList, allow_none=True)
 
     def __init__(self,
