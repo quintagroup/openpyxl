@@ -69,6 +69,9 @@ class Hyperlink(Serialisable):
     extLst = Typed(expected_type=OfficeArtExtensionList, allow_none=True)
     id = Relation(allow_none=True)
 
+    target = "" # somewhere to store the URL
+    mode = ""
+
     __elements__ = ('snd',)
 
     def __init__(self,

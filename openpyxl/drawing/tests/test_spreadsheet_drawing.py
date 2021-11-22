@@ -8,6 +8,7 @@ from openpyxl.xml.functions import fromstring, tostring
 from openpyxl.tests.helper import compare_xml
 from openpyxl.drawing.image import Image
 from openpyxl.chart import BarChart
+from openpyxl.packaging.relationship import Relationship
 
 
 @pytest.fixture
@@ -490,12 +491,24 @@ class TestSpreadsheetDrawing:
 
 
     def test_shapes(self, SpreadsheetDrawing, datadir):
-        datadir.chdir
+        datadir.chdir()
         with open ("commands.xml", "rb") as src:
             xml = src.read()
         tree = fromstring(xml)
         drawing = SpreadsheetDrawing.from_tree(tree)
         assert len(drawing._shapes) == 4
+
+
+    def test_hyperlink(self, SpreadsheetDrawing, datadir):
+        datadir.chdir()
+
+        with open("hyperlink.xml", "rb") as src:
+            xml = src.read()
+        tree = fromstring(xml)
+        drawing = SpreadsheetDrawing.from_tree(tree)
+        drawing.shapes = drawing._shapes
+        drawing._write()
+        assert drawing._rels.Relationship[0] == Relationship(Target="", Id="rId1", type="hyperlink", TargetMode="")
 
 
 def test_check_anchor_chart():

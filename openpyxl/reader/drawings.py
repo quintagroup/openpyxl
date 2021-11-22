@@ -6,7 +6,7 @@ from io import BytesIO
 from warnings import warn
 
 from openpyxl.xml.functions import fromstring
-from openpyxl.xml.constants import IMAGE_NS
+from openpyxl.xml.constants import IMAGE_NS, REL_NS
 from openpyxl.packaging.relationship import get_rel, get_rels_path, get_dependents
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.image import Image, PILImage
@@ -41,6 +41,13 @@ def find_images(archive, path):
 
     shapes = drawing._shapes
 
+    for shape in shapes:
+        link = getattr(shape.nvSpPr.cNvPr, "hlinkClick")
+        if link:
+            link.target = deps[link.id].Target
+            link.mode = deps[link.id].TargetMode
+            link.id = None
+
     for rel in drawing._chart_rels:
         cs = get_rel(archive, deps, rel.id, ChartSpace)
         chart = read_chart(cs)
@@ -60,9 +67,10 @@ def find_images(archive, path):
                 warn(msg)
                 continue
             if image.format.upper() == "WMF": # cannot save
-                msg = "{0} image format is not supported so the image is being dropped".format(image.format)
+                msg = f"{image.format} image format is not supported so the image {dep.target} is being dropped"
                 warn(msg)
                 continue
             image.anchor = rel.anchor
             images.append(image)
+
     return charts, images, shapes

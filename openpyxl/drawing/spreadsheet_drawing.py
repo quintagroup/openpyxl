@@ -119,7 +119,7 @@ class SpreadsheetDrawing(Serialisable):
         self.charts = []
         self.images = []
         self.shapes = []
-        self._rels = []
+        self._rels = RelationshipList()
         if AlternateContent:
             for obj in AlternateContent:
                 if obj.Choice.twoCellAnchor:
@@ -152,13 +152,23 @@ class SpreadsheetDrawing(Serialisable):
             if isinstance(obj, ChartBase):
                 rel = Relationship(type="chart", Target=obj.path)
                 anchor.graphicFrame = self._chart_frame(idx)
+
             elif isinstance(obj, Image):
                 rel = Relationship(type="image", Target=obj.path)
                 child = anchor.pic or anchor.groupShape and anchor.groupShape.pic
                 if not child:
                     anchor.pic = self._picture_frame(idx)
                 else:
-                    child.blipFill.blip.embed = "rId{0}".format(idx)
+                    child.blipFill.blip.embed = f"rId{idx}"
+            else:
+                link = getattr(obj.nvSpPr.cNvPr, "hlinkClick")
+                if link:
+                    rel = Relationship(
+                        type="hyperlink",
+                        Target=link.target,
+                        TargetMode=link.mode,
+                        Id=f"rId{idx}",
+                    )
 
             anchors.append(anchor)
             if rel:
@@ -203,9 +213,7 @@ class SpreadsheetDrawing(Serialisable):
 
 
     def _write_rels(self):
-        rels = RelationshipList()
-        rels.Relationship = self._rels
-        return rels.to_tree()
+        return self._rels.to_tree()
 
 
     @property
