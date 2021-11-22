@@ -35,7 +35,8 @@ def find_images(archive, path):
     try:
         drawing = SpreadsheetDrawing.from_tree(tree)
     except TypeError:
-        warn("DrawingML support is incomplete and limited to charts and images only. Shapes and drawings will be lost.")
+        warn(f"DrawingML support is incomplete and limited to charts and images only." +
+             "Shapes and other elements may be lost from {path}.")
         return charts, images, shapes
 
     shapes = drawing._shapes
