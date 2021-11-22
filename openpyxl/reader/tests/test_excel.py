@@ -308,7 +308,7 @@ class TestWorksheetProcessor:
                 embedded.append(prop.image)
 
         assert len(embedded) == 3
-        assert embedded[0].Target == "xl/media/image1.emf"
+        assert embedded[0].Target == "/xl/media/image1.emf"
         assert embedded[0].blob[:10]  == b"\x01\x00\x00\x00l\x00\x00\x00\x00\x00"
 
         archive.close()

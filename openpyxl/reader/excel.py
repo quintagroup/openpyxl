@@ -300,6 +300,7 @@ class WorksheetProcessor:
 
         rel = self.rels[self.ws.legacy_drawing]
         vml = self.archive.read(rel.target)
+        vml = vml.replace(b"<br>", b"<br/>")
         drawing = LegacyDrawing(vml)
         self.ws.legacy_drawing = drawing
         rels_path = get_rels_path(rel.target)
@@ -369,6 +370,7 @@ class WorksheetProcessor:
         Get related objects for ActiveX Controls
         """
         active = {}
+        images = set()
 
         for rel in self.rels.control:
             src = self.archive.read(rel.target)
@@ -382,7 +384,10 @@ class WorksheetProcessor:
             prop = control.controlPr
             if prop.id:
                 rel = self.rels[prop.id]
-                rel.blob = self.archive.read(rel.Target)
+                if prop.id not in images:
+                    rel.blob = self.archive.read(rel.Target)
+                    rel.Target = "/" + rel.Target # needs preserving as an absolute path
+                    images.add(prop.id)
                 prop.image = rel
 
 
