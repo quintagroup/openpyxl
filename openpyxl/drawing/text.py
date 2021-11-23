@@ -581,6 +581,8 @@ class GeomGuideList(Serialisable):
 
     gd = Sequence(expected_type=GeomGuide, allow_none=True)
 
+    __elements__ = ("gd",)
+
     def __init__(self,
                  gd=(),
                 ):
@@ -603,6 +605,8 @@ class PresetTextShape(Serialisable):
          ]
     ))
     avLst = Typed(expected_type=GeomGuideList, allow_none=True)
+
+    __elements__ = ("avLst",)
 
     def __init__(self,
                  prst=None,
