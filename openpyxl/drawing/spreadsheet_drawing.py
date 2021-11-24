@@ -163,6 +163,7 @@ class SpreadsheetDrawing(Serialisable):
             else:
                 link = getattr(obj.nvSpPr.cNvPr, "hlinkClick")
                 if link:
+                    link.id = f"rId{idx}"
                     rel = Relationship(
                         type="hyperlink",
                         Target=link.target,
