@@ -210,10 +210,13 @@ class TestActiveXControl:
 
 
     def test_ctor(self, ActiveXControl):
-        ctrl = ActiveXControl(id="rId1")
+        ctrl = ActiveXControl(id="rId1", persistence="persistStreamInit")
         xml = tostring(ctrl.to_tree())
         expected = """
-        <ax:ocx ax:classid="{8BD21D50-EC42-11CE-9E0D-00AA006002F3}" r:id="rId1" xmlns:ax="http://schemas.microsoft.com/office/2006/activeX" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
+        <ax:ocx ax:classid="{8BD21D50-EC42-11CE-9E0D-00AA006002F3}"
+         ax:persistence="persistStreamInit" r:id="rId1"
+         xmlns:ax="http://schemas.microsoft.com/office/2006/activeX"
+         xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -221,22 +224,24 @@ class TestActiveXControl:
 
     def test_from_xml(self, ActiveXControl):
         src = """
-        <ax:ocx ax:classid="{8BD21D50-EC42-11CE-9E0D-00AA006002F3}" r:id="rId1" xmlns:ax="http://schemas.microsoft.com/office/2006/activeX" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
+        <ocx classid="{8BD21D50-EC42-11CE-9E0D-00AA006002F3}" r:id="rId1" xmlns="http://schemas.microsoft.com/office/2006/activeX"
+        persistence="persistStreamInit"
+        xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"/>
         """
         node = fromstring(src)
         ctrl = ActiveXControl.from_tree(node)
-        assert ctrl == ActiveXControl(id="rId1")
+        assert ctrl == ActiveXControl(id="rId1", persistence="persistStreamInit")
 
 
     def test_path(self, ActiveXControl):
-        ctrl = ActiveXControl("rId4")
+        ctrl = ActiveXControl("rId4", persistence="persistStreamInit")
         ctrl.counter = 4
         assert ctrl.path == "/xl/activeX/activeX4.xml"
 
 
     def test_write(self, ActiveXControl):
         archive = ZipFile(BytesIO(), "w")
-        ctrl = ActiveXControl("Button")
+        ctrl = ActiveXControl(persistence="persistStreamInit")
         ctrl.counter = 1
         manifest = []
         ctrl._write(archive, manifest)

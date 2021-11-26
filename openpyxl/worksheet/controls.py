@@ -5,6 +5,7 @@ from openpyxl.descriptors import (
     Typed,
     Bool,
     Integer,
+    Set,
     String,
     Sequence,
 )
@@ -290,8 +291,8 @@ class FormControl(Serialisable):
 
 class ActiveXControl(Serialisable):
 
-    tagname = "ocx"
     namespace = ACTIVEX_NS
+    tagname = "ocx"
     mime_type = "application/vnd.ms-office.activeX+xml"
     rel_type = f"{REL_NS}/control"
     _path = "/xl/activeX/activeX{0}.xml"
@@ -301,13 +302,16 @@ class ActiveXControl(Serialisable):
 
     id = Relation()
     classid = String(namespace=ACTIVEX_NS)
+    persistence = Set(values=["persistPropertyBag", "persistStream", "persistStreamInit", "persistStorage"],
+                      namespace=ACTIVEX_NS)
 
     bin = None # active X binary
     bin = b"\001"
 
-    def __init__(self, id=None, classid=None):
+    def __init__(self, id=None, classid=None, persistence=None):
         self.id = id
         self.classid = "{8BD21D50-EC42-11CE-9E0D-00AA006002F3}"
+        self.persistence = persistence
 
 
     @property
@@ -320,7 +324,8 @@ class ActiveXControl(Serialisable):
         Add to zipfile and update manifest
         """
         self._write_rels(archive, manifest)
-        xml = tostring(self.to_tree())
+        tree = self.to_tree()
+        xml = tostring(tree)
         archive.writestr(self.path[1:], xml)
         manifest.append(self)
 
