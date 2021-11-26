@@ -135,14 +135,10 @@ def test_read_stringio(load_workbook):
 def test_load_workbook_with_vba(datadir, load_workbook):
     datadir.chdir()
 
-    test_file = 'legacy_drawing.xlsm'
+    test_file = 'form_controls.xlsm'
     # open the workbook directly from the file
-    wb1 = load_workbook(test_file, keep_vba=True)
-    # open again from a BytesIO copy
-    with open(test_file, 'rb') as f:
-        wb2 = load_workbook(BytesIO(f.read()), keep_vba=True)
-    assert wb1.vba_archive.namelist() == wb2.vba_archive.namelist()
-    assert wb1.vba_archive.namelist() == ZipFile(test_file, 'r').namelist()
+    wb = load_workbook(test_file)
+    assert wb._vba is not None
 
 
 def test_no_external_links(datadir, load_workbook):

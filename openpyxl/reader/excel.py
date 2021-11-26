@@ -30,6 +30,7 @@ from openpyxl.xml.constants import (
     ARC_WORKBOOK,
     ARC_THEME,
     SHARED_STRINGS,
+    VBA,
     XLTM,
     XLTX,
     XLSM,
@@ -160,12 +161,9 @@ class ExcelReader:
         wb._read_only = self.read_only
         wb.template = wb_part.ContentType in (XLTX, XLTM)
 
-        # If are going to preserve the vba then attach a copy of the archive to the
-        # workbook so that is available for the save.
-        if self.keep_vba:
-            wb.vba_archive = ZipFile(BytesIO(), 'a', ZIP_DEFLATED)
-            for name in self.valid_files:
-                wb.vba_archive.writestr(name, self.archive.read(name))
+        if "xl/vbaProject.bin" in self.archive.namelist():
+            # might also want to search the manifest by content type
+            wb._vba = self.archive.read("xl/vbaProject.bin")
 
         if self.read_only:
             wb._archive = self.archive

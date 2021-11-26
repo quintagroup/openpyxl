@@ -100,19 +100,22 @@ class ExcelWriter(object):
 
         self.manifest._write(archive, self.workbook)
 
+
     def _merge_vba(self):
         """
         If workbook contains macros then extract associated files from cache
         of old file and add to archive
         """
-        ARC_VBA = re.compile("|".join(
-            ('xl/vba','customUI', ))
-                             )
+        if self.workbook._vba:
+            self.archive.writestr("xl/vbaProject.bin", self.workbook._vba)
+        #ARC_VBA = re.compile("|".join(
+            #('xl/vba','customUI', ))
+                             #)
 
-        if self.workbook.vba_archive:
-            for name in set(self.workbook.vba_archive.namelist()) - self.vba_modified:
-                if ARC_VBA.match(name):
-                    self.archive.writestr(name, self.workbook.vba_archive.read(name))
+        #if self.workbook.vba_archive:
+            #for name in set(self.workbook.vba_archive.namelist()) - self.vba_modified:
+                #if ARC_VBA.match(name):
+                    #self.archive.writestr(name, self.workbook.vba_archive.read(name))
 
 
     def _write_images(self):

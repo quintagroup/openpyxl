@@ -162,7 +162,7 @@ class TestExcelWriter:
     def test_merge_vba(self, ExcelWriter, archive, datadir):
         from openpyxl import load_workbook
         datadir.chdir()
-        wb = load_workbook("vba+comments.xlsm", keep_vba=True)
+        wb = load_workbook("vba+comments.xlsm")
 
         writer = ExcelWriter(wb, archive)
         writer._merge_vba()
@@ -213,7 +213,7 @@ class TestExcelWriter:
         tree = fromstring(src)
         controls = ControlList.from_tree(tree)
         ctrl = controls.control[0]
-        ctrl.shape = ActiveXControl()
+        ctrl.shape = ActiveXControl(persistence="persistStreamInit")
         ctrl.shape.bin = b"\001"
         prop = ctrl.controlPr
         prop.image = Relationship(type="image", Target="")
@@ -283,7 +283,7 @@ class TestExcelWriter:
         tree = fromstring(src)
         controls = ControlList.from_tree(tree)
         for ctrl in controls.control:
-            ctrl.shape = ActiveXControl()
+            ctrl.shape = ActiveXControl(persistence="persistStreamInit")
             ctrl.shape.bin = b"\001"
             prop = ctrl.controlPr
             prop.image = Relationship(type="image", Target="")

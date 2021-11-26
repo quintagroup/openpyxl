@@ -183,6 +183,8 @@ class Manifest(Serialisable):
         """
         Add content types from cached workbook when keeping VBA
         """
+        if workbook._vba:
+            ct= Override(PartName="/xl/vbaProject.bin", ContentType=VBA)
         if workbook.vba_archive:
             node = fromstring(workbook.vba_archive.read(ARC_CONTENT_TYPES))
             mf = Manifest.from_tree(node)
