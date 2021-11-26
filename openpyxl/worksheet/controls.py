@@ -308,9 +308,9 @@ class ActiveXControl(Serialisable):
     bin = None # active X binary
     bin = b"\001"
 
-    def __init__(self, id=None, classid=None, persistence=None):
+    def __init__(self, id=None, classid="{8BD21D50-EC42-11CE-9E0D-00AA006002F3}", persistence=None):
         self.id = id
-        self.classid = "{8BD21D50-EC42-11CE-9E0D-00AA006002F3}"
+        self.classid = classid
         self.persistence = persistence
 
 
