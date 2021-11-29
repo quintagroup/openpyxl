@@ -295,7 +295,9 @@ class TestWorksheetProcessor:
         processor = WorksheetProcessor(ws, archive)
         processor.find_children("xl/worksheets/sheet1.xml")
         processor.get_activex()
-        assert isinstance(ws.controls.control[0].shape, ActiveXControl)
+        ctrl = ws.controls.control[0].shape
+        assert isinstance(ctrl, ActiveXControl)
+        assert ctrl.bin[:10] == b"@2\x05\xd7i\xce\xcd\x11\xa7w"
 
         embedded = []
         for ctrl in ws.controls.control:

@@ -243,6 +243,7 @@ class TestActiveXControl:
         archive = ZipFile(BytesIO(), "w")
         ctrl = ActiveXControl(persistence="persistStreamInit")
         ctrl.counter = 1
+        ctrl.bin = b"\001"
         manifest = []
         ctrl._write(archive, manifest)
         assert archive.namelist() == ["xl/activeX/activeX1.bin",

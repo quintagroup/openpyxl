@@ -306,7 +306,7 @@ class ActiveXControl(Serialisable):
                       namespace=ACTIVEX_NS)
 
     bin = None # active X binary
-    bin = b"\001"
+    #bin = b"\001"
 
     def __init__(self, id=None, classid="{8BD21D50-EC42-11CE-9E0D-00AA006002F3}", persistence=None):
         self.id = id

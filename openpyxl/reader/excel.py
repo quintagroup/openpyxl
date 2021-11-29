@@ -373,7 +373,15 @@ class WorksheetProcessor:
         for rel in self.rels.control:
             src = self.archive.read(rel.target)
             tree = fromstring(src)
-            active[rel.id] = ActiveXControl.from_tree(tree)
+            ctrl = ActiveXControl.from_tree(tree)
+            active[rel.id] = ctrl
+            active_path = get_rels_path(rel.target)
+            rels = get_dependents(self.archive, active_path)
+
+            # get activeX binary
+            bin_rel = rels[ctrl.id]
+            ctrl.bin = self.archive.read(bin_rel.Target)
+
 
         for control in self.ws.controls.control:
             if control.id in active:
