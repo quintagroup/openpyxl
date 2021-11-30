@@ -4,11 +4,9 @@ from openpyxl.xml.functions import (
     Element,
     SubElement,
     tostring,
-    fromstring,
 )
 
 from openpyxl.utils import (
-    column_index_from_string,
     coordinate_to_tuple,
 )
 
