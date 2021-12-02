@@ -412,9 +412,10 @@ class TestSpreadsheetDrawing:
         drawing = SpreadsheetDrawing.from_tree(node)
         anchor = drawing.twoCellAnchor[0]
         drawing.twoCellAnchor = []
-        im = Image(PIL.Image.new(mode="RGB", size=(1, 1)))
-        im.anchor = anchor
-        drawing.images.append(im)
+        img = Image(PIL.Image.new(mode="RGB", size=(1, 1)))
+        img.format = "PNG"
+        img.anchor = anchor
+        drawing.images.append(img)
         xml = tostring(drawing._write())
         diff = compare_xml(xml, src)
         assert diff is None, diff
@@ -482,9 +483,10 @@ class TestSpreadsheetDrawing:
         drawing = SpreadsheetDrawing.from_tree(node)
         anchor = drawing.twoCellAnchor[0]
         drawing.twoCellAnchor = []
-        im = Image(PIL.Image.new(mode="RGB", size=(1, 1)))
-        im.anchor = anchor
-        drawing.images.append(im)
+        img = Image(PIL.Image.new(mode="RGB", size=(1, 1)))
+        img.anchor = anchor
+        img.format = "PNG"
+        drawing.images.append(img)
         xml = tostring(drawing._write())
         diff = compare_xml(xml, src)
         assert diff is None, diff

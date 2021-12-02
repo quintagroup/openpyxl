@@ -66,10 +66,12 @@ def find_images(archive, path):
                 msg = "The image {0} will be removed because it cannot be read".format(dep.target)
                 warn(msg)
                 continue
-            if image.format.upper() == "WMF": # cannot save
-                msg = f"{image.format} image format is not supported so the image {dep.target} is being dropped"
-                warn(msg)
-                continue
+            if image.format == "WMF" and dep.target.endswith("emf"):
+                image.format = "EMF"
+            #if image.format.upper() == "WMF": # cannot save
+                #msg = f"{image.format} image format is not supported so the image {dep.target} is being dropped"
+                #warn(msg)
+                #continue
             image.anchor = rel.anchor
             images.append(image)
 

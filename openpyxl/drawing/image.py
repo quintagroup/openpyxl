@@ -24,6 +24,7 @@ class Image(object):
     _id = 1
     _path = "/xl/media/image{0}.{1}"
     anchor = "A1"
+    format = "PNG"
 
     def __init__(self, img):
 
@@ -33,9 +34,9 @@ class Image(object):
         self.width, self.height = image.size
 
         try:
-            self.format = image.format.lower()
+            self.format = image.format
         except AttributeError:
-            self.format = "png"
+            pass
         if mark_to_close:
             # PIL instances created for metadata should be closed.
             image.close()
@@ -47,7 +48,7 @@ class Image(object):
         """
         img = _import_image(self.ref)
         # don't convert these file formats
-        if self.format in ['gif', 'jpeg', 'png']:
+        if self.format in ['GIF', 'JPEG', 'PNG', "WMF", "EMF"]:
             img.fp.seek(0)
             fp = img.fp
         else:
@@ -60,4 +61,4 @@ class Image(object):
 
     @property
     def path(self):
-        return self._path.format(self._id, self.format)
+        return self._path.format(self._id, self.format.lower())
