@@ -6,6 +6,7 @@ from openpyxl.descriptors import (
     Bool,
     Integer,
     Set,
+    NoneSet,
     String,
     Sequence,
 )
@@ -302,7 +303,7 @@ class ActiveXControl(Serialisable):
 
     id = Relation()
     classid = String(namespace=ACTIVEX_NS)
-    persistence = Set(values=["persistPropertyBag", "persistStream", "persistStreamInit", "persistStorage"],
+    persistence = NoneSet(values=["persistPropertyBag", "persistStream", "persistStreamInit", "persistStorage"],
                       namespace=ACTIVEX_NS)
 
     bin = None # active X binary
