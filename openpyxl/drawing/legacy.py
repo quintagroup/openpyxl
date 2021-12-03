@@ -3,7 +3,7 @@
 from openpyxl.xml.constants import (
     VML_NS,
 )
-from openpyxl.xml.functions import tostring
+from openpyxl.packaging.relationship import RelationshipList
 
 
 class LegacyDrawing:
@@ -18,7 +18,7 @@ class LegacyDrawing:
 
     def __init__(self, vml):
         self.vml = vml
-        self.children = []
+        self.children = RelationshipList()
 
 
     @property
