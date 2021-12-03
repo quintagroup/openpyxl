@@ -101,6 +101,16 @@ class ExcelWriter(object):
         self.manifest._write(archive, self.workbook)
 
 
+    def _add_image(self, img):
+        """
+        Collect images from various components
+        """
+        if img in self._images:
+            img._id = self._images.index(img)
+        self._images.append(img)
+        img._id = len(self._images)
+
+
     def _merge_vba(self):
         """
         If workbook contains macros then extract associated files from cache
@@ -193,7 +203,7 @@ class ExcelWriter(object):
         ws._rels.append(comment_rel)
 
 
-    def write_legacy(self, ws, archive):
+    def write_legacy(self, ws):
         """
         Write VML
         """
@@ -203,23 +213,17 @@ class ExcelWriter(object):
 
         self.legacy.append(drawing)
         drawing._counter = len(self.legacy)
-        rel = ws._rels[drawing._rel_id]
-        rel.Target = drawing.path
-        drawing._write(archive)
+        drawing._write(self.archive)
 
-        if not drawing.children:
-            return
-
-        # Add
-        for rel in drawing.children:
+        for rel in drawing.children.Relationship:
             img = rel.blob
-            self._images.append(img)
-            img._id = len(self._images)
+            self._add_image(img)
             rel.Target = img.path
 
-        xml = drawing.children.to_tree()
-        path = get_rels_path(ws.legacy_drawing.path)
-        self.archive.writestr(path[1:], tostring(xml))
+        if drawing.children:
+            xml = drawing.children.to_tree()
+            path = get_rels_path(ws.legacy_drawing.path)
+            self.archive.writestr(path[1:], tostring(xml))
 
 
     def write_worksheet(self, ws):
@@ -227,6 +231,7 @@ class ExcelWriter(object):
         ws._drawing.charts = ws._charts
         ws._drawing.images = ws._images
         ws._drawing.shapes = ws._shapes
+
         if self.workbook.write_only:
             if not ws.closed:
                 ws.close()
@@ -242,9 +247,11 @@ class ExcelWriter(object):
         self.write_controls(ws, writer.controls)
         self.write_embedded(ws, writer.control_images)
 
-        # get wmf files from rels and copy to legacy
         if ws.legacy_drawing:
-            self.write_legacy(ws, self.archive)
+            drawing = ws.legacy_drawing
+            self.write_legacy(ws)
+            rel = ws._rels[drawing._rel_id]
+            rel.Target = drawing.path
 
         self.archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
@@ -271,10 +278,10 @@ class ExcelWriter(object):
         """
         Update path for embedded images for controls
         """
-        for img in control_images:
-            self._images.append(img.blob)
-            img._id = len(self._images)
-            img.Target = img.blob.path
+        for obj in control_images:
+            img = obj.blob
+            self._add_image(img)
+            obj.Target = img.path
 
 
     def _write_worksheets(self):

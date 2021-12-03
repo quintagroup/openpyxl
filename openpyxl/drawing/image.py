@@ -7,6 +7,7 @@ try:
 except ImportError:
     PILImage = False
 
+from openpyxl.xml.constants import IMAGE_NS
 
 def _import_image(img):
     if not PILImage:
@@ -25,6 +26,7 @@ class Image(object):
     _path = "/xl/media/image{0}.{1}"
     anchor = "A1"
     format = "PNG"
+    rel_type = IMAGE_NS
 
     def __init__(self, img):
 

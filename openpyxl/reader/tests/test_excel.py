@@ -286,9 +286,6 @@ class TestWorksheetProcessor:
     def test_get_activex(self, datadir, WorksheetProcessor, load_workbook):
         datadir.chdir()
         archive = ZipFile("form_controls.xlsm")
-        #wb = Workbook()
-        #ws = wb.create_sheet()
-        #ws.controls = controls
         wb = load_workbook("form_controls.xlsm")
         ws = wb.active
 
@@ -307,7 +304,7 @@ class TestWorksheetProcessor:
 
         assert len(embedded) == 3
         assert embedded[0].Target == "xl/media/image1.emf"
-        assert embedded[0].blob[:10]  == b"\x01\x00\x00\x00l\x00\x00\x00\x00\x00"
+        assert embedded[0].blob._data()[:10]  == b"\x01\x00\x00\x00l\x00\x00\x00\x00\x00"
 
         archive.close()
 
@@ -338,6 +335,9 @@ class TestWorksheetProcessor:
         processor.find_children("xl/worksheets/sheet1.xml")
         processor.get_legacy()
 
-        assert ws.legacy_drawing.path == "/xl/drawings/vmlDrawing0.vml"
-        assert ws.legacy_drawing.children.Relationship[0].target == "xl/media/image3.emf"
+        drawing = ws.legacy_drawing
+        assert drawing.path == "/xl/drawings/vmlDrawing0.vml"
+        rel = drawing.children.Relationship[0]
+        assert rel.target == "xl/media/image3.emf"
+        assert rel.blob._data()[:10] == b"\x01\x00\x00\x00l\x00\x00\x00\x00\x00"
 

@@ -308,7 +308,7 @@ class WorksheetProcessor:
 
         rels = get_dependents(self.archive, rels_path)
 
-        for rel in rels:
+        for rel in rels.Relationship:
             rel.blob = Image(BytesIO(self.archive.read(rel.target)))
             if rel.target.endswith(".emf"):
                 rel.blob.format = "EMF"

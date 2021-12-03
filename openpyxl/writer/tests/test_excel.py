@@ -8,13 +8,13 @@ from zipfile import ZipFile
 
 import pytest
 
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 from openpyxl.chart import BarChart
 from openpyxl.comments import Comment
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.legacy import LegacyDrawing
 from openpyxl.drawing.image import Image
-from openpyxl import Workbook
+from openpyxl.packaging.relationship import RelationshipList, Relationship
 from openpyxl.worksheet.table import Table
 from openpyxl.utils.exceptions import InvalidFileException
 
@@ -79,16 +79,25 @@ class TestExcelWriter:
         assert drawing.path in writer.manifest.filenames
 
 
-    def test_legacy(self, ExcelWriter, archive):
+    def test_legacy(self, ExcelWriter, archive, EMF):
         wb = Workbook()
         ws = wb.active
-        ws.legacy_drawing = LegacyDrawing("some vml")
+        drawing = LegacyDrawing("some vml")
+        rels = RelationshipList()
+        rel = Relationship(Type=EMF.rel_type, Target="")
+        rel.blob = EMF
+        rels.append(rel)
+        drawing.children = rels
+        ws.legacy_drawing = drawing
 
         writer = ExcelWriter(wb, archive)
-        writer.write_worksheet(ws)
+        writer.write_legacy(ws)
+
+        assert len(writer._images) == 1
+        assert rel.Target == "/xl/media/image1.wmf"
         assert archive.namelist() == [
-                                      "xl/drawings/vmlDrawing1.vml",
-                                      "xl/worksheets/sheetNone.xml"
+            "xl/drawings/vmlDrawing1.vml",
+            "xl/drawings/_rels/vmlDrawing1.vml.rels",
         ]
 
 
