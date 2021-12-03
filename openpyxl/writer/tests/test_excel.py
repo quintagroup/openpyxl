@@ -13,6 +13,7 @@ from openpyxl.chart import BarChart
 from openpyxl.comments import Comment
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.legacy import LegacyDrawing
+from openpyxl.drawing.image import Image
 from openpyxl import Workbook
 from openpyxl.worksheet.table import Table
 from openpyxl.utils.exceptions import InvalidFileException
@@ -28,6 +29,13 @@ def ExcelWriter():
 def archive():
     out = BytesIO()
     return ZipFile(out, "w")
+
+
+@pytest.fixture
+def EMF(datadir):
+    datadir.chdir()
+    img = Image("checkbox.emf")
+    return img
 
 
 class TestExcelWriter:
@@ -80,7 +88,6 @@ class TestExcelWriter:
         writer.write_worksheet(ws)
         assert archive.namelist() == [
                                       "xl/drawings/vmlDrawing1.vml",
-                                      "xl/drawings/_rels/vmlDrawing1.vml.rels",
                                       "xl/worksheets/sheetNone.xml"
         ]
 
@@ -183,7 +190,7 @@ class TestExcelWriter:
             writer._write_charts()
 
 
-    def test_controls(self, ExcelWriter, archive):
+    def test_controls(self, ExcelWriter, archive, EMF):
         from openpyxl.worksheet.controls import ControlList, ActiveXControl
         from openpyxl.xml.functions import fromstring
         from openpyxl.packaging.relationship import Relationship
@@ -217,8 +224,7 @@ class TestExcelWriter:
         ctrl.shape.bin = b"\001"
         prop = ctrl.controlPr
         prop.image = Relationship(type="image", Target="")
-        prop.image.blob = b"\001"
-        prop.image.Target = "/xl/media/image1.emf"
+        prop.image.blob = EMF
 
         wb = Workbook()
         ws = wb.active
@@ -226,16 +232,17 @@ class TestExcelWriter:
         writer = ExcelWriter(wb, archive)
         writer.write_worksheet(ws)
 
+        assert prop.image.target == "/xl/media/image1.wmf"
+        assert len(writer._images) == 1
         assert archive.namelist() == [
             "xl/activeX/activeX1.bin",
             "xl/activeX/_rels/activeX1.xml.rels",
             'xl/activeX/activeX1.xml',
-            'xl/media/image1.emf',
             'xl/worksheets/sheetNone.xml',
         ]
 
 
-    def test_controls_with_shared_images(self, ExcelWriter, archive):
+    def test_controls_with_shared_images(self, ExcelWriter, archive, EMF):
         from openpyxl.worksheet.controls import ControlList, ActiveXControl
         from openpyxl.xml.functions import fromstring
         from openpyxl.packaging.relationship import Relationship
@@ -287,7 +294,7 @@ class TestExcelWriter:
             ctrl.shape.bin = b"\001"
             prop = ctrl.controlPr
             prop.image = Relationship(type="image", Target="")
-            prop.image.blob = b"\001"
+            prop.image.blob = EMF
             prop.image.Target = "/xl/media/image1.emf"
 
         wb = Workbook()
@@ -303,7 +310,6 @@ class TestExcelWriter:
             "xl/activeX/activeX2.bin",
             "xl/activeX/_rels/activeX2.xml.rels",
             'xl/activeX/activeX2.xml',
-            'xl/media/image1.emf',
             'xl/worksheets/sheetNone.xml',
         ]
 

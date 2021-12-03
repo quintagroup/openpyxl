@@ -22,7 +22,7 @@ from openpyxl.xml.constants import (
 )
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.legacy import LegacyDrawing
-from openpyxl.xml.functions import tostring, fromstring
+from openpyxl.xml.functions import tostring
 from openpyxl.packaging.manifest import Manifest
 from openpyxl.packaging.relationship import (
     get_rels_path,
@@ -207,11 +207,17 @@ class ExcelWriter(object):
         rel.Target = drawing.path
         drawing._write(archive)
 
-        wmf = RelationshipList()
-        for img in ws._rels.find(IMAGE_NS):
-            new_rel = Relationship(Type=img.Type, Target=img.Target)
-            wmf.append(new_rel)
-        xml = wmf.to_tree()
+        if not drawing.children:
+            return
+
+        # Add
+        for rel in drawing.children:
+            img = rel.blob
+            self._images.append(img)
+            img._id = len(self._images)
+            rel.Target = img.path
+
+        xml = drawing.children.to_tree()
         path = get_rels_path(ws.legacy_drawing.path)
         self.archive.writestr(path[1:], tostring(xml))
 
@@ -263,10 +269,12 @@ class ExcelWriter(object):
 
     def write_embedded(self, ws, control_images):
         """
-        Serialise embedded images in form controls for a specific worksheet
+        Update path for embedded images for controls
         """
-        for embedded in control_images:
-            self.archive.writestr(embedded.Target[1:], embedded.blob)
+        for img in control_images:
+            self._images.append(img.blob)
+            img._id = len(self._images)
+            img.Target = img.blob.path
 
 
     def _write_worksheets(self):
@@ -342,6 +350,8 @@ def save_workbook(workbook, filename):
     :rtype: bool
 
     """
+    #if wb._vba and not filename.endswith(".xlsm"):
+        #warn()
     archive = ZipFile(filename, 'w', ZIP_DEFLATED, allowZip64=True)
     writer = ExcelWriter(workbook, archive)
     writer.save()
