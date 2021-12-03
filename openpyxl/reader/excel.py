@@ -6,7 +6,7 @@
 # Python stdlib
 from zipfile import (
     ZipFile,
-    ZIP_DEFLATED
+
 )
 from io import BytesIO
 import os.path
@@ -63,6 +63,7 @@ from openpyxl.worksheet.controls import (
 )
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.legacy import LegacyDrawing
+from openpyxl.drawing.image import Image
 
 from openpyxl.xml.functions import fromstring
 
@@ -302,10 +303,17 @@ class WorksheetProcessor:
         drawing = LegacyDrawing(vml)
         self.ws.legacy_drawing = drawing
         rels_path = get_rels_path(rel.target)
-        try:
-            drawing.children = get_dependents(self.archive, rels_path)
-        except KeyError:
-            pass # has no images
+        if rels_path not in self.archive.namelist():
+            return
+
+        rels = get_dependents(self.archive, rels_path)
+
+        for rel in rels:
+            rel.blob = Image(BytesIO(self.archive.read(rel.target)))
+            if rel.target.endswith(".emf"):
+                rel.blob.format = "EMF"
+
+        drawing.children = rels
 
 
     def get_comments(self):
@@ -368,7 +376,6 @@ class WorksheetProcessor:
         Get related objects for ActiveX Controls
         """
         active = {}
-        images = set()
 
         for rel in self.rels.control:
             src = self.archive.read(rel.target)
@@ -382,17 +389,19 @@ class WorksheetProcessor:
             bin_rel = rels[ctrl.id]
             ctrl.bin = self.archive.read(bin_rel.Target)
 
-
+        images = set()
         for control in self.ws.controls.control:
             if control.id in active:
                 control.shape = active[control.id]
-            # embed any graphics
+            # embed any graphics, but skip duplicates
             prop = control.controlPr
             if prop.id:
                 rel = self.rels[prop.id]
                 if prop.id not in images:
-                    rel.blob = self.archive.read(rel.Target)
-                    rel.Target = "/" + rel.Target # needs preserving as an absolute path
+                    img = Image(BytesIO(self.archive.read(rel.target)))
+                    if rel.target.endswith(".emf"):
+                        img.format = "EMF"
+                    rel.blob = img
                     images.add(prop.id)
                 prop.image = rel
 

@@ -14,10 +14,11 @@ class LegacyDrawing:
     _rel_id = None
     _path = "/xl/drawings/vmlDrawing{0}.vml"
     vml = None
-    children = [] # rels from the worksheet
+    children = None # rels from the worksheet
 
     def __init__(self, vml):
         self.vml = vml
+        self.children = []
 
 
     @property

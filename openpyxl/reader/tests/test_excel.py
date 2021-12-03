@@ -306,7 +306,7 @@ class TestWorksheetProcessor:
                 embedded.append(prop.image)
 
         assert len(embedded) == 3
-        assert embedded[0].Target == "/xl/media/image1.emf"
+        assert embedded[0].Target == "xl/media/image1.emf"
         assert embedded[0].blob[:10]  == b"\x01\x00\x00\x00l\x00\x00\x00\x00\x00"
 
         archive.close()
@@ -329,13 +329,15 @@ class TestWorksheetProcessor:
 
     def test_get_legacy(self, datadir, WorksheetProcessor):
         datadir.chdir()
-        archive = ZipFile("legacy_drawing.xlsm")
+        archive = ZipFile("form_controls.xlsm")
         wb = Workbook()
         ws = wb.create_sheet()
-        ws.legacy_drawing = "rId1"
+        ws.legacy_drawing = "rId3"
 
         processor = WorksheetProcessor(ws, archive)
-        processor.find_children("xl/worksheets/sheet2.xml")
+        processor.find_children("xl/worksheets/sheet1.xml")
         processor.get_legacy()
 
         assert ws.legacy_drawing.path == "/xl/drawings/vmlDrawing0.vml"
+        assert ws.legacy_drawing.children.Relationship[0].target == "xl/media/image3.emf"
+
