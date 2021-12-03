@@ -107,8 +107,9 @@ class ExcelWriter(object):
         """
         if img in self._images:
             img._id = self._images.index(img)
-        self._images.append(img)
-        img._id = len(self._images)
+        else:
+            self._images.append(img)
+            img._id = len(self._images)
 
 
     def _merge_vba(self):

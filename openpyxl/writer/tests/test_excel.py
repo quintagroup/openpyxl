@@ -323,6 +323,20 @@ class TestExcelWriter:
         ]
 
 
+    def test_add_image(self, ExcelWriter, EMF):
+        writer = ExcelWriter(None, None)
+        writer._add_image(EMF)
+        assert writer._images == [EMF]
+
+
+    def test_duplicate_image(self, ExcelWriter, EMF):
+        writer = ExcelWriter(None, None)
+        writer._add_image(EMF)
+        writer._add_image(EMF)
+        assert writer._images == [EMF]
+
+
+
 def test_write_empty_workbook(tmpdir):
     tmpdir.chdir()
     wb = Workbook()

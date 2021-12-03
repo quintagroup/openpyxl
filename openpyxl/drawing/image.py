@@ -64,3 +64,7 @@ class Image(object):
     @property
     def path(self):
         return self._path.format(self._id, self.format.lower())
+
+
+    def __eq__(self, other):
+        return self.ref == other.ref

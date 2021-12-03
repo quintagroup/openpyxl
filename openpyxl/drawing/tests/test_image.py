@@ -63,3 +63,11 @@ class TestImage:
         datadir.chdir()
         img = Image("plain.tif")
         assert img._data()[:10] == b'\x89PNG\r\n\x1a\n\x00\x00'
+
+
+    @pytest.mark.pil_required
+    def test_compare(self, Image, datadir):
+        datadir.chdir()
+        img1 = Image("plain.png")
+        img2 = Image("plain.png")
+        assert img1 == img2
