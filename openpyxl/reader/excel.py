@@ -309,11 +309,19 @@ class WorksheetProcessor:
         rels = get_dependents(self.archive, rels_path)
 
         for rel in rels.Relationship:
-            rel.blob = Image(BytesIO(self.archive.read(rel.target)))
-            if rel.target.endswith(".emf"):
-                rel.blob.format = "EMF"
+            rel.blob = self._get_image_for(rel.target)
 
         drawing.children = rels
+
+
+    def _get_image_for(self, path):
+        """
+        Extract image from the archive and return it as a BytesIO object
+        """
+        img = Image(BytesIO(self.archive.read(path)))
+        if path.endswith(".emf"):
+            img.format = "EMF"
+        return img
 
 
     def get_comments(self):
@@ -370,6 +378,11 @@ class WorksheetProcessor:
             if control.id in ctrlProps:
                 control.shape = ctrlProps[control.id]
 
+            prop = control.controlPr
+            if prop.id:
+                rel = self.rels[prop.id]
+                rel.blob = self._get_image_for(rel.target)
+                prop.image = rel
 
     def get_activex(self):
         """
@@ -398,10 +411,7 @@ class WorksheetProcessor:
             if prop.id:
                 rel = self.rels[prop.id]
                 if prop.id not in images:
-                    img = Image(BytesIO(self.archive.read(rel.target)))
-                    if rel.target.endswith(".emf"):
-                        img.format = "EMF"
-                    rel.blob = img
+                    rel.blob = self._get_image_for(rel.target)
                     images.add(prop.id)
                 prop.image = rel
 
