@@ -155,11 +155,17 @@ class SpreadsheetDrawing(Serialisable):
 
             elif isinstance(obj, Image):
                 rel = Relationship(type="image", Target=obj.path)
-                child = anchor.pic or anchor.groupShape and anchor.groupShape.pic
-                if not child:
-                    anchor.pic = self._picture_frame(idx)
-                else:
+                if anchor.pic:
+                    child = anchor.pic
                     child.blipFill.blip.embed = f"rId{idx}"
+
+                elif anchor.groupShape and anchor.groupShape.pic:
+                    for child in anchor.groupShape.pic:
+                        child.blipFill.blip.embed = f"rId{idx}"
+
+                else:
+                    anchor.pic = self._picture_frame(idx)
+
             else:
                 link = getattr(obj.nvSpPr.cNvPr, "hlinkClick")
                 if link:
@@ -251,12 +257,19 @@ class SpreadsheetDrawing(Serialisable):
         anchors = self.absoluteAnchor + self.oneCellAnchor + self.twoCellAnchor
 
         for anchor in anchors:
-            child = anchor.pic or anchor.groupShape and anchor.groupShape.pic
-            if child and child.blipFill:
-                rel = child.blipFill.blip
-                if rel is not None and rel.embed:
-                    rel.anchor = anchor
-                    rels.append(rel)
+            if anchor.pic:
+                child = anchor.pic
+                if child and child.blipFill:
+                    rel = child.blipFill.blip
+                    if rel is not None and rel.embed:
+                        rel.anchor = anchor
+                        rels.append(rel)
+            elif anchor.groupShape and anchor.groupShape.pic:
+                for child in anchor.groupShape.pic:
+                    rel = child.blipFill.blip
+                    if rel is not None and rel.embed:
+                        rel.anchor = anchor
+                        rels.append(rel)
 
         return rels
 
