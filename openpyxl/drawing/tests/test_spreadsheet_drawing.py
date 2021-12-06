@@ -492,6 +492,15 @@ class TestSpreadsheetDrawing:
         assert diff is None, diff
 
 
+    def test_multipic_group(self, SpreadsheetDrawing, datadir):
+        datadir.chdir()
+        with open("multipic_group.xml", "rb") as src:
+            xml = src.read()
+        tree = fromstring(xml)
+        drawing = SpreadsheetDrawing.from_tree(tree)
+        assert len(drawing._blip_rels) == 2
+
+
     def test_shapes(self, SpreadsheetDrawing, datadir):
         datadir.chdir()
         with open ("commands.xml", "rb") as src:
