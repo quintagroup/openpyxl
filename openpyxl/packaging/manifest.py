@@ -29,6 +29,7 @@ mimetypes.add_type('application/vnd.openxmlformats-package.relationships+xml', "
 mimetypes.add_type("application/vnd.ms-office.vbaProject", ".bin")
 mimetypes.add_type("application/vnd.openxmlformats-officedocument.vmlDrawing", ".vml")
 mimetypes.add_type("image/x-emf", ".emf")
+mimetypes.add_type("image/x-wmf", ".wmf")
 
 
 class FileExtension(Serialisable):
