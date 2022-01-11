@@ -2,13 +2,12 @@
 
 from openpyxl.xml.constants import DRAWING_NS
 
+from openpyxl.descriptors import Strict
 from openpyxl.descriptors.serialisable import Serialisable
 from openpyxl.descriptors import (
     Typed,
     Bool,
-    NoneSet,
     Integer,
-    Set,
     String,
     Alias,
 )
@@ -16,8 +15,8 @@ from openpyxl.descriptors.excel import ExtensionList as OfficeArtExtensionList
 
 from openpyxl.chart.shapes import GraphicalProperties
 
-from .fill import RelativeRect, BlipFillProperties
-from .properties import NonVisualDrawingProps, NonVisualGroupDrawingShapeProps
+from .fill import BlipFillProperties
+from .properties import NonVisualDrawingProps
 from .geometry import ShapeStyle
 
 
@@ -109,16 +108,14 @@ class PictureNonVisual(Serialisable):
         self.cNvPicPr = cNvPicPr
 
 
-
-
 class PictureFrame(Serialisable):
 
     tagname = "pic"
 
     macro = String(allow_none=True)
     fPublished = Bool(allow_none=True)
-    nvPicPr = Typed(expected_type=PictureNonVisual, )
-    blipFill = Typed(expected_type=BlipFillProperties, )
+    nvPicPr = Typed(expected_type=PictureNonVisual)
+    blipFill = Typed(expected_type=BlipFillProperties)
     spPr = Typed(expected_type=GraphicalProperties, )
     graphicalProperties = Alias('spPr')
     style = Typed(expected_type=ShapeStyle, allow_none=True)
@@ -146,3 +143,8 @@ class PictureFrame(Serialisable):
         self.spPr = spPr
         self.style = style
 
+
+    def _get_image(self):
+        blip = self.blipFill.blip
+        if blip is not None and blip.embed:
+            return blip

@@ -97,6 +97,19 @@ class _AnchorBase(Serialisable):
         self.contentPart = contentPart
 
 
+    @property
+    def _content(self):
+        """
+        What kind of content does the anchor contain
+        """
+        if self.pic is not None:
+            return self.pic
+        elif self.groupShape is not None:
+            return self.groupShape
+        elif self.connectionShape is None:
+            return self.connectionShape
+
+
 class AbsoluteAnchor(_AnchorBase):
 
     tagname = "absoluteAnchor"

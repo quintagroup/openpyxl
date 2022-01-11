@@ -24,6 +24,7 @@ from openpyxl.chart._chart import ChartBase
 from .fill import Blip
 from .graphic import (
      GraphicFrame,
+     GroupShape,
     )
 from .geometry import PresetGeometry2D
 from .picture import PictureFrame
@@ -257,19 +258,19 @@ class SpreadsheetDrawing(Serialisable):
         anchors = self.absoluteAnchor + self.oneCellAnchor + self.twoCellAnchor
 
         for anchor in anchors:
-            if anchor.pic:
-                child = anchor.pic
-                if child and child.blipFill:
-                    rel = child.blipFill.blip
-                    if rel is not None and rel.embed:
-                        rel.anchor = anchor
-                        rels.append(rel)
-            elif anchor.groupShape and anchor.groupShape.pic:
-                for child in anchor.groupShape.pic:
-                    rel = child.blipFill.blip
-                    if rel is not None and rel.embed:
-                        rel.anchor = anchor
-                        rels.append(rel)
+            child = anchor._content
+            if isinstance(child, PictureFrame):
+                img = child._get_image()
+                if img:
+                    img.anchor = anchor
+                    rels.append(img)
+
+            elif isinstance(child, GroupShape):
+                for pic in child.pic:
+                    img = pic._get_image()
+                    if img is not None:
+                        img.anchor = anchor
+                        rels.append(img)
 
         return rels
 
