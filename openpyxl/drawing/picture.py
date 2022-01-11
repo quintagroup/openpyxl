@@ -144,7 +144,8 @@ class PictureFrame(Serialisable):
         self.style = style
 
 
-    def _get_image(self):
+    @property
+    def _image(self):
         blip = self.blipFill.blip
         if blip is not None and blip.embed:
             return blip

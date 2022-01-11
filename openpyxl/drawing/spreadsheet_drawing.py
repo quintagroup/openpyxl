@@ -260,14 +260,14 @@ class SpreadsheetDrawing(Serialisable):
         for anchor in anchors:
             child = anchor._content
             if isinstance(child, PictureFrame):
-                img = child._get_image()
+                img = child._image
                 if img:
                     img.anchor = anchor
                     rels.append(img)
 
             elif isinstance(child, GroupShape):
                 for pic in child.pic:
-                    img = pic._get_image()
+                    img = pic._image
                     if img is not None:
                         img.anchor = anchor
                         rels.append(img)
