@@ -312,7 +312,6 @@ class TestSpreadsheetDrawing:
 
     @pytest.mark.parametrize("path", [
         "spreadsheet_drawing_with_blip.xml",
-        "two_cell_anchor_group.xml",
         "two_cell_anchor_pic.xml",
     ])
     def test_read_blip(self, SpreadsheetDrawing, datadir, path):
@@ -334,6 +333,15 @@ class TestSpreadsheetDrawing:
         drawing = SpreadsheetDrawing.from_tree(node)
 
         assert drawing._blip_rels == []
+
+
+    def test_group_rels(self, SpreadsheetDrawing, datadir):
+        with open("multipic_group.xml", "rb") as src:
+            xml = src.read()
+        node = fromstring(xml)
+        drawing = SpreadsheetDrawing.from_tree(node)
+
+        assert len(drawing._group_rels[0]) == 2
 
 
     def test_write_rels(self, SpreadsheetDrawing):
