@@ -9,7 +9,7 @@ from openpyxl.xml.functions import fromstring
 from openpyxl.xml.constants import IMAGE_NS, REL_NS
 from openpyxl.packaging.relationship import get_rel, get_rels_path, get_dependents
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
-from openpyxl.drawing.image import Image, PILImage
+from openpyxl.drawing.image import Image, PILImage, ImageGroup
 from openpyxl.chart.chartspace import ChartSpace
 from openpyxl.chart.reader import read_chart
 
@@ -72,5 +72,20 @@ def find_images(archive, path):
                 #continue
             image.anchor = rel.anchor
             images.append(image)
+
+    for group in drawing._group_rels:
+        img_group = ImageGroup()
+        img_group.anchor = group.pop(0)
+        for rel in group:
+            dep = deps[rel.embed]
+            try:
+                image = Image(BytesIO(archive.read(dep.target)))
+            except OSError:
+                msg = "The image {0} will be removed because it cannot be read".format(dep.target)
+                warn(msg)
+                continue
+            image.properties = rel.properties # need xfrm to position the image within the anchor
+            img_group.append(image)
+        images.append(img_group)
 
     return charts, images, shapes

@@ -263,15 +263,32 @@ class SpreadsheetDrawing(Serialisable):
                 img = child._image
                 if img:
                     img.anchor = anchor
+                    img.properties = child.spPr
                     rels.append(img)
 
-            elif isinstance(child, GroupShape):
+        return rels
+
+
+    @property
+    def _group_rels(self):
+        """
+        Extract groups of images
+        """
+        rels = []
+        anchors = self.absoluteAnchor + self.oneCellAnchor + self.twoCellAnchor
+
+        for anchor in anchors:
+            child = anchor._content
+
+            if isinstance(child, GroupShape):
+                group = [anchor]
                 for pic in child.pic:
                     img = pic._image
                     if img is not None:
-                        img.anchor = anchor
-                        rels.append(img)
+                        img.properties = pic.spPr
+                        group.append(img)
 
+            rels.append(group)
         return rels
 
 
