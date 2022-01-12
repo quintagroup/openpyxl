@@ -160,7 +160,7 @@ class GroupShape(Serialisable):
     visualProperties = Alias("grpSpPr")
     pic = Sequence(expected_type=PictureFrame, allow_none=True)
 
-    __elements__ = ["nvGrpSpPr", "grpSpPr", "pic"]
+    __elements__ = ("nvGrpSpPr", "grpSpPr", "pic")
 
     def __init__(self,
                  nvGrpSpPr=None,
