@@ -108,6 +108,8 @@ class _AnchorBase(Serialisable):
             return self.groupShape
         elif self.connectionShape is None:
             return self.connectionShape
+        elif self.shape is not None:
+            return self.shape
 
 
 class AbsoluteAnchor(_AnchorBase):
