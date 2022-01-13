@@ -2,12 +2,10 @@
 
 from openpyxl.xml.constants import DRAWING_NS
 
-from openpyxl.descriptors import Strict
 from openpyxl.descriptors.serialisable import Serialisable
 from openpyxl.descriptors import (
     Typed,
     Bool,
-    Integer,
     String,
     Alias,
 )
