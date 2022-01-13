@@ -57,20 +57,9 @@ def find_images(archive, path):
     if not PILImage: # Pillow not installed, drop images
         return charts, images, shapes
 
-    for rel in drawing._blip_rels:
-        dep = deps[rel.embed]
-        if dep.Type == IMAGE_NS:
-            try:
-                image = Image(BytesIO(archive.read(dep.target)))
-            except OSError:
-                msg = "The image {0} will be removed because it cannot be read".format(dep.target)
-                warn(msg)
-                continue
-            #if image.format.upper() == "WMF": # cannot save
-                #msg = f"{image.format} image format is not supported so the image {dep.target} is being dropped"
-                #warn(msg)
-                #continue
-            image.anchor = rel.anchor
+    for blip in drawing._blip_rels:
+        image = blip._read(deps, archive)
+        if image is not None:
             images.append(image)
 
     for group in drawing._group_rels:

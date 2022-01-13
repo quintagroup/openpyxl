@@ -15,7 +15,7 @@ from openpyxl.descriptors import (
     String,
     Sequence,
 )
-from .picture import PictureFrame
+
 from openpyxl.packaging.relationship import Relationship
 
 
@@ -101,9 +101,8 @@ class ImageGroup(Strict):
 
 
     def append(self, img):
-        images = self.images
-        images.append(img)
-        self.images = images
+        self.images.append(img)
+        self.images = self.images
 
 
     @property

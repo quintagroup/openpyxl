@@ -288,7 +288,8 @@ class SpreadsheetDrawing(Serialisable):
                         img.properties = pic.spPr
                         group.append(img)
 
-            rels.append(group)
+                rels.append(group)
+
         return rels
 
 

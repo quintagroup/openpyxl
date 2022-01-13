@@ -341,7 +341,7 @@ class TestSpreadsheetDrawing:
         node = fromstring(xml)
         drawing = SpreadsheetDrawing.from_tree(node)
 
-        assert len(drawing._group_rels[0]) == 2
+        assert len(drawing._group_rels[0]) == 3
 
 
     def test_write_rels(self, SpreadsheetDrawing):
@@ -498,15 +498,6 @@ class TestSpreadsheetDrawing:
         xml = tostring(drawing._write())
         diff = compare_xml(xml, src)
         assert diff is None, diff
-
-
-    def test_multipic_group(self, SpreadsheetDrawing, datadir):
-        datadir.chdir()
-        with open("multipic_group.xml", "rb") as src:
-            xml = src.read()
-        tree = fromstring(xml)
-        drawing = SpreadsheetDrawing.from_tree(tree)
-        assert len(drawing._blip_rels) == 2
 
 
     def test_shapes(self, SpreadsheetDrawing, datadir):
