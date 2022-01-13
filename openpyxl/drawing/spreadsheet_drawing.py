@@ -16,7 +16,10 @@ from openpyxl.utils.units import (
     cm_to_EMU,
     pixels_to_EMU,
 )
-from openpyxl.drawing.image import Image
+from openpyxl.drawing.image import (
+    Image,
+    ImageGroup,
+)
 
 from openpyxl.xml.constants import SHEET_DRAWING_NS
 
@@ -160,12 +163,14 @@ class SpreadsheetDrawing(Serialisable):
                     child = anchor.pic
                     child.blipFill.blip.embed = f"rId{idx}"
 
-                elif anchor.groupShape and anchor.groupShape.pic:
-                    for child in anchor.groupShape.pic:
-                        child.blipFill.blip.embed = f"rId{idx}"
-
                 else:
                     anchor.pic = self._picture_frame(idx)
+
+            elif isinstance(obj, ImageGroup):
+                for img, pic in zip(obj.images, anchor.groupShape.pic):
+                    rel = Relationship(type="image", Target=img.path)
+                    self._rels.append(rel)
+                    pic.blipFill.blip.embed = rel.Id
 
             else:
                 link = getattr(obj.nvSpPr.cNvPr, "hlinkClick")
