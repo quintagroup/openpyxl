@@ -8,6 +8,16 @@ except ImportError:
     PILImage = False
 
 from openpyxl.xml.constants import IMAGE_NS
+from openpyxl.descriptors import (
+    Strict,
+    Typed,
+    Integer,
+    String,
+    Sequence,
+)
+from .picture import PictureFrame
+from openpyxl.packaging.relationship import Relationship
+
 
 def _import_image(img):
     if not PILImage:
@@ -68,3 +78,34 @@ class Image(object):
 
     def __eq__(self, other):
         return self.ref == other.ref
+
+
+class ImageGroup(Strict):
+
+    """
+    A way of grouping pictures in shapes
+    """
+
+    images = Sequence(expected_type=Image)
+    counter = Integer()
+
+
+    def __init__(self,
+                 images=(),
+                 counter=counter,
+                 archive=None,
+                 anchor=None):
+        self.images = images
+        self.counter = 0
+        self.anchor = anchor
+
+
+    def append(self, img):
+        images = self.images
+        images.append(img)
+        self.images = images
+
+
+    @property
+    def name(self):
+        return f"Group {self.counter}"
