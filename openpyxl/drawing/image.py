@@ -80,6 +80,10 @@ class Image(object):
         return self.ref == other.ref
 
 
+    def _write(self, archive):
+        archive.writestr(self.path[1:], self._data())
+
+
 class ImageGroup(Strict):
 
     """
@@ -108,3 +112,8 @@ class ImageGroup(Strict):
     @property
     def name(self):
         return f"Group {self.counter}"
+
+
+    def _write(self, archive):
+        for img in self.images:
+            img._write(archive)

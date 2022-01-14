@@ -132,7 +132,7 @@ class ExcelWriter(object):
     def _write_images(self):
         # delegate to object
         for img in self._images:
-            self.archive.writestr(img.path[1:], img._data())
+            img._write(self.archive)
 
 
     def _write_charts(self):
