@@ -45,7 +45,7 @@ class TestExcelWriter:
         wb = Workbook()
         ws = wb.active
         writer = ExcelWriter(wb, archive)
-        writer._write_worksheets()
+        writer.write_worksheets()
 
         assert ws.path[1:] in archive.namelist()
         assert ws.path in writer.manifest.filenames
@@ -60,7 +60,7 @@ class TestExcelWriter:
         ws.add_table(t)
 
         writer = ExcelWriter(wb, archive)
-        writer._write_worksheets()
+        writer.write_worksheets()
 
         assert t.path[1:] in archive.namelist()
         assert t.path in writer.manifest.filenames
@@ -72,7 +72,7 @@ class TestExcelWriter:
         drawing = SpreadsheetDrawing()
 
         writer = ExcelWriter(wb, archive)
-        writer._write_drawing(drawing)
+        writer.write_drawing(drawing)
         assert drawing.path == '/xl/drawings/drawing1.xml'
         assert drawing.path[1:] in archive.namelist()
         assert drawing.path in writer.manifest.filenames
@@ -108,7 +108,7 @@ class TestExcelWriter:
         ws.add_chart(chart)
 
         writer = ExcelWriter(wb, archive)
-        writer._write_worksheets()
+        writer.write_worksheets()
         assert 'xl/worksheets/sheet1.xml' in archive.namelist()
         assert ws.path in writer.manifest.filenames
 
@@ -128,7 +128,7 @@ class TestExcelWriter:
         img = Image("plain.png")
         writer._images.append(img)
 
-        writer._write_images()
+        writer.write_images()
         archive.close()
 
         #zipinfo = archive.infolist()
@@ -140,7 +140,7 @@ class TestExcelWriter:
         cs = wb.create_chartsheet()
 
         writer = ExcelWriter(wb, archive)
-        writer._write_chartsheets()
+        writer.write_chartsheets()
 
         assert cs.path in writer.manifest.filenames
         assert cs.path[1:] in writer.archive.namelist()
@@ -153,7 +153,7 @@ class TestExcelWriter:
         ws['B5'].comment = Comment("A comment", "The Author")
 
         writer = ExcelWriter(None, archive)
-        writer._write_comment(ws)
+        writer.write_comment(ws)
 
         assert archive.namelist() == ['xl/comments/comment1.xml']
         assert '/xl/comments/comment1.xml' in writer.manifest.filenames
@@ -168,8 +168,8 @@ class TestExcelWriter:
         ws['B5'].comment = Comment("A comment", "The Author")
 
         writer = ExcelWriter(wb, archive)
-        writer._write_comment(ws)
-        writer._write_comment(ws)
+        writer.write_comment(ws)
+        writer.write_comment(ws)
 
         #assert len(ws.legacy_drawing.vml) == 489
 
@@ -195,7 +195,7 @@ class TestExcelWriter:
 
         writer._charts = [pc]*2
         with pytest.raises(InvalidFileException):
-            writer._write_charts()
+            writer.write_charts()
 
 
     def test_controls(self, ExcelWriter, archive, EMF):
@@ -324,14 +324,14 @@ class TestExcelWriter:
 
     def test_add_image(self, ExcelWriter, EMF):
         writer = ExcelWriter(None, None)
-        writer._add_image(EMF)
+        writer.add_image(EMF)
         assert writer._images == [EMF]
 
 
     def test_duplicate_image(self, ExcelWriter, EMF):
         writer = ExcelWriter(None, None)
-        writer._add_image(EMF)
-        writer._add_image(EMF)
+        writer.add_image(EMF)
+        writer.add_image(EMF)
         assert writer._images == [EMF]
 
 

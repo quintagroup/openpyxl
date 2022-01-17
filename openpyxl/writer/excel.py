@@ -81,12 +81,12 @@ class ExcelWriter(object):
             # custom_override = Override(PartName="/docProps/custom.xml", ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml")
             self.manifest.append(custom_override)
 
-        self._write_worksheets()
-        self._write_chartsheets()
-        self._write_images()
-        self._write_charts()
+        self.write_worksheets()
+        self.write_chartsheets()
+        self.write_images()
+        self.write_charts()
 
-        self._write_external_links()
+        self.write_external_links()
 
         stylesheet = write_stylesheet(self.workbook)
         archive.writestr(ARC_STYLE, tostring(stylesheet))
@@ -101,7 +101,7 @@ class ExcelWriter(object):
         self.manifest._write(archive, self.workbook)
 
 
-    def _add_image(self, img):
+    def add_image(self, img):
         """
         Collect images from various components
         """
@@ -129,13 +129,13 @@ class ExcelWriter(object):
                     #self.archive.writestr(name, self.workbook.vba_archive.read(name))
 
 
-    def _write_images(self):
+    def write_images(self):
         # delegate to object
         for img in self._images:
             img._write(self.archive)
 
 
-    def _write_charts(self):
+    def write_charts(self):
         # delegate to object
         if len(self._charts) != len(set(self._charts)):
             raise InvalidFileException("The same chart cannot be used in more than one worksheet")
@@ -144,7 +144,7 @@ class ExcelWriter(object):
             self.manifest.append(chart)
 
 
-    def _write_drawing(self, drawing):
+    def write_drawing(self, drawing):
         """
         Write a drawing
         """
@@ -162,7 +162,7 @@ class ExcelWriter(object):
         self.manifest.append(drawing)
 
 
-    def _write_chartsheets(self):
+    def write_chartsheets(self):
         for idx, sheet in enumerate(self.workbook.chartsheets, 1):
 
             sheet._id = idx
@@ -172,7 +172,7 @@ class ExcelWriter(object):
             self.manifest.append(sheet)
 
             if sheet._drawing:
-                self._write_drawing(sheet._drawing)
+                self.write_drawing(sheet._drawing)
 
                 rel = Relationship(type="drawing", Target=sheet._drawing.path)
                 rels = RelationshipList()
@@ -183,7 +183,7 @@ class ExcelWriter(object):
                 self.archive.writestr(rels_path, tostring(tree))
 
 
-    def _write_comment(self, ws):
+    def write_comment(self, ws):
 
         cs = CommentSheet.from_comments(ws._comments)
         self._comments.append(cs)
@@ -218,7 +218,7 @@ class ExcelWriter(object):
 
         for rel in drawing.children.Relationship:
             img = rel.blob
-            self._add_image(img)
+            self.add_image(img)
             rel.Target = img.path
 
         if drawing.children:
@@ -244,7 +244,7 @@ class ExcelWriter(object):
         ws._rels = writer._rels
 
         if ws._comments:
-            self._write_comment(ws)
+            self.write_comment(ws)
         self.write_controls(ws, writer.controls)
         self.write_embedded(ws, writer.control_images)
 
@@ -281,11 +281,11 @@ class ExcelWriter(object):
         """
         for obj in control_images:
             img = obj.blob
-            self._add_image(img)
+            self.add_image(img)
             obj.Target = img.path
 
 
-    def _write_worksheets(self):
+    def write_worksheets(self):
 
         pivot_caches = set()
 
@@ -294,7 +294,7 @@ class ExcelWriter(object):
             self.write_worksheet(ws)
 
             if ws._drawing:
-                self._write_drawing(ws._drawing)
+                self.write_drawing(ws._drawing)
                 for r in ws._rels.Relationship:
                     if "drawing" in r.Type:
                         r.Target = ws._drawing.path
@@ -324,7 +324,7 @@ class ExcelWriter(object):
                 self.archive.writestr(rels_path, tostring(tree))
 
 
-    def _write_external_links(self):
+    def write_external_links(self):
         # delegate to object
         """Write links to external workbooks"""
         wb = self.workbook
