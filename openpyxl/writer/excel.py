@@ -254,6 +254,19 @@ class ExcelWriter(object):
             rel = ws._rels[drawing._rel_id]
             rel.Target = drawing.path
 
+        if ws._drawing:
+            self.write_drawing(ws._drawing)
+            for r in ws._rels.Relationship:
+                if "drawing" in r.Type:
+                    r.Target = ws._drawing.path
+
+        for t in ws._tables.values():
+            self._tables.append(t)
+            t.id = len(self._tables)
+            t._write(self.archive)
+            self.manifest.append(t)
+            ws._rels[t._rel_id].Target = t.path
+
         self.archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
 
@@ -292,19 +305,6 @@ class ExcelWriter(object):
         for idx, ws in enumerate(self.workbook.worksheets, 1):
             ws._id = idx
             self.write_worksheet(ws)
-
-            if ws._drawing:
-                self.write_drawing(ws._drawing)
-                for r in ws._rels.Relationship:
-                    if "drawing" in r.Type:
-                        r.Target = ws._drawing.path
-
-            for t in ws._tables.values():
-                self._tables.append(t)
-                t.id = len(self._tables)
-                t._write(self.archive)
-                self.manifest.append(t)
-                ws._rels[t._rel_id].Target = t.path
 
             for p in ws._pivots:
                 if p.cache not in pivot_caches:
