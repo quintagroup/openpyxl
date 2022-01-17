@@ -68,7 +68,6 @@ class TestExcelWriter:
 
     def test_drawing(self, ExcelWriter, archive):
         wb = Workbook()
-        ws = wb.active
 
         drawing = SpreadsheetDrawing()
 
