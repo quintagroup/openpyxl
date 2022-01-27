@@ -171,6 +171,7 @@ class SpreadsheetDrawing(Serialisable):
                     rel = Relationship(type="image", Target=img.path)
                     self._rels.append(rel)
                     pic.blipFill.blip.embed = rel.Id
+                    rel = None # reset to stop it being added twice
 
             else:
                 link = getattr(obj.nvSpPr.cNvPr, "hlinkClick")

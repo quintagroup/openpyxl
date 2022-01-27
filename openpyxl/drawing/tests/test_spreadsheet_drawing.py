@@ -342,6 +342,8 @@ class TestSpreadsheetDrawing:
         drawing = SpreadsheetDrawing.from_tree(node)
 
         assert len(drawing._group_rels[0]) == 3
+        anchor = drawing._group_rels[0][0]
+        assert anchor.grpSp.sp is not None
 
 
     def test_write_rels(self, SpreadsheetDrawing):
@@ -429,6 +431,7 @@ class TestSpreadsheetDrawing:
         assert diff is None, diff
 
 
+    @pytest.mark.xfail # Group handling has changed
     def test_image_as_group(self, SpreadsheetDrawing):
         src = """
         <wsDr xmlns="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">

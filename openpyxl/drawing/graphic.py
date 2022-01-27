@@ -152,21 +152,27 @@ class GraphicFrame(Serialisable):
         self.fPublished = fPublished
 
 
+from .connector import Shape
+
+
 class GroupShape(Serialisable):
 
     nvGrpSpPr = Typed(expected_type=NonVisualGroupShape)
     nonVisualProperties = Alias("nvGrpSpPr")
     grpSpPr = Typed(expected_type=GroupShapeProperties)
     visualProperties = Alias("grpSpPr")
-    pic = Sequence(expected_type=PictureFrame, allow_none=True)
+    pic = Sequence(expected_type=PictureFrame)
+    sp = Sequence(expected_type=Shape)
 
-    __elements__ = ("nvGrpSpPr", "grpSpPr", "pic")
+    __elements__ = ("nvGrpSpPr", "grpSpPr", "pic", "sp")
 
     def __init__(self,
                  nvGrpSpPr=None,
                  grpSpPr=None,
                  pic=(),
+                 sp=(),
                 ):
         self.nvGrpSpPr = nvGrpSpPr
         self.grpSpPr = grpSpPr
         self.pic = pic
+        self.sp = sp

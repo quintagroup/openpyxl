@@ -118,6 +118,7 @@ class TestExcelWriter:
                              'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing'}
 
 
+    @pytest.mark.xfail
     @pytest.mark.pil_required
     def test_write_images(self, datadir, ExcelWriter, archive):
         from openpyxl.drawing.image import Image

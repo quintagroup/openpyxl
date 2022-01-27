@@ -83,7 +83,7 @@ class ExcelWriter(object):
 
         self.write_worksheets()
         self.write_chartsheets()
-        self.write_images()
+        #self.write_images()
         self.write_charts()
 
         self.write_external_links()
@@ -131,6 +131,7 @@ class ExcelWriter(object):
 
     def write_images(self):
         # delegate to object
+        return
         for img in self._images:
             img._write(self.archive)
 
@@ -153,9 +154,10 @@ class ExcelWriter(object):
         for chart in drawing.charts:
             self._charts.append(chart)
             chart._id = len(self._charts)
+        idx = len(self._images)
         for img in drawing.images:
             self._images.append(img)
-            img._id = len(self._images)
+            idx = img._write(self.archive, idx)
         rels_path = get_rels_path(drawing.path)[1:]
         self.archive.writestr(drawing.path[1:], tostring(drawing._write()))
         self.archive.writestr(rels_path, tostring(drawing._write_rels()))
