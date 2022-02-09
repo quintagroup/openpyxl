@@ -22,6 +22,7 @@ from openpyxl.xml.constants import (
 )
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.legacy import LegacyDrawing
+from openpyxl.drawing.image import ImageGroup
 from openpyxl.xml.functions import tostring
 from openpyxl.packaging.manifest import Manifest
 from openpyxl.packaging.relationship import (
@@ -156,7 +157,11 @@ class ExcelWriter(object):
             chart._id = len(self._charts)
         idx = len(self._images)
         for img in drawing.images:
-            self._images.append(img)
+            if isinstance(img, ImageGroup):
+                for im in img.images:
+                    self._images.append(im)
+            else:
+                self._images.append(img)
             idx = img._write(self.archive, idx)
         rels_path = get_rels_path(drawing.path)[1:]
         self.archive.writestr(drawing.path[1:], tostring(drawing._write()))
