@@ -60,6 +60,7 @@ def find_images(archive, path):
     for blip in drawing._blip_rels:
         image = blip._read(deps, archive)
         if image is not None:
+            image.anchor = blip.anchor
             images.append(image)
 
     for group in drawing._group_rels:
