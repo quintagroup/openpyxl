@@ -1,5 +1,6 @@
 # Copyright (c) 2010-2022 openpyxl
 
+from io import BytesIO
 from zipfile import ZipFile
 
 import pytest
@@ -109,6 +110,12 @@ class TestRelationshipList:
         assert len(rels.worksheet) == 1
 
 
+@pytest.fixture
+def get_dependents():
+    from .. relationship import get_dependents
+    return get_dependents
+
+
 @pytest.mark.parametrize("filename, expected",
                          [
                              ("xl/_rels/workbook.xml.rels",
@@ -144,3 +151,22 @@ def test_get_external_link(datadir):
     rels = get_dependents(archive, "xl/worksheets/_rels/sheet1.xml.rels")
 
     assert [r.Target for r in rels.Relationship] == ["http://www.readthedocs.org"]
+
+
+def test_expanding_rel_path(datadir, get_dependents):
+    datadir.chdir()
+    rel_path = "xl/drawings/_rels/drawing1.rels.xml"
+    archive = ZipFile(BytesIO(), "w")
+    archive.write("drawing1.xml.rels", rel_path)
+
+    rels = get_dependents(archive, rel_path)
+    targets = [r.Target for r in rels.Relationship]
+    assert targets == [
+        "#Sheet1!Q59",
+        "xl/media/image1.png",
+        "file:///Documents/somefile.txt",
+        "https://ooxml.org/some_link",
+        "media/image1.png",
+    ]
+
+

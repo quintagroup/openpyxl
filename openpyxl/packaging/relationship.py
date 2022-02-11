@@ -137,6 +137,8 @@ def get_dependents(archive, filename):
     Normalise dependency file paths to absolute ones
 
     Relative paths are relative to parent object
+
+    Do nothing with hyperlinks
     """
     src = archive.read(filename)
     node = fromstring(src)
@@ -149,7 +151,7 @@ def get_dependents(archive, filename):
     folder = posixpath.dirname(filename)
     parent = posixpath.split(folder)[0]
     for r in rels.Relationship:
-        if r.TargetMode == "External":
+        if r.TargetMode == "External" or "hyperlink" in r.Type:
             continue
         elif r.target.startswith("/"):
             r.target = r.target[1:]
