@@ -95,7 +95,9 @@ class TestExcelWriter:
         assert len(writer._images) == 1
         assert rel.Target == "/xl/media/image1.wmf"
         assert archive.namelist() == [
+
             "xl/drawings/vmlDrawing1.vml",
+            "xl/media/image1.wmf",
             "xl/drawings/_rels/vmlDrawing1.vml.rels",
         ]
 
@@ -116,24 +118,6 @@ class TestExcelWriter:
         assert dict(rel) == {'Id': 'rId1', 'Target': '/xl/drawings/drawing1.xml',
                              'Type':
                              'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing'}
-
-
-    @pytest.mark.xfail
-    @pytest.mark.pil_required
-    def test_write_images(self, datadir, ExcelWriter, archive):
-        from openpyxl.drawing.image import Image
-        datadir.chdir()
-
-        writer = ExcelWriter(None, archive)
-
-        img = Image("plain.png")
-        writer._images.append(img)
-
-        writer.write_images()
-        archive.close()
-
-        #zipinfo = archive.infolist()
-        assert 'xl/media/image1.png' in archive.namelist()
 
 
     def test_chartsheet(self, ExcelWriter, archive):
@@ -247,6 +231,7 @@ class TestExcelWriter:
             "xl/activeX/activeX1.bin",
             "xl/activeX/_rels/activeX1.xml.rels",
             'xl/activeX/activeX1.xml',
+            "xl/media/image1.wmf",
             'xl/worksheets/sheetNone.xml',
         ]
 
@@ -319,22 +304,26 @@ class TestExcelWriter:
             "xl/activeX/activeX2.bin",
             "xl/activeX/_rels/activeX2.xml.rels",
             'xl/activeX/activeX2.xml',
+            "xl/media/image1.wmf",
             'xl/worksheets/sheetNone.xml',
         ]
 
 
     def test_add_image(self, ExcelWriter, EMF):
-        writer = ExcelWriter(None, None)
+        archive = ZipFile(BytesIO(), "w")
+        writer = ExcelWriter(None, archive)
         writer.add_image(EMF)
         assert writer._images == [EMF]
+        assert writer.archive.namelist() == ["xl/media/image1.wmf"]
 
 
     def test_duplicate_image(self, ExcelWriter, EMF):
-        writer = ExcelWriter(None, None)
+        archive = ZipFile(BytesIO(), "w")
+        writer = ExcelWriter(None, archive)
         writer.add_image(EMF)
         writer.add_image(EMF)
         assert writer._images == [EMF]
-
+        assert writer.archive.namelist() == ["xl/media/image1.wmf"]
 
 
 def test_write_empty_workbook(tmpdir):

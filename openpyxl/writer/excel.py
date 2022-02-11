@@ -102,15 +102,26 @@ class ExcelWriter(object):
         self.manifest._write(archive, self.workbook)
 
 
+    @property
+    def images(self):
+        return self._images
+
+
     def add_image(self, img):
         """
-        Collect images from various components
+        Images must have unique names with a workbook. This is done by a simple counter.
+        Adding an image will check whether the image has already been included.
+        The index is set directly on the image but also returned
         """
         if img in self._images:
-            img._id = self._images.index(img)
+            idx = self._images.index(img) + 1
+            return idx
         else:
             self._images.append(img)
-            img._id = len(self._images)
+            idx = len(self._images)
+        img._id = idx
+        img._write(self.archive)
+        return idx
 
 
     def _merge_vba(self):
@@ -128,13 +139,6 @@ class ExcelWriter(object):
             #for name in set(self.workbook.vba_archive.namelist()) - self.vba_modified:
                 #if ARC_VBA.match(name):
                     #self.archive.writestr(name, self.workbook.vba_archive.read(name))
-
-
-    def write_images(self):
-        # delegate to object
-        return
-        for img in self._images:
-            img._write(self.archive)
 
 
     def write_charts(self):
@@ -155,14 +159,14 @@ class ExcelWriter(object):
         for chart in drawing.charts:
             self._charts.append(chart)
             chart._id = len(self._charts)
-        idx = len(self._images)
+        #idx = len(self._images)
         for img in drawing.images:
             if isinstance(img, ImageGroup):
                 for im in img.images:
-                    self._images.append(im)
+                    self.add_image(im)
             else:
-                self._images.append(img)
-            idx = img._write(self.archive, idx)
+                self.add_image(img)
+            #idx = img._write(self.archive, idx)
         rels_path = get_rels_path(drawing.path)[1:]
         self.archive.writestr(drawing.path[1:], tostring(drawing._write()))
         self.archive.writestr(rels_path, tostring(drawing._write_rels()))

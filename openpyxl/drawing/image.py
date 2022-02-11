@@ -80,11 +80,8 @@ class Image(object):
         return self.ref == other.ref
 
 
-    def _write(self, archive, idx):
-        idx += 1
-        self._id = idx
+    def _write(self, archive):
         archive.writestr(self.path[1:], self._data())
-        return idx
 
 
 class ImageGroup(Strict):
@@ -116,8 +113,3 @@ class ImageGroup(Strict):
     def name(self):
         return f"Group {self.counter}"
 
-
-    def _write(self, archive, idx):
-        for img in self.images:
-            idx = img._write(archive, idx)
-        return idx
