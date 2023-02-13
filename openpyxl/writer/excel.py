@@ -1,20 +1,20 @@
 # Copyright (c) 2010-2023 openpyxl
 
-"""Write a .xlsx file."""
 
 # Python stdlib imports
+import datetime
 import re
-from tempfile import TemporaryFile
 from zipfile import ZipFile, ZIP_DEFLATED
 
 # package imports
-from openpyxl.compat import deprecated
 from openpyxl.utils.exceptions import InvalidFileException
 from openpyxl.xml.constants import (
     ARC_ROOT_RELS,
     ARC_WORKBOOK_RELS,
-    ARC_APP, ARC_CORE,
-    ARC_CUSTOM, CPROPS_TYPE,
+    ARC_APP,
+    ARC_CORE,
+    ARC_CUSTOM,
+    CPROPS_TYPE,
     ARC_THEME,
     ARC_STYLE,
     ARC_WORKBOOK,
@@ -79,7 +79,6 @@ class ExcelWriter(object):
                 mime_type = CPROPS_TYPE #ContentType
 
             custom_override = CustomOverride()
-            # custom_override = Override(PartName="/docProps/custom.xml", ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml")
             self.manifest.append(custom_override)
 
         self.write_worksheets()
@@ -372,6 +371,7 @@ def save_workbook(workbook, filename):
     #if wb._vba and not filename.endswith(".xlsm"):
         #warn()
     archive = ZipFile(filename, 'w', ZIP_DEFLATED, allowZip64=True)
+    workbook.properties.modified = datetime.datetime.utcnow()
     writer = ExcelWriter(workbook, archive)
     writer.save()
     return True
