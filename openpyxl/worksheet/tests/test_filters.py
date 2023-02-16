@@ -287,11 +287,29 @@ class TestCustomFilter:
 
     def test_blank_filter(self, CustomFilter):
         src = """
-        <customFilter val=" " operator="equal" />
+        <customFilter val=" " operator="notEqual" />
         """
         node = fromstring(src)
         fut = CustomFilter.from_tree(node)
-        assert fut == CustomFilter(val=" ", operator="equal")
+        assert fut == CustomFilter(val=" ", operator="notEqual")
+
+    def test_ctor_blank(self, CustomFilter):
+        fut = CustomFilter(operator="notEqual", val=None)
+        xml = tostring(fut.to_tree())
+        expected = """
+        <customFilter operator="notEqual" val=" " />
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+    def test_ctor_single_space(self, CustomFilter):
+        fut = CustomFilter(operator="notEqual", val=" ")
+        xml = tostring(fut.to_tree())
+        expected = """
+        <customFilter operator="notEqual" val=" " />
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
 
 
 @pytest.fixture

@@ -163,8 +163,10 @@ class CustomFilterValueDescriptor(Convertible):
             m = self.pattern.match(value)
             if not m:
                 raise ValueError("Value must be either numerical, blank or a string containing a wildcard")
+
             if "*" in value or not value.strip():
                 self.expected_type = str
+
         super().__set__(instance, value)
 
 
@@ -176,10 +178,23 @@ class CustomFilter(Serialisable):
                             'notEqual', 'greaterThanOrEqual', 'greaterThan']))
     val = CustomFilterValueDescriptor()
 
+    # when filtering blanks excel uses a single space character
+    _blank_filter_value = " "
+
     def __init__(self,
                  operator=None,
                  val=None,
                 ):
+
+        #1967: when filtering blanks, val is present
+        #      as " ". This is a workaround for strange
+        #      excel behaviour
+        if operator == "notEqual":
+            if val is None:
+                val = self._blank_filter_value
+            elif isinstance(val, str) and not val.strip():
+                val = self._blank_filter_value
+
         self.operator = operator
         self.val = val
 
