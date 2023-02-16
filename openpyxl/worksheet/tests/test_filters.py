@@ -285,6 +285,14 @@ class TestCustomFilter:
         fut = CustomFilter.from_tree(node)
         assert fut == CustomFilter(val="K*", operator="equal")
 
+    def test_blank_filter(self, CustomFilter):
+        src = """
+        <customFilter val=" " operator="equal" />
+        """
+        node = fromstring(src)
+        fut = CustomFilter.from_tree(node)
+        assert fut == CustomFilter(val=" ", operator="equal")
+
 
 @pytest.fixture
 def CustomFilters():
