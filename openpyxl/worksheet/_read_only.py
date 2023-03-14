@@ -77,7 +77,9 @@ class ReadOnlyWorksheet(object):
         src = self._get_source()
         parser = WorkSheetParser(src, self._shared_strings,
                                  data_only=self.parent.data_only, epoch=self.parent.epoch,
-                                 date_formats=self.parent._date_formats)
+                                 date_formats=self.parent._date_formats,
+                                 timedelta_formats=self.parent._timedelta_formats)
+
         for idx, row in parser.parse():
             if max_row is not None and idx > max_row:
                 break
