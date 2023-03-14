@@ -2,6 +2,10 @@
 ==================
 
 
+* `#1973 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1973>`_ Timedeltas not read properly in read-only mode
+* `#1987 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1987>`_ List of formulae names contains mistakes
+
+
 3.1.2 (2023-03-11)
 ==================
 
