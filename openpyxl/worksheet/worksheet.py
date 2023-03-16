@@ -531,6 +531,14 @@ class Worksheet(_WorkbookChild):
         return self.iter_cols()
 
 
+    @property
+    def column_groups(self):
+        """
+        Return a list of column ranges where more than one column
+        """
+        return [cd.range for cd in self.column_dimensions.values() if cd.min and cd.max > cd.min]
+
+
     def set_printer_settings(self, paper_size, orientation):
         """Set printer settings """
 

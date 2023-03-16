@@ -4,6 +4,7 @@ from copy import copy
 
 from openpyxl.compat import safe_string
 from openpyxl.utils import (
+    get_column_letter,
     get_column_interval,
     column_index_from_string,
     range_boundaries,
@@ -174,6 +175,11 @@ class ColumnDimension(Dimension):
         """
         if not all([self.min, self.max]):
             self.min = self.max = column_index_from_string(self.index)
+
+    @property
+    def range(self):
+        """Return the range of cells actually covered"""
+        return f"{get_column_letter(self.min)}:{get_column_letter(self.max)}"
 
 
     def to_tree(self):
