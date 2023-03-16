@@ -147,7 +147,7 @@ class Worksheet(_WorkbookChild):
 
     @property
     def sheet_view(self):
-        return self.views.sheetView[0]
+        return self.views.active
 
 
     @property
