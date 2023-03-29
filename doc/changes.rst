@@ -19,6 +19,7 @@ Changes
 -------
 
 * Workbooks use ISO dates by default
+* Workbooks no longer load external links by default `load_workbook(keep_links=False)`
 
 
 Bugfixes
