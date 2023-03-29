@@ -30,6 +30,10 @@ Bugfixes
 3.1.3 (unreleased)
 ==================
 
+* `#1954 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1954>`_ Documentation for sheet views is incorrect
+* `#1973 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1973>`_ Timedeltas not read properly in read-only mode
+* `#1987 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1987>`_ List of formulae names contains mistakes
+
 
 3.1.2 (2023-03-11)
 ==================

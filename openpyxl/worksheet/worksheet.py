@@ -150,7 +150,7 @@ class Worksheet(_WorkbookChild):
 
     @property
     def sheet_view(self):
-        return self.views.sheetView[0]
+        return self.views.active
 
 
     @property
@@ -532,6 +532,14 @@ class Worksheet(_WorkbookChild):
     def columns(self):
         """Produces all cells in the worksheet, by column  (see :func:`iter_cols`)"""
         return self.iter_cols()
+
+
+    @property
+    def column_groups(self):
+        """
+        Return a list of column ranges where more than one column
+        """
+        return [cd.range for cd in self.column_dimensions.values() if cd.min and cd.max > cd.min]
 
 
     def set_printer_settings(self, paper_size, orientation):

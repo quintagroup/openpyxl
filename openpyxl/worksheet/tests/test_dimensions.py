@@ -167,6 +167,13 @@ class TestColDimension:
         assert cd.to_tree() is None
 
 
+    def test_range(self, ColumnDimension):
+        ws = DummyWorksheet()
+        cd = ColumnDimension(ws, index="C")
+        cd.reindex()
+        assert cd.range == "C:C"
+
+
 class TestGrouping:
 
     def test_group_columns_simple(self):
@@ -177,8 +184,7 @@ class TestGrouping:
         assert len(dims) == 1
         group = list(dims.values())[0]
         assert group.outline_level == 1
-        assert group.min == 1
-        assert group.max == 3
+        assert group.range == "A:C"
 
 
     def test_group_columns_collapse(self):
