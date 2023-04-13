@@ -11,7 +11,7 @@ from openpyxl.descriptors import (
     Typed
 )
 
-from openpyxl.xml.functions import Element, XML_NS
+from openpyxl.xml.functions import Element, whitespace
 
 class TextBlock(Strict):
     """ Represents text string in a specific format
@@ -41,7 +41,13 @@ class TextBlock(Strict):
 
 
     def to_tree(self):
-        pass
+        el = Element("r")
+        el.append(self.font.to_tree(tagname="rPr"))
+        t = Element("t")
+        t.text = self.text
+        whitespace(t)
+        el.append(t)
+        return el
 
 #
 # Rich Text class.
@@ -179,17 +185,15 @@ class CellRichText(list):
         """
         container = Element("is")
         for obj in self:
-            el = Element("r")
-            value = obj
             if isinstance(obj, TextBlock):
-                el.append(obj.font.to_tree(tagname="rPr"))
-                value = obj.text
-            attrs = {}
-            if value != value.strip():
-                attrs["{%s}space" % XML_NS] = "preserve"
-            t = Element("t", attrs)
-            t.text = value
-            el.append(t)
-            container.append(el)
+                container.append(obj.to_tree())
+
+            else:
+                el = Element("r")
+                t = Element("t")
+                t.text = obj
+                whitespace(t)
+                el.append(t)
+                container.append(el)
         return container
 

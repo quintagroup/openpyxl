@@ -43,6 +43,23 @@ class TestTextBlock:
         assert repr(b) == """TextBlock text=Mary had a little lamb, font=default"""
 
 
+    def test_to_tree(self):
+        ft = InlineFont(color="FF0000")
+        b = TextBlock(ft, "Mary had a little lamb")
+        tree = b.to_tree()
+        xml = tostring(tree)
+        expected = """
+        <r>
+          <rPr>
+            <color rgb="00FF0000"></color>
+          </rPr>
+          <t>Mary had a little lamb</t>
+        </r>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
 class TestCellRichText:
 
     def test_rich_text_create_single(self):
