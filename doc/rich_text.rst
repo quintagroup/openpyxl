@@ -78,7 +78,7 @@ For example:
 
 .. :: doctest
 
->>> red = InlineFont(color='FF000000')
+>>> red = InlineFont(color='00FF0000')
 >>> rich_string1 = CellRichText(['When the color ', TextBlock(red, 'red'), ' is used, you can expect ', TextBlock(red, 'danger')])
 
 The :class:`CellRichText` object is derived from `list`, and can be used as such.
