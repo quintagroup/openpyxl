@@ -6,12 +6,9 @@ from io import BytesIO
 
 import pytest
 
-from openpyxl.xml.functions import fromstring, tostring, xmlfile
-from openpyxl.reader.excel import load_workbook
-from openpyxl import Workbook
+from openpyxl.xml.functions import xmlfile
 
 from openpyxl.tests.helper import compare_xml
-from openpyxl.xml.constants import SHEET_MAIN_NS, REL_NS
 from openpyxl.utils.datetime import CALENDAR_MAC_1904, CALENDAR_WINDOWS_1900
 
 from openpyxl import LXML
