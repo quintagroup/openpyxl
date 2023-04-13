@@ -195,5 +195,6 @@ class CellRichText(list):
                 whitespace(t)
                 el.append(t)
                 container.append(el)
+
         return container
 
