@@ -4,8 +4,9 @@ from openpyxl.cell.rich_text import TextBlock, CellRichText
 from openpyxl.cell.text import InlineFont
 from openpyxl.styles.colors import Color
 
-import xml.etree.ElementTree as ET
-
+from openpyxl.xml.functions import fromstring, tostring
+import pytest
+from openpyxl.tests.helper import compare_xml
 
 class TestTextBlock:
 
@@ -67,17 +68,17 @@ class TestCellRichText:
         assert len(text) == 2
 
     def test_rich_text_from_element_simple_text(self):
-        node = ET.fromstring("<si><t>a</t></si>")
+        node = fromstring("<si><t>a</t></si>")
         text = CellRichText.from_tree(node)
         assert text[0] == "a"
 
     def test_rich_text_from_element_rich_text_only_text(self):
-        node = ET.fromstring("<si><r><t>a</t></r></si>")
+        node = fromstring("<si><r><t>a</t></r></si>")
         text = CellRichText.from_tree(node)
         assert text[0] == "a"
 
     def test_rich_text_from_element_rich_text_only_text_block(self):
-        node = ET.fromstring('<si><r><rPr><b/><sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr><t>c</t></r></si>')
+        node = fromstring('<si><r><rPr><b/><sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr><t>c</t></r></si>')
         text = CellRichText.from_tree(node)
         assert text == CellRichText(
             TextBlock(font=InlineFont(sz=11, rFont="Calibri", family="2", scheme="minor", b=True, color=Color(theme=1)),
@@ -85,7 +86,7 @@ class TestCellRichText:
         )
 
     def test_rich_text_from_element_rich_text_mixed(self):
-        node = ET.fromstring('<si><r><t>a</t></r><r><rPr><b/><sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr><t>c</t></r><r><t>e</t></r></si>')
+        node = fromstring('<si><r><t>a</t></r><r><rPr><b/><sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr><t>c</t></r><r><t>e</t></r></si>')
         text = CellRichText.from_tree(node)
         assert text == CellRichText(
             "a",
@@ -126,6 +127,21 @@ class TestCellRichText:
           </r>
           </is>
         """
-        tree = ET.fromstring(src)
+        tree = fromstring(src)
         rt = CellRichText.from_tree(tree)
         assert rt == CellRichText(TextBlock(InlineFont(sz=8), "11 de September de 2014"))
+
+
+    @pytest.mark.xfail
+    def test_to_tree(self):
+        red = InlineFont(color='FF000000')
+        rich_string = CellRichText(
+            [TextBlock(red, 'red'),
+             ' is used, you can expect ',
+             TextBlock(red, 'danger')]
+        )
+        tree = rich_string.to_tree()
+        xml = tostring(tree)
+        expected = """<root/>"""
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff

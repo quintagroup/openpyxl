@@ -165,3 +165,9 @@ class CellRichText(list):
         The main reason for this is to make editing easier.
         """
         return [str(s) for s in self]
+
+
+    def to_tree(self):
+        """
+        Return the full XML representation
+        """
