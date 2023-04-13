@@ -132,9 +132,8 @@ class TestCellRichText:
         assert rt == CellRichText(TextBlock(InlineFont(sz=8), "11 de September de 2014"))
 
 
-    @pytest.mark.xfail
     def test_to_tree(self):
-        red = InlineFont(color='FF000000')
+        red = InlineFont(color='FF0000')
         rich_string = CellRichText(
             [TextBlock(red, 'red'),
              ' is used, you can expect ',
@@ -142,6 +141,24 @@ class TestCellRichText:
         )
         tree = rich_string.to_tree()
         xml = tostring(tree)
-        expected = """<root/>"""
+        expected = """
+        <is>
+        <r>
+        <rPr>
+          <color rgb="00FF0000" />
+        </rPr>
+        <t>red</t>
+        </r>
+        <r>
+          <t xml:space="preserve"> is used, you can expect </t>
+        </r>
+        <r>
+          <rPr>
+            <color rgb="00FF0000" />
+          </rPr>
+          <t>danger</t>
+        </r>
+        </is>
+        """
         diff = compare_xml(xml, expected)
         assert diff is None, diff

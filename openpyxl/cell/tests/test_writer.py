@@ -237,3 +237,48 @@ def test_array_formula(worksheet, write_cell_implementation):
     xml = out.getvalue()
     diff = compare_xml(xml, expected)
     assert diff is None, diff
+
+
+def test_rich_text(worksheet, write_cell_implementation):
+    write_cell = write_cell_implementation
+    ws = worksheet
+
+    from ..rich_text import CellRichText, TextBlock, InlineFont
+
+    red = InlineFont(color='FF0000')
+    rich_string = CellRichText(
+        [TextBlock(red, 'red'),
+         ' is used, you can expect ',
+         TextBlock(red, 'danger')]
+    )
+    cell = ws["A2"]
+    cell.value = rich_string
+
+
+    out = BytesIO()
+    with xmlfile(out) as xf:
+        write_cell(xf, ws, cell)
+
+    expected = """
+    <c r="A2" t="inlineStr">
+      <is>
+        <r>
+        <rPr>
+          <color rgb="00FF0000" />
+        </rPr>
+        <t>red</t>
+        </r>
+        <r>
+          <t xml:space="preserve"> is used, you can expect </t>
+        </r>
+        <r>
+          <rPr>
+            <color rgb="00FF0000" />
+          </rPr>
+          <t>danger</t>
+        </r>
+      </is>
+    </c>"""
+    xml = out.getvalue()
+    diff = compare_xml(xml, expected)
+    assert diff is None, diff

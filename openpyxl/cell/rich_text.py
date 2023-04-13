@@ -10,6 +10,9 @@ from openpyxl.descriptors import (
     String,
     Typed
 )
+
+from openpyxl.xml.functions import Element, XML_NS
+
 class TextBlock(Strict):
     """ Represents text string in a specific format
 
@@ -36,6 +39,9 @@ class TextBlock(Strict):
         font = self.font != InlineFont() and self.font or "default"
         return f"{self.__class__.__name__} text={self.text}, font={font}"
 
+
+    def to_tree(self):
+        pass
 
 #
 # Rich Text class.
@@ -171,3 +177,19 @@ class CellRichText(list):
         """
         Return the full XML representation
         """
+        container = Element("is")
+        for obj in self:
+            el = Element("r")
+            value = obj
+            if isinstance(obj, TextBlock):
+                el.append(obj.font.to_tree(tagname="rPr"))
+                value = obj.text
+            attrs = {}
+            if value != value.strip():
+                attrs["{%s}space" % XML_NS] = "preserve"
+            t = Element("t", attrs)
+            t.text = value
+            el.append(t)
+            container.append(el)
+        return container
+
