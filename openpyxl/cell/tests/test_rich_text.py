@@ -179,3 +179,23 @@ class TestCellRichText:
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
+
+
+    @pytest.mark.xfail
+    def test_opt(self):
+        pass
+
+
+    @pytest.mark.xfail
+    def test_add(self):
+        pass
+
+
+    @pytest.mark.xfail
+    def test_setitem(self):
+        pass
+
+
+    @pytest.mark.xfail
+    def test_check_invalid_element(self):
+        pass
