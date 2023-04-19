@@ -31,6 +31,7 @@ Bugfixes
 3.1.3 (unreleased)
 ==================
 
+* `#1842 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1842>`_ Rich-text can be saved if lxml is not installed
 * `#1954 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1954>`_ Documentation for sheet views is incorrect
 * `#1973 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1973>`_ Timedeltas not read properly in read-only mode
 * `#1987 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1987>`_ List of formulae names contains mistakes
@@ -115,6 +116,7 @@ Bugfixes
 * `#1684 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1684>`_ Image files not closed when workbooks are saved
 * `#1778 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1778>`_ Problem with missing scope attribute in Pivot Table formats
 * `#1821 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1821>`_ Excel unhappy when multiple sorts are defined
+* `#2014 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2014>`_ Accounting format interpreted as datetime
 
 
 3.0.9 (2021-09-22)
