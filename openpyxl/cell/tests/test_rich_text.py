@@ -186,16 +186,19 @@ class TestCellRichText:
         pass
 
 
-    @pytest.mark.xfail
     def test_add(self):
-        pass
+        rt1 = CellRichText(TextBlock(InlineFont(sz=8), "11 de September de 2014"))
+        rt2 = rt1 + "un bon jour"
+        assert rt2 ==  CellRichText(TextBlock(InlineFont(sz=8), "11 de September de 2014"), "un bon jour")
 
 
-    @pytest.mark.xfail
     def test_setitem(self):
-        pass
+        rt =  CellRichText(TextBlock(InlineFont(sz=8), "11 de September de 2014"), "un bon jour")
+        rt[1] = "sera"
+        assert rt == CellRichText(TextBlock(InlineFont(sz=8), "11 de September de 2014"), "sera")
 
 
-    @pytest.mark.xfail
     def test_check_invalid_element(self):
-        pass
+        with pytest.raises(TypeError):
+            CellRichText._check_element(InlineFont())
+
