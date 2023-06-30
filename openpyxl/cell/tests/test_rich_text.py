@@ -181,10 +181,89 @@ class TestCellRichText:
         assert diff is None, diff
 
 
-    @pytest.mark.xfail
-    def test_opt(self):
-        pass
+    def test_opt_text(self):
+        text = CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary "),
+                "had ",
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+        text._opt()
+        assert text == CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary "),
+                "had a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
 
+    def test_opt_empty_text(self):
+        text = CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary "),
+                "had a little ",
+                "",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+        text._opt()
+        assert text == CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary "),
+                "had a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+
+    def test_opt_textblock(self):
+        text = CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary "),
+                TextBlock(font=InlineFont(b=True), text="had "),
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+        text._opt()
+        assert text == CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary had "),
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+
+    def test_opt_empty_textblock(self):
+        text = CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary had "),
+                TextBlock(font=InlineFont(b=True), text=""),
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+        text._opt()
+        assert text == CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary had "),
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+
+    def test_opt_empty_different_textblock_after(self):
+        text = CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary had "),
+                TextBlock(font=InlineFont(i=True), text=""),
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+        text._opt()
+        assert text == CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary had "),
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+
+    def test_opt_empty_different_textblock_before(self):
+        text = CellRichText(
+                TextBlock(font=InlineFont(i=True), text=""),
+                TextBlock(font=InlineFont(b=True), text="Mary had "),
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
+        text._opt()
+        assert text == CellRichText(
+                TextBlock(font=InlineFont(b=True), text="Mary had "),
+                "a little ",
+                TextBlock(InlineFont(i=True), text="lamb"),
+        )
 
     def test_add(self):
         rt1 = CellRichText(TextBlock(InlineFont(sz=8), "11 de September de 2014"))
