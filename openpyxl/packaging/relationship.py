@@ -53,7 +53,8 @@ class RelationshipList(Serialisable):
 
     tagname = "Relationships"
 
-    Relationship = Sequence(expected_type=Relationship)
+    __expected_type = Relationship
+    Relationship = Sequence(expected_type=__expected_type)
 
 
     def __init__(self, Relationship=()):
@@ -61,11 +62,11 @@ class RelationshipList(Serialisable):
 
 
     def append(self, value):
-        values = self.Relationship[:]
-        values.append(value)
+        if not isinstance(value, self.__expected_type):
+            raise TypeError("Value must of type {self.__expected_type} {type(value)} provided")
+        self.Relationship.append(value)
         if not value.Id:
-            value.Id = "rId{0}".format((len(values)))
-        self.Relationship = values
+            value.Id = f"rId{len(self)}"
 
 
     def __len__(self):
