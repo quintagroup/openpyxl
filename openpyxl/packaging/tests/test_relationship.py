@@ -97,7 +97,7 @@ def test_get_dependents(datadir, filename, expected):
 
     from ..relationship import get_dependents
     rels = get_dependents(archive, filename)
-    assert [r.Target for r in rels.Relationship] == expected
+    assert [r.Target for r in rels] == expected
 
 
 def test_get_external_link(datadir):
@@ -107,4 +107,4 @@ def test_get_external_link(datadir):
     from ..relationship import get_dependents
     rels = get_dependents(archive, "xl/worksheets/_rels/sheet1.xml.rels")
 
-    assert [r.Target for r in rels.Relationship] == ["http://www.readthedocs.org"]
+    assert [r.Target for r in rels] == ["http://www.readthedocs.org"]

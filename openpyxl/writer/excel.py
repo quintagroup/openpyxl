@@ -217,7 +217,7 @@ class ExcelWriter(object):
             if ws._drawing:
                 self._write_drawing(ws._drawing)
 
-                for r in ws._rels.Relationship:
+                for r in ws._rels:
                     if "drawing" in r.Type:
                         r.Target = ws._drawing.path
 
