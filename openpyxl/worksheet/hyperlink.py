@@ -44,19 +44,3 @@ class HyperlinkList(Serialisable):
 
     def __init__(self, hyperlink=()):
         self.hyperlink = hyperlink
-
-
-    def __bool__(self):
-        return bool(self.hyperlink)
-
-
-    def __len__(self):
-        return len(self.hyperlink)
-
-
-    def append(self, value):
-        if not isinstance(value, self.__expected_type):
-            raise TypeError("Value must of type {self.__expected_type} {type(value)} provided")
-        self.hyperlink.append(value)
-        if not value.id:
-            value.id = f"rId{len(self)}"
