@@ -73,7 +73,7 @@ class RelationshipList(ElementList):
                 yield r
 
 
-    def __getitem__(self, key):
+    def get(self, key):
         for r in self:
             if r.Id == key:
                 return r
@@ -132,7 +132,7 @@ def get_rel(archive, deps, id=None, cls=None):
     if not any([id, cls]):
         raise ValueError("Either the id or the content type are required")
     if id is not None:
-        rel = deps[id]
+        rel = deps.get(id)
     else:
         try:
             rel = next(deps.find(cls.rel_type))

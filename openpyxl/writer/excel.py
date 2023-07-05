@@ -234,7 +234,7 @@ class ExcelWriter(object):
                 t.id = len(self._tables)
                 t._write(self._archive)
                 self.manifest.append(t)
-                ws._rels[t._rel_id].Target = t.path
+                ws._rels.get(t._rel_id).Target = t.path
 
             for p in ws._pivots:
                 if p.cache not in pivot_caches:

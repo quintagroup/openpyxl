@@ -251,7 +251,7 @@ class ExcelReader:
 
             # preserve link to VML file if VBA
             if self.wb.vba_archive and ws.legacy_drawing:
-                ws.legacy_drawing = rels[ws.legacy_drawing].target
+                ws.legacy_drawing = rels.get(ws.legacy_drawing).target
             else:
                 ws.legacy_drawing = None
 
