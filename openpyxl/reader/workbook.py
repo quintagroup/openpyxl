@@ -36,7 +36,7 @@ class WorkbookParser:
     @property
     def rels(self):
         if self._rels is None:
-            self._rels = get_dependents(self.archive, get_rels_path(self.workbook_part_name))
+            self._rels = get_dependents(self.archive, get_rels_path(self.workbook_part_name)).to_dict()
         return self._rels
 
 
@@ -83,7 +83,7 @@ class WorkbookParser:
                 msg = f"File contains an invalid specification for {0}. This will be removed".format(sheet.name)
                 warn(msg)
                 continue
-            yield sheet, self.rels.get(sheet.id)
+            yield sheet, self.rels[sheet.id]
 
 
     def assign_names(self):

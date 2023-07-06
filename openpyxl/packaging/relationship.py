@@ -80,6 +80,11 @@ class RelationshipList(ElementList):
         raise KeyError("Unknown relationship: {0}".format(key))
 
 
+    def to_dict(self):
+        """Return a dictionary of relations keyed by id"""
+        return {r.id:r for r in self}
+
+
     def to_tree(self):
         tree = super().to_tree()
         tree.set("xmlns", PKG_REL_NS)
