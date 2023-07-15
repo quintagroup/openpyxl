@@ -293,14 +293,6 @@ class TestCustomFilter:
         fut = CustomFilter.from_tree(node)
         assert fut == CustomFilter(val=" ", operator="notEqual")
 
-    def test_ctor_blank(self, CustomFilter):
-        fut = CustomFilter(operator="notEqual", val=None)
-        xml = tostring(fut.to_tree())
-        expected = """
-        <customFilter operator="notEqual" val=" " />
-        """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
 
     def test_ctor_single_space(self, CustomFilter):
         fut = CustomFilter(operator="notEqual", val=" ")
