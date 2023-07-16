@@ -285,6 +285,7 @@ class TestCustomFilter:
         fut = CustomFilter.from_tree(node)
         assert fut == CustomFilter(val="K*", operator="equal")
 
+
     def test_blank_filter(self, CustomFilter):
         src = """
         <customFilter val=" " operator="notEqual" />
@@ -292,6 +293,17 @@ class TestCustomFilter:
         node = fromstring(src)
         fut = CustomFilter.from_tree(node)
         assert fut == CustomFilter(val=" ", operator="notEqual")
+
+
+    def test_value_error(self, CustomFilter):
+        src = """
+        <customFilter val="ab" operator="notEqual" />
+        """
+        node = fromstring(src)
+        with pytest.raises(ValueError) as e:
+            fut = CustomFilter.from_tree(node)
+        assert str(e.value) == "Value must be either numerical, a single space, or a string containing a wildcard"
+
 
 
     def test_ctor_single_space(self, CustomFilter):
