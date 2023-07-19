@@ -16,6 +16,7 @@ from openpyxl.descriptors import (
     Sequence,
     MinMax,
     Convertible,
+    MatchPattern,
 )
 from openpyxl.descriptors.excel import ExtensionList, CellRange
 from openpyxl.descriptors.sequence import ValueSequence
@@ -173,8 +174,9 @@ class CustomFilter(Serialisable):
 
     tagname = "customFilter"
 
-    operator = NoneSet(values=(['equal', 'lessThan', 'lessThanOrEqual',
-                            'notEqual', 'greaterThanOrEqual', 'greaterThan']))
+    operator = NoneSet(values=(
+        ['equal', 'lessThan', 'lessThanOrEqual','notEqual', 'greaterThanOrEqual', 'greaterThan']
+    ))
     val = CustomFilterValueDescriptor()
 
     def __init__(self,
@@ -183,6 +185,22 @@ class CustomFilter(Serialisable):
                 ):
         self.operator = operator
         self.val = val
+
+
+class NonBlankCustomFilter(CustomFilter):
+    operator = NoneSet(values=(["notEqual"]))
+    val = MatchPattern(name="val", pattern="^ $")
+
+
+class NumberCustomFilter(CustomFilter):
+    operator = NoneSet(values=(['equal', 'lessThan', 'lessThanOrEqual',
+                                'notEqual', 'greaterThanOrEqual', 'greaterThan']))
+    val = Float()
+
+
+class StringCustomFilter(CustomFilter):
+    operator = NoneSet(values=(['equal', 'notEqual']))
+    val = MatchPattern(name="val", pattern=r'^\*.*$|.*\*$')
 
 
 class CustomFilters(Serialisable):
