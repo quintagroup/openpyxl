@@ -174,33 +174,85 @@ class CustomFilter(Serialisable):
 
     tagname = "customFilter"
 
-    operator = NoneSet(values=(
+    operator = Set(values=(
         ['equal', 'lessThan', 'lessThanOrEqual','notEqual', 'greaterThanOrEqual', 'greaterThan']
     ))
     val = CustomFilterValueDescriptor()
 
     def __init__(self,
-                 operator=None,
+                 operator="equal",
                  val=None,
                 ):
         self.operator = operator
         self.val = val
 
 
-class NonBlankCustomFilter(CustomFilter):
-    operator = NoneSet(values=(["notEqual"]))
-    val = MatchPattern(name="val", pattern="^ $")
+    #@classmethod
+    #def from_tree(cls, node):
+        #value = node.attrib["val"]
+        #if value == " ":
+            #cls = BlankCustomFilter
+            #exclude = node.attrib["operator"] == "notEqual" and False or True
+        #else:
+            #try:
+                #value = float(value)
+                #cls = NumberFilter
+            #except:
+                #cls = StringFilter
+        #node.attrib["val"] = value
+        #return cls(**node.attrib)
+
+
+def _map_to_string_operator(attrib):
+    """convert value attribute user friendly API"""
+    exclude = attrib["operator"] == "notEqual" and True or False
+
+    wildcard_regex = re.search("(?<!~)[*?]", attrib["value"])
+    wildcard = ""
+    if not wildcard_regex:
+        operator = "is"
+    else:
+        if wildcard_regex.startpos == 0:
+            operator = "endswith"
+        elif wildcard_regex.endpos == len(value):
+            operator = "startswith"
+        else:
+            operator = "contains"
+    return operator, exclude, value, wildcard
+
+class BlankCustomFilter:
+
+
+    def __init__(exclude=True):
+        self.exclude = exclude
+
+
+    def to_tree(self, *args):
+        custom = CustomFilter(val=" ", operator="notEqual" and self.exclude or "equal")
+        return custom.to_tree(*args)
 
 
 class NumberCustomFilter(CustomFilter):
-    operator = NoneSet(values=(['equal', 'lessThan', 'lessThanOrEqual',
-                                'notEqual', 'greaterThanOrEqual', 'greaterThan']))
+
     val = Float()
 
 
-class StringCustomFilter(CustomFilter):
-    operator = NoneSet(values=(['equal', 'notEqual']))
-    val = MatchPattern(name="val", pattern=r'^\*.*$|.*\*$')
+class StringCustomFilter:
+
+    operator = Set(values=("startswith", "endswith", "contains", "is"))
+    exclude = Bool()
+
+    def __init__(self, operator="is", exclude=False, value="", wildcard=""):
+        self.operator = operator
+        self.exclude = exclude
+        self.wildcard = wildcard
+        self.value = value
+
+
+    def to_tree(self, *args):
+        # map operators to CustomFilter
+        custom = CustomFilter(operator, val)
+        return custom.to_tree(*args)
 
 
 class CustomFilters(Serialisable):
