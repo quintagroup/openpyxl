@@ -255,6 +255,21 @@ def CustomFilter():
     from ..filters import CustomFilter
     return CustomFilter
 
+@pytest.fixture
+def NumberCustomFilter():
+    from ..filters import NumberCustomFilter
+    return NumberCustomFilter
+
+@pytest.fixture
+def StringCustomFilter():
+    from ..filters import StringCustomFilter
+    return StringCustomFilter
+
+@pytest.fixture
+def BlankFilter():
+    from ..filters import BlankCustomFilter
+    return BlankCustomFilter
+
 
 class TestCustomFilter:
 
@@ -268,31 +283,31 @@ class TestCustomFilter:
         assert diff is None, diff
 
 
-    def test_from_xml(self, CustomFilter):
+    def test_from_xml(self, CustomFilter, NumberCustomFilter):
         src = """
         <customFilter operator="greaterThanOrEqual" val="0.2" />
         """
         node = fromstring(src)
         fut = CustomFilter.from_tree(node)
-        assert fut == CustomFilter(operator="greaterThanOrEqual", val=0.2)
+        assert fut == NumberCustomFilter(operator="greaterThanOrEqual", val=0.2)
 
 
-    def test_string_filter(self, CustomFilter):
+    def test_string_filter(self, CustomFilter, StringCustomFilter):
         src = """
         <customFilter val="K*" operator="equal" />
         """
         node = fromstring(src)
         fut = CustomFilter.from_tree(node)
-        assert fut == CustomFilter(val="K*", operator="equal")
+        assert fut == StringCustomFilter(val="K*", operator="equal")
 
 
-    def test_blank_filter(self, CustomFilter):
+    def test_blank_filter(self, CustomFilter, BlankFilter):
         src = """
         <customFilter val=" " operator="notEqual" />
         """
         node = fromstring(src)
         fut = CustomFilter.from_tree(node)
-        assert fut == CustomFilter(val=" ", operator="notEqual")
+        assert fut == BlankFilter(val=" ", operator="notEqual")
 
 
     def test_value_error(self, CustomFilter):
@@ -303,7 +318,6 @@ class TestCustomFilter:
         with pytest.raises(ValueError) as e:
             fut = CustomFilter.from_tree(node)
         assert str(e.value) == "Value must be either numerical, a single space, or a string containing a wildcard"
-
 
 
     def test_ctor_single_space(self, CustomFilter):

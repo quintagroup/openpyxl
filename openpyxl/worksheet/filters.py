@@ -162,11 +162,10 @@ class CustomFilterValueDescriptor(Convertible):
 
     def __set__(self, instance, value):
         if isinstance(value, str):
+            self.expected_type = str
             m = self.pattern.match(value)
             if not m:
                 raise ValueError("Value must be either numerical, a single space, or a string containing a wildcard")
-            if "*" in value:
-                self.expected_type = str
         super().__set__(instance, value)
 
 
@@ -186,46 +185,27 @@ class CustomFilter(Serialisable):
         self.operator = operator
         self.val = val
 
+    @classmethod
+    def from_tree(cls, node):
+        value = node.attrib["val"]
 
-    #@classmethod
-    #def from_tree(cls, node):
-        #value = node.attrib["val"]
-        #if value == " ":
-            #cls = BlankCustomFilter
-            #exclude = node.attrib["operator"] == "notEqual" and False or True
-        #else:
-            #try:
-                #value = float(value)
-                #cls = NumberFilter
-            #except:
-                #cls = StringFilter
-        #node.attrib["val"] = value
-        #return cls(**node.attrib)
-
-
-def _map_to_string_operator(attrib):
-    """convert value attribute user friendly API"""
-    exclude = attrib["operator"] == "notEqual" and True or False
-
-    wildcard_regex = re.search("(?<!~)[*?]", attrib["value"])
-    wildcard = ""
-    if not wildcard_regex:
-        operator = "is"
-    else:
-        if wildcard_regex.startpos == 0:
-            operator = "endswith"
-        elif wildcard_regex.endpos == len(value):
-            operator = "startswith"
+        if value == " ":
+            cls = BlankCustomFilter
         else:
-            operator = "contains"
-    return operator, exclude, value, wildcard
+            try:
+                value = float(value)
+                cls = NumberCustomFilter
+            except ValueError:
+                cls = StringCustomFilter
+        return cls(**node.attrib)
 
-class BlankCustomFilter:
 
+class BlankCustomFilter(CustomFilter):
+    exclude = Bool()
 
-    def __init__(exclude=True):
+    def __init__(self, exclude=True, **kw):
         self.exclude = exclude
-
+        super().__init__(**kw)
 
     def to_tree(self, *args):
         custom = CustomFilter(val=" ", operator="notEqual" and self.exclude or "equal")
@@ -237,17 +217,28 @@ class NumberCustomFilter(CustomFilter):
     val = Float()
 
 
-class StringCustomFilter:
+class StringCustomFilter(CustomFilter):
 
-    operator = Set(values=("startswith", "endswith", "contains", "is"))
+    string_operator = Set(values=("startswith", "endswith", "contains", "is"))
     exclude = Bool()
 
-    def __init__(self, operator="is", exclude=False, value="", wildcard=""):
-        self.operator = operator
-        self.exclude = exclude
-        self.wildcard = wildcard
-        self.value = value
+    def _map_to_string_operator(attrib):
+        """convert value attribute user friendly API"""
+        exclude = attrib["operator"] == "notEqual" and True or False
 
+        wildcard_regex = re.search("(?<!~)[*?]", attrib["value"])
+        value = attrib["val"]
+        wildcard = ""
+        if not wildcard_regex:
+            operator = "is"
+        else:
+            if wildcard_regex.startpos == 0:
+                operator = "endswith"
+            elif wildcard_regex.endpos == len(value):
+                operator = "startswith"
+            else:
+                operator = "contains"
+        return operator, exclude, value, wildcard
 
     def to_tree(self, *args):
         # map operators to CustomFilter
