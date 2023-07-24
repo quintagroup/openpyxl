@@ -173,77 +173,103 @@ class CustomFilter(Serialisable):
 
     tagname = "customFilter"
 
-    operator = Set(values=(
-        ['equal', 'lessThan', 'lessThanOrEqual','notEqual', 'greaterThanOrEqual', 'greaterThan']
-    ))
-    val = CustomFilterValueDescriptor()
-
     def __init__(self,
                  operator="equal",
                  val=None,
                 ):
+        subtype = CustomFilter.get_subtype(val)
+        self._filter_type = subtype(operator, val)
+
+    @staticmethod
+    def get_subtype(val=None):
+        if val == " ":
+            subtype = BlankCustomFilter
+        else:
+            try:
+                val = float(val)
+                subtype = NumberCustomFilter
+            except ValueError:
+                subtype = StringCustomFilter
+        return subtype
+
+    def __getattr__(self, item):
+        if item.startswith("_"):
+            return super.__getattr__(self, item)
+        else:
+            return getattr(self._filter_type, item)
+
+    def __setattr__(self, key, value):
+        if key.startswith("_"):
+            super.__setattr__(self, key, value)
+        else:
+            setattr(self._filter_type, key, value)
+
+    def __delattr__(self, item):
+        if item.startswith("_"):
+            return super.__delattr__(self, item)
+        else:
+            return delattr(self._filter_type, item)
+
+    def to_tree(self, tagname=None, idx=None, namespace=None):
+        return self._filter_type.to_tree(tagname=self.tagname)
+
+
+class BlankCustomFilter(Serialisable):
+    operator = Set(values=["notEqual"])
+    val = Set(values=[" "])
+
+    def __init__(self, operator="notEqual", val=" "):
         self.operator = operator
         self.val = val
 
-    @classmethod
-    def from_tree(cls, node):
-        value = node.attrib["val"]
-
-        if value == " ":
-            cls = BlankCustomFilter
-        else:
-            try:
-                value = float(value)
-                cls = NumberCustomFilter
-            except ValueError:
-                cls = StringCustomFilter
-        return cls(**node.attrib)
+    # def to_tree(self, *args):
+    #     custom = CustomFilter(val=" ", operator="notEqual" and self.exclude or "equal")
+    #     return custom.to_tree(*args)
 
 
-class BlankCustomFilter(CustomFilter):
-    exclude = Bool()
-
-    def __init__(self, exclude=True, **kw):
-        self.exclude = exclude
-        super().__init__(**kw)
-
-    def to_tree(self, *args):
-        custom = CustomFilter(val=" ", operator="notEqual" and self.exclude or "equal")
-        return custom.to_tree(*args)
-
-
-class NumberCustomFilter(CustomFilter):
-
+class NumberCustomFilter(Serialisable):
+    operator = Set(values=
+                   ['equal', 'lessThan', 'lessThanOrEqual','notEqual', 'greaterThanOrEqual', 'greaterThan'])
     val = Float()
 
+    def __init__(self, operator="equal", val=None):
+        self.operator = operator
+        self.val = val
 
-class StringCustomFilter(CustomFilter):
 
-    string_operator = Set(values=("startswith", "endswith", "contains", "is"))
-    exclude = Bool()
+class StringCustomFilter(Serialisable):
 
-    def _map_to_string_operator(attrib):
-        """convert value attribute user friendly API"""
-        exclude = attrib["operator"] == "notEqual" and True or False
+    operator = Set(values=["equal", "notEqual"])
+    val = MatchPattern(pattern="(^\*.*)|(.*\*$)")
 
-        wildcard_regex = re.search("(?<!~)[*?]", attrib["value"])
-        value = attrib["val"]
-        wildcard = ""
-        if not wildcard_regex:
-            operator = "is"
-        else:
-            if wildcard_regex.startpos == 0:
-                operator = "endswith"
-            elif wildcard_regex.endpos == len(value):
-                operator = "startswith"
-            else:
-                operator = "contains"
-        return operator, exclude, value, wildcard
 
-    def to_tree(self, *args):
-        # map operators to CustomFilter
-        custom = CustomFilter(operator, val)
-        return custom.to_tree(*args)
+    def __init__(self, operator="equal", val=None):
+        self.operator = operator
+        self.val = val
+
+    # def _map_to_string_operator(self):
+    #     """convert value attribute user friendly API"""
+    #     attrib = self.attrs
+    #     exclude = attrib["operator"] == "notEqual" and True or False
+    #
+    #     wildcard_regex = re.search("(?<!~)[*?]", attrib["value"])
+    #     value = attrib["val"]
+    #     wildcard = ""
+    #     if not wildcard_regex:
+    #         operator = "is"
+    #     else:
+    #         if wildcard_regex.startpos == 0:
+    #             operator = "endswith"
+    #         elif wildcard_regex.endpos == len(value):
+    #             operator = "startswith"
+    #         else:
+    #             operator = "contains"
+    #     return operator, exclude, value, wildcard
+    #
+    # def to_tree(self, *args):
+    #     # map operators to CustomFilter
+    #     custom = CustomFilter(operator, val)
+    #     return custom.to_tree(*args)
 
 
 class CustomFilters(Serialisable):

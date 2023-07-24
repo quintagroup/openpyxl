@@ -302,7 +302,7 @@ class TestCustomFilter:
         node = fromstring(src)
         with pytest.raises(ValueError) as e:
             fut = CustomFilter.from_tree(node)
-        assert str(e.value) == "Value must be either numerical, a single space, or a string containing a wildcard"
+        assert str(e.value) == r"Value does not match pattern (^\*.*)|(.*\*$)"
 
 
 
