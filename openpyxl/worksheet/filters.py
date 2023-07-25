@@ -154,8 +154,11 @@ class CustomFilter(Serialisable):
 
     tagname = "customFilter"
 
-    def __init__(self, operator="equal", val=None):
-        self._filter_type = self._get_subtype(val)(operator, val)
+    def __init__(self, operator="equal", val=None, filter_type=None):
+        if filter_type is None:
+            self._filter_type = self._get_subtype(val)(operator, val)
+        else:
+            self._filter_type = filter_type
 
     @staticmethod
     def _get_subtype(val=None):
@@ -218,6 +221,24 @@ class StringCustomFilter(Serialisable):
     def __init__(self, operator="equal", val=None):
         self.operator = operator
         self.val = val
+
+
+    @staticmethod
+    def from_string_operator(operator, val):
+        operators = {
+            "contains": StringCustomFilter(operator="equal", val=f"*{val}*"),
+            "doesNotContain": StringCustomFilter(operator="notEqual", val=f"*{val}*"),
+            "beginsWith": StringCustomFilter(operator="equal", val=f"{val}*"),
+            "doesNotBeginWith": StringCustomFilter(operator="notEqual", val=f"{val}*"),
+            "endsWith": StringCustomFilter(operator="equal", val=f"*{val}"),
+            "doesNotEndWith": StringCustomFilter(operator="notEqual", val=f"*{val}")
+        }
+        if operator not in operators.keys():
+            raise ValueError(f"Unsupported operator: {operator}")
+
+        return operators[operator]
+
+
 
 
 class CustomFilters(Serialisable):
