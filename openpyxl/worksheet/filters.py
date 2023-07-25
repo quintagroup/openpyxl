@@ -15,7 +15,6 @@ from openpyxl.descriptors import (
     String,
     Sequence,
     MinMax,
-    Convertible,
     MatchPattern,
 )
 from openpyxl.descriptors.excel import ExtensionList, CellRange
@@ -151,37 +150,15 @@ class DynamicFilter(Serialisable):
         self.maxValIso = maxValIso
 
 
-class CustomFilterValueDescriptor(Convertible):
-    """
-    Excel uses wildcards for string matching
-    """
-
-    pattern = re.compile(r"\d+|^\*.+|^.+\*$|^ $")
-
-    expected_type = float
-
-    def __set__(self, instance, value):
-        if isinstance(value, str):
-            self.expected_type = str
-            m = self.pattern.match(value)
-            if not m:
-                raise ValueError("Value must be either numerical, a single space, or a string containing a wildcard")
-        super().__set__(instance, value)
-
-
 class CustomFilter(Serialisable):
 
     tagname = "customFilter"
 
-    def __init__(self,
-                 operator="equal",
-                 val=None,
-                ):
-        subtype = CustomFilter.get_subtype(val)
-        self._filter_type = subtype(operator, val)
+    def __init__(self, operator="equal", val=None):
+        self._filter_type = self._get_subtype(val)(operator, val)
 
     @staticmethod
-    def get_subtype(val=None):
+    def _get_subtype(val=None):
         if val == " ":
             subtype = BlankCustomFilter
         else:
@@ -222,10 +199,6 @@ class BlankCustomFilter(Serialisable):
         self.operator = operator
         self.val = val
 
-    # def to_tree(self, *args):
-    #     custom = CustomFilter(val=" ", operator="notEqual" and self.exclude or "equal")
-    #     return custom.to_tree(*args)
-
 
 class NumberCustomFilter(Serialisable):
     operator = Set(values=
@@ -240,36 +213,11 @@ class NumberCustomFilter(Serialisable):
 class StringCustomFilter(Serialisable):
 
     operator = Set(values=["equal", "notEqual"])
-    val = MatchPattern(pattern="(^\*.*)|(.*\*$)")
-
+    val = MatchPattern(pattern=r"(^\*.*)|(.*\*$)")
 
     def __init__(self, operator="equal", val=None):
         self.operator = operator
         self.val = val
-
-    # def _map_to_string_operator(self):
-    #     """convert value attribute user friendly API"""
-    #     attrib = self.attrs
-    #     exclude = attrib["operator"] == "notEqual" and True or False
-    #
-    #     wildcard_regex = re.search("(?<!~)[*?]", attrib["value"])
-    #     value = attrib["val"]
-    #     wildcard = ""
-    #     if not wildcard_regex:
-    #         operator = "is"
-    #     else:
-    #         if wildcard_regex.startpos == 0:
-    #             operator = "endswith"
-    #         elif wildcard_regex.endpos == len(value):
-    #             operator = "startswith"
-    #         else:
-    #             operator = "contains"
-    #     return operator, exclude, value, wildcard
-    #
-    # def to_tree(self, *args):
-    #     # map operators to CustomFilter
-    #     custom = CustomFilter(operator, val)
-    #     return custom.to_tree(*args)
 
 
 class CustomFilters(Serialisable):
