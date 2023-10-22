@@ -225,9 +225,8 @@ class CustomPropertyList(Strict):
     def append(self, prop):
         if prop.name in self.names:
             raise ValueError(f"Property with name {prop.name} already exists")
-        props = self.props
-        props.append(prop)
-        self.props = props
+
+        self.props.append(prop)
 
 
     def to_tree(self):
