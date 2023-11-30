@@ -14,6 +14,12 @@ Bugfixes
 * `#2106 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2106>`_ Setting Trendline.name attribute raises exception when saving
 
 
+Changes
+-------
+
+* Add a `__repr__` method for Row and Column dimension objects so you don't need to check every time.
+
+
 3.1.2 (2023-03-11)
 ==================
 
