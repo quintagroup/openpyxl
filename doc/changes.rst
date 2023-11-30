@@ -11,6 +11,7 @@ Bugfixes
 * `#1987 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1987>`_ List of formulae names contains mistakes
 * `#2054 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2054>`_ Type checking increases exponentially
 * `#2057 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2057>`_ Loading pivot tables can be unnecessarily slow
+* `#2106 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2106>`_ Setting Trendline.name attribute raises exception when saving
 
 
 3.1.2 (2023-03-11)
