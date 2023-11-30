@@ -63,6 +63,10 @@ class Dimension(Strict, StyleableObject):
         return cp
 
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__} Instance, Attributes={dict(self)}>"
+
+
 class RowDimension(Dimension):
     """Information about the display properties of a row."""
 
