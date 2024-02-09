@@ -5,6 +5,7 @@
 Bugfixes
 --------
 
+* `#1401 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1401>`_ Column name caches are slow and use a lot of memory
 * `#1842 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1842>`_ Rich-text can be saved if lxml is not installed
 * `#1954 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1954>`_ Documentation for sheet views is incorrect
 * `#1973 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1973>`_ Timedeltas not read properly in read-only mode
@@ -13,7 +14,7 @@ Bugfixes
 * `#2057 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2057>`_ Loading pivot tables can be unnecessarily slow
 * `#2106 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2106>`_ Setting Trendline.name attribute raises exception when saving
 * `#2120 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2120>`_ Timezone and Zombie formatting cannot be combined.
-
+* `#2107 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2107>`_ Column name generation is inefficient and slow
 
 
 Changes
