@@ -12,6 +12,8 @@ Bugfixes
 * `#2054 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2054>`_ Type checking increases exponentially
 * `#2057 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2057>`_ Loading pivot tables can be unnecessarily slow
 * `#2106 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2106>`_ Setting Trendline.name attribute raises exception when saving
+* `#2120 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2120>`_ Timezone and Zombie formatting cannot be combined.
+
 
 
 Changes
