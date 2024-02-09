@@ -3,8 +3,10 @@
 """
 Collection of utilities used within the package and also available for client code
 """
+from functools import lru_cache
+from itertools import chain, product
+from string import ascii_uppercase, digits
 import re
-from string import digits
 
 from .exceptions import CellCoordinatesException
 
@@ -71,56 +73,37 @@ def absolute_coordinate(coord_string):
     return fmt.format(**d)
 
 
-def _get_column_letter(col_idx):
-    """Convert a column number into a column letter (3 -> 'C')
+def _list_of_columns():
+    """Generate a list of all possible column names"""
+    prods = chain(
+        # A->Z
+        ascii_uppercase,
+        # AA->ZZ
+        product(ascii_uppercase, repeat=2),
+        # AAA->ZZZ
+        product(ascii_uppercase, repeat=3)
+    )
+    return ["".join(col) for col in prods]
 
-    Right shift the column col_idx by 26 to find column letters in reverse
-    order.  These numbers are 1-based, and can be converted to ASCII
-    ordinals by adding 64.
-
-    """
-    # these indicies corrospond to A -> ZZZ and include all allowed
-    # columns
-    if not 1 <= col_idx <= 18278:
-        raise ValueError("Invalid column index {0}".format(col_idx))
-    letters = []
-    while col_idx > 0:
-        col_idx, remainder = divmod(col_idx, 26)
-        # check for exact division and borrow if needed
-        if remainder == 0:
-            remainder = 26
-            col_idx -= 1
-        letters.append(chr(remainder+64))
-    return ''.join(reversed(letters))
+_COLS = _list_of_columns()
 
 
-_COL_STRING_CACHE = {}
-_STRING_COL_CACHE = {}
-for i in range(1, 18279):
-    col = _get_column_letter(i)
-    _STRING_COL_CACHE[i] = col
-    _COL_STRING_CACHE[col] = i
-
-
-def get_column_letter(idx,):
+@lru_cache(maxsize=None)
+def get_column_letter(idx):
     """Convert a column index into a column letter
     (3 -> 'C')
     """
-    try:
-        return _STRING_COL_CACHE[idx]
-    except KeyError:
-        raise ValueError("Invalid column index {0}".format(idx))
+    if not 1 <= idx <= 18278:
+        raise ValueError(f"Invalid column index {idx}. Indices must be between 1 and 18,278")
+    return _COLS[idx-1]
 
 
-def column_index_from_string(str_col):
-    """Convert a column name into a numerical index
-    ('A' -> 1)
-    """
-    # we use a function argument to get indexed name lookup
+@lru_cache(maxsize=None)
+def column_index_from_string(col):
     try:
-        return _COL_STRING_CACHE[str_col.upper()]
-    except KeyError:
-        raise ValueError("{0} is not a valid column name".format(str_col))
+        return _COLS.index(col.upper()) + 1
+    except ValueError:
+        raise ValueError(f"{col} is not a valid column name. Column names are from A to ZZZ")
 
 
 def range_boundaries(range_string):
@@ -197,9 +180,9 @@ def coordinate_to_tuple(coordinate):
     for idx, c in enumerate(coordinate):
         if c in digits:
             break
-    col = coordinate[:idx].upper()
+    col = coordinate[:idx]
     row = coordinate[idx:]
-    return int(row), _COL_STRING_CACHE[col]
+    return int(row), column_index_from_string(col)
 
 
 def range_to_tuple(range_string):
