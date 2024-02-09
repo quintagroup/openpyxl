@@ -289,7 +289,7 @@ def save_workbook(workbook, filename):
 
     """
     archive = ZipFile(filename, 'w', ZIP_DEFLATED, allowZip64=True)
-    workbook.properties.modified = datetime.datetime.now(tz=datetime.timezone.utc)
+    workbook.properties.modified = datetime.datetime.now(tz=datetime.timezone.utc).replace(tzinfo=None)
     writer = ExcelWriter(workbook, archive)
     writer.save()
     return True

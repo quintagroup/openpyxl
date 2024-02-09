@@ -188,9 +188,7 @@ def test_modified(tmpdir):
     tmpdir.chdir()
 
     wb = Workbook()
-    modified = datetime.datetime(
-        2011, 5, 19, 10, 23, 15, tzinfo=datetime.timezone.utc
-    )
+    modified = datetime.datetime(2011, 5, 19, 10, 23, 15)
     wb.properties.modified = modified
 
     dest_filename = 'empty_book.xlsx'
