@@ -119,7 +119,7 @@ class DataValidation(Serialisable):
                  errorTitle=None,
                  imeMode=None,
                  operator=None,
-                 allow_blank=False,
+                 allow_blank=None,
                  ):
         self.sqref = sqref
         self.showDropDown = showDropDown

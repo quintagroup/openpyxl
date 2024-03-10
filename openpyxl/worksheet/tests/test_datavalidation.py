@@ -20,7 +20,7 @@ class TestDataValidation:
         dv = DataValidation(allowBlank=True)
         xml = tostring(dv.to_tree())
         expected = """
-        <dataValidation allowBlank="0" showDropDown="0" showErrorMessage="0" showInputMessage="0" sqref="" />
+        <dataValidation allowBlank="1" showDropDown="0" showErrorMessage="0" showInputMessage="0" sqref="" />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
