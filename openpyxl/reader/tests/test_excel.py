@@ -337,6 +337,6 @@ class TestWorksheetProcessor:
 
         drawing = ws.legacy_drawing
         assert drawing.path == "/xl/drawings/vmlDrawing0.vml"
-        rel = drawing.children["rId3"]
+        rel = drawing.children[0]
         assert rel.target == "xl/media/image3.emf"
         assert rel.blob._data()[:10] == b"\x01\x00\x00\x00l\x00\x00\x00\x00\x00"

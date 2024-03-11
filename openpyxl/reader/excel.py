@@ -29,7 +29,6 @@ from openpyxl.xml.constants import (
     ARC_WORKBOOK,
     ARC_THEME,
     SHARED_STRINGS,
-    VBA,
     XLTM,
     XLTX,
     XLSM,
@@ -321,7 +320,7 @@ class WorksheetProcessor:
         if self.ws.legacy_drawing is None:
             return
 
-        rel = self.rels[self.ws.legacy_drawing]
+        rel = self.rels.get(self.ws.legacy_drawing)
         vml = self.archive.read(rel.target)
         vml = vml.replace(b"<br>", b"<br/>")
         drawing = LegacyDrawing(vml)
@@ -400,11 +399,11 @@ class WorksheetProcessor:
 
         for control in self.ws.controls.control:
             if control.id in ctrlProps:
-                control.shape = ctrlProps[control.id]
+                control.shape = ctrlProps.get(control.id)
 
             prop = control.controlPr
             if prop.id:
-                rel = self.rels[prop.id]
+                rel = self.rels.get(prop.id)
                 rel.blob = self._get_image_for(rel.target)
                 prop.image = rel
 
@@ -423,7 +422,7 @@ class WorksheetProcessor:
             rels = get_dependents(self.archive, active_path)
 
             # get activeX binary
-            bin_rel = rels[ctrl.id]
+            bin_rel = rels.get(ctrl.id)
             ctrl.bin = self.archive.read(bin_rel.Target)
 
         images = set()
@@ -433,7 +432,7 @@ class WorksheetProcessor:
             # embed any graphics, but skip duplicates
             prop = control.controlPr
             if prop.id:
-                rel = self.rels[prop.id]
+                rel = self.rels.get(prop.id)
                 if prop.id not in images:
                     rel.blob = self._get_image_for(rel.target)
                     images.add(prop.id)

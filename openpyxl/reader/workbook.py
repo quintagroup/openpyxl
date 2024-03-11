@@ -59,7 +59,7 @@ class WorkbookParser:
             package.externalReferences = []
 
         for ext_ref in package.externalReferences:
-            rel = self.rels[ext_ref.id]
+            rel = self.rels.get(ext_ref.id)
             self.wb._external_links.append(
                 read_external_link(self.archive, rel.Target)
             )
@@ -83,7 +83,7 @@ class WorkbookParser:
                 msg = f"File contains an invalid specification for {0}. This will be removed".format(sheet.name)
                 warn(msg)
                 continue
-            yield sheet, self.rels[sheet.id]
+            yield sheet, self.rels.get(sheet.id)
 
 
     def assign_names(self):

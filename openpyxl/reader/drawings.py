@@ -41,8 +41,8 @@ def find_images(archive, path):
     for shape in shapes:
         link = getattr(shape.nvSpPr.cNvPr, "hlinkClick")
         if link:
-            link.target = deps[link.id].Target
-            link.mode = deps[link.id].TargetMode
+            link.target = deps.get(link.id).Target
+            link.mode = deps.get(link.id).TargetMode
             link.id = None
 
     for rel in drawing._chart_rels:

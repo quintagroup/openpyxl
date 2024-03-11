@@ -380,7 +380,7 @@ class Blip(Serialisable):
     def _read(self, rels, archive):
         """Read image data from archive"""
         if self.embed is not None:
-            rel = rels[self.embed]
+            rel = rels.get(self.embed)
             src = archive.read(rel.target)
             data = BytesIO(src)
             try:

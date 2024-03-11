@@ -261,7 +261,7 @@ class ExcelWriter(object):
         if ws.legacy_drawing:
             drawing = ws.legacy_drawing
             self.write_legacy(ws)
-            rel = ws._rels[drawing._rel_id]
+            rel = ws._rels.get(drawing._rel_id)
             rel.Target = drawing.path
 
         if ws._drawing:
@@ -275,7 +275,7 @@ class ExcelWriter(object):
             t.id = len(self._tables)
             t._write(self.archive)
             self.manifest.append(t)
-            ws._rels[t._rel_id].Target = t.path
+            ws._rels.get(t._rel_id).Target = t.path
 
         self.archive.write(writer.out, ws.path[1:])
         self.manifest.append(ws)
@@ -295,7 +295,7 @@ class ExcelWriter(object):
             ctrl.counter = len(store) # ugh!
             ctrl._write(self.archive, self.manifest)
 
-            ws._rels[ctrl._rel_id].Target = ctrl.path
+            ws._rels.get(ctrl._rel_id).Target = ctrl.path
 
 
     def write_embedded(self, ws, control_images):

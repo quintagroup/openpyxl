@@ -185,6 +185,6 @@ def read_external_link(archive, book_path):
 
     link_path = get_rels_path(book_path)
     deps = get_dependents(archive, link_path)
-    book.file_link = list(deps)[0]
+    book.file_link = deps[0]
 
     return book
