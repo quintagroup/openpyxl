@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2023 openpyxl
+# Copyright (c) 2010-2024 openpyxl
 
 from io import BytesIO
 from zipfile import ZipFile
@@ -279,4 +279,3 @@ def test_read_datetime(datadir):
     ws = wb.active
     assert type(ws["A1"].value) == datetime.timedelta
     assert type(ws["A2"].value) == datetime.datetime
- 
