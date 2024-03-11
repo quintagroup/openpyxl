@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2023 openpyxl
+# Copyright (c) 2010-2024 openpyxl
 
 import posixpath
 from warnings import warn
@@ -78,6 +78,11 @@ class RelationshipList(ElementList):
             if r.Id == key:
                 return r
         raise KeyError("Unknown relationship: {0}".format(key))
+
+
+    def to_dict(self):
+        """Return a dictionary of relations keyed by id"""
+        return {r.id:r for r in self}
 
 
     def to_tree(self):
