@@ -9,6 +9,7 @@ from openpyxl.descriptors import (
     Sequence,
 )
 from openpyxl.descriptors.serialisable import Serialisable
+from openpyxl.descriptors.container import ElementList
 
 from openpyxl.xml.constants import REL_NS, PKG_REL_NS
 from openpyxl.xml.functions import (
@@ -49,31 +50,16 @@ class Relationship(Serialisable):
         self.Id = Id
 
 
-class RelationshipList(Serialisable):
+class RelationshipList(ElementList):
 
     tagname = "Relationships"
-
-    Relationship = Sequence(expected_type=Relationship)
-
-
-    def __init__(self, Relationship=()):
-        self.Relationship = Relationship
+    expected_type = Relationship
 
 
     def append(self, value):
-        values = self.Relationship[:]
-        values.append(value)
+        super().append(value)
         if not value.Id:
-            value.Id = "rId{0}".format((len(values)))
-        self.Relationship = values
-
-
-    def __len__(self):
-        return len(self.Relationship)
-
-
-    def __bool__(self):
-        return bool(self.Relationship)
+            value.Id = f"rId{len(self)}"
 
 
     def find(self, content_type):
@@ -82,32 +68,28 @@ class RelationshipList(Serialisable):
         NB. these content-types namespaced objects and different to the MIME-types
         in the package manifest :-(
         """
-        for r in self.Relationship:
+        for r in self:
             if r.Type == content_type:
                 yield r
 
 
     def __getitem__(self, key):
-        for r in self.Relationship:
+        for r in self:
             if r.Id == key:
                 return r
         raise KeyError("Unknown relationship: {0}".format(key))
 
 
     def to_tree(self):
-        tree = Element("Relationships", xmlns=PKG_REL_NS)
-        for idx, rel in enumerate(self.Relationship, 1):
-            if not rel.Id:
-                rel.Id = "rId{0}".format(idx)
-            tree.append(rel.to_tree())
-
+        tree = super().to_tree()
+        tree.set("xmlns", PKG_REL_NS)
         return tree
 
 
     def get_types(self):
         """Return a set of types contained"""
         known_types = set()
-        for r in self.Relationship:
+        for r in self:
             simple = r.Type.split("/")[-1]
             if simple not in known_types:
                 known_types.add(simple)
@@ -148,8 +130,8 @@ def get_dependents(archive, filename):
         rels = RelationshipList()
     folder = posixpath.dirname(filename)
     parent = posixpath.split(folder)[0]
-    for r in rels.Relationship:
-        if r.TargetMode == "External" or "hyperlink" in r.Type:
+    for r in rels:
+        if r.TargetMode == "External":
             continue
         elif r.target.startswith("/"):
             r.target = r.target[1:]

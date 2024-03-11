@@ -226,7 +226,7 @@ class ExcelWriter(object):
         drawing._counter = len(self.legacy)
         drawing._write(self.archive)
 
-        for rel in drawing.children.Relationship:
+        for rel in drawing.children:
             img = rel.blob
             self.add_image(img)
             rel.Target = img.path
@@ -266,7 +266,7 @@ class ExcelWriter(object):
 
         if ws._drawing:
             self.write_drawing(ws._drawing)
-            for r in ws._rels.Relationship:
+            for r in ws._rels:
                 if "drawing" in r.Type:
                     r.Target = ws._drawing.path
 

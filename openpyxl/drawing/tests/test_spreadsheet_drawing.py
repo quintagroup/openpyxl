@@ -546,7 +546,7 @@ class TestSpreadsheetDrawing:
         drawing = SpreadsheetDrawing.from_tree(tree)
         drawing.shapes = drawing._shapes
         drawing._write()
-        assert drawing._rels.Relationship[0] == Relationship(Target="", Id="rId1", type="hyperlink", TargetMode="")
+        assert drawing._rels["rId1"] == Relationship(Target="", Id="rId1", type="hyperlink", TargetMode="")
 
 
 def test_check_anchor_chart():

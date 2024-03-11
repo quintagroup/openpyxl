@@ -20,7 +20,6 @@ from openpyxl.utils import (
     get_column_letter,
     range_boundaries,
     coordinate_to_tuple,
-    absolute_coordinate,
 )
 from openpyxl.cell import Cell, MergedCell
 from openpyxl.formatting.formatting import ConditionalFormattingList

@@ -332,7 +332,7 @@ class WorksheetProcessor:
 
         rels = get_dependents(self.archive, rels_path)
 
-        for rel in rels.Relationship:
+        for rel in rels:
             rel.blob = self._get_image_for(rel.target)
 
         drawing.children = rels

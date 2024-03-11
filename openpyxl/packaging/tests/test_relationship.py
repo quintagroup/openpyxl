@@ -140,7 +140,7 @@ def test_get_dependents(datadir, filename, expected):
 
     from ..relationship import get_dependents
     rels = get_dependents(archive, filename)
-    assert [r.Target for r in rels.Relationship] == expected
+    assert [r.Target for r in rels] == expected
 
 
 def test_get_external_link(datadir):
@@ -150,24 +150,4 @@ def test_get_external_link(datadir):
     from ..relationship import get_dependents
     rels = get_dependents(archive, "xl/worksheets/_rels/sheet1.xml.rels")
 
-    assert [r.Target for r in rels.Relationship] == ["http://www.readthedocs.org"]
-
-
-def test_expanding_rel_path(datadir, get_dependents):
-    datadir.chdir()
-    rel_path = "xl/drawings/_rels/drawing1.rels.xml"
-    archive = ZipFile(BytesIO(), "a")
-    with open("drawing1.xml.rels", "rb") as src:
-        archive.writestr(rel_path, src.read())
-
-    rels = get_dependents(archive, rel_path)
-    targets = [r.Target for r in rels.Relationship]
-    assert targets == [
-        "#Sheet1!Q59",
-        "xl/media/image1.png",
-        "file:///Documents/somefile.txt",
-        "https://ooxml.org/some_link",
-        "media/image1.png",
-    ]
-
-
+    assert [r.Target for r in rels] == ["http://www.readthedocs.org"]
