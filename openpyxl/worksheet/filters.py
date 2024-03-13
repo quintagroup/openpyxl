@@ -154,58 +154,62 @@ class CustomFilter(Serialisable):
 
     tagname = "customFilter"
 
-    def __init__(self, operator="equal", val=None, filter_type=None):
-        if filter_type is None:
-            self._filter_type = self._get_subtype(val)(operator, val)
-        else:
-            self._filter_type = filter_type
+    val = String()
+    operator = Set(values=['equal', 'lessThan', 'lessThanOrEqual',
+                           'notEqual', 'greaterThanOrEqual', 'greaterThan'])
 
-    @staticmethod
-    def _get_subtype(val=None):
-        if val == " ":
-            subtype = BlankCustomFilter
-        else:
-            try:
-                val = float(val)
-                subtype = NumberCustomFilter
-            except ValueError:
-                subtype = StringCustomFilter
-        return subtype
-
-    def __getattr__(self, item):
-        if item.startswith("_"):
-            return super.__getattr__(self, item)
-        else:
-            return getattr(self._filter_type, item)
-
-    def __setattr__(self, key, value):
-        if key.startswith("_"):
-            super.__setattr__(self, key, value)
-        else:
-            setattr(self._filter_type, key, value)
-
-    def __delattr__(self, item):
-        if item.startswith("_"):
-            return super.__delattr__(self, item)
-        else:
-            return delattr(self._filter_type, item)
-
-    def to_tree(self, tagname=None, idx=None, namespace=None):
-        return self._filter_type.to_tree(tagname=self.tagname)
-
-
-class BlankCustomFilter(Serialisable):
-    operator = Set(values=["notEqual"])
-    val = Set(values=[" "])
-
-    def __init__(self, operator="notEqual", val=" "):
+    def __init__(self, operator="equal", val=None):
         self.operator = operator
         self.val = val
 
 
-class NumberCustomFilter(Serialisable):
+    @staticmethod
+    def _get_subtype(val=None):
+        if val == " ":
+            subtype = BlankFilter
+        else:
+            try:
+                val = float(val)
+                subtype = NumberFilter
+            except ValueError:
+                subtype = StringFilter
+        return subtype
+
+
+    #@classmethod
+    #def from_tree(cls, node):
+        #val = node.attrib['val']
+        #cls = cls._get_subtype(val)
+        #return super(cls, node)
+
+
+class BlankFilter(Serialisable):
+    """
+    Exclude blanks
+    """
+
+    __attrs__ = ("operator", "val")
+
+    def __init__(self, **kw):
+        pass
+
+
+    @property
+    def operator(self):
+        return "notEqual"
+
+
+    @property
+    def val(self):
+        return " "
+
+
+class NumberFilter(Serialisable):
+
+
     operator = Set(values=
-                   ['equal', 'lessThan', 'lessThanOrEqual','notEqual', 'greaterThanOrEqual', 'greaterThan'])
+                   ['equal', 'lessThan', 'lessThanOrEqual',
+                    'notEqual', 'greaterThanOrEqual', 'greaterThan'])
     val = Float()
 
     def __init__(self, operator="equal", val=None):
@@ -213,32 +217,35 @@ class NumberCustomFilter(Serialisable):
         self.val = val
 
 
-class StringCustomFilter(Serialisable):
+string_operator_mapping = {
+    "contains": {"operator":"equal", "val":"*{}*"},
+    "doesNotContain": {"operator":"notEqual", "val":"*{}*"},
+    "beginsWith": {"operator":"equal", "val":"{}*"},
+    "doesNotBeginWith": {"operator":"notEqual", "val":"{}*"},
+    "endsWith": {"operator":"equal", "val":"*{}"},
+    "doesNotEndWith": {"operator":"notEqual", "val":"*{}"}
+}
 
-    operator = Set(values=["equal", "notEqual"])
+
+class StringFilter(Serialisable):
+
+    operator = Set(values=['contains', 'doesNotContain', 'beginsWith',
+                           'doesNotBeginWith', 'endsWith', 'doesNotEndWith'])
     val = MatchPattern(pattern=r"(^\*.*)|(.*\*$)")
+    val = String()
+
 
     def __init__(self, operator="equal", val=None):
         self.operator = operator
         self.val = val
 
 
-    @staticmethod
-    def from_string_operator(operator, val):
-        operators = {
-            "contains": StringCustomFilter(operator="equal", val=f"*{val}*"),
-            "doesNotContain": StringCustomFilter(operator="notEqual", val=f"*{val}*"),
-            "beginsWith": StringCustomFilter(operator="equal", val=f"{val}*"),
-            "doesNotBeginWith": StringCustomFilter(operator="notEqual", val=f"{val}*"),
-            "endsWith": StringCustomFilter(operator="equal", val=f"*{val}"),
-            "doesNotEndWith": StringCustomFilter(operator="notEqual", val=f"*{val}")
-        }
-        if operator not in operators.keys():
-            raise ValueError(f"Unsupported operator: {operator}")
-
-        return operators[operator]
-
-
+    def to_tree(self, tagname=None, idx=None, namespace=None):
+        match = string_operator_mapping[self.operator]
+        op = match["operator"]
+        value = match["val"].format(self.val)
+        flt = CustomFilter(op, value)
+        return flt.to_tree(tagname, idx, namespace)
 
 
 class CustomFilters(Serialisable):
@@ -246,12 +253,13 @@ class CustomFilters(Serialisable):
     tagname = "customFilters"
 
     _and = Bool(allow_none=True)
-    customFilter = Sequence(expected_type=CustomFilter) # min 1, max 2
+    customFilter = Sequence(expected_type=(CustomFilter, BlankFilter,
+                                           NumberFilter, StringFilter)) # min 1, max 2
 
     __elements__ = ('customFilter',)
 
     def __init__(self,
-                 _and=False,
+                 _and=None,
                  customFilter=(),
                 ):
         self._and = _and

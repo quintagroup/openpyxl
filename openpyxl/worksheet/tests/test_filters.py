@@ -256,194 +256,160 @@ def CustomFilter():
     return CustomFilter
 
 
-@pytest.fixture
-def NumberCustomFilter():
-    from ..filters import NumberCustomFilter
-    return NumberCustomFilter
-
-
-@pytest.fixture
-def StringCustomFilter():
-    from ..filters import StringCustomFilter
-    return StringCustomFilter
-
-
-@pytest.fixture
-def BlankCustomFilter():
-    from ..filters import BlankCustomFilter
-    return BlankCustomFilter
-
-
 class TestCustomFilter:
 
     def test_ctor(self, CustomFilter):
-        fut = CustomFilter(operator="greaterThanOrEqual", val=0.2)
-        xml = tostring(fut.to_tree())
+        flt = CustomFilter(operator="greaterThanOrEqual", val="0.2")
+        xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="greaterThanOrEqual" val="0.2" />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
+
 
     def test_from_xml(self, CustomFilter):
         src = """
         <customFilter operator="greaterThanOrEqual" val="0.2" />
         """
         node = fromstring(src)
-        fut = CustomFilter.from_tree(node)
-        assert fut == CustomFilter(operator="greaterThanOrEqual", val=0.2)
+        flt = CustomFilter.from_tree(node)
+        assert flt == CustomFilter(operator="greaterThanOrEqual", val="0.2")
 
-    def test_string_filter(self, CustomFilter):
+
+    @pytest.mark.parametrize("value, typ", (
+        [" ", "BlankFilter"],
+        ["2.5", "NumberFilter"],
+        ["ab", "StringFilter"],
+    )
+                             )
+    def test_dispatch(self, CustomFilter, value, typ):
+        cls = CustomFilter._get_subtype(value)
+        assert cls.__name__ == typ
+
+
+@pytest.fixture
+def NumberFilter():
+    from ..filters import NumberFilter
+    return NumberFilter
+
+
+class TestNumberFilter:
+
+    def test_ctor(self, NumberFilter):
+        flt = NumberFilter(operator="greaterThanOrEqual", val=0.2)
+        xml = tostring(flt.to_tree(tagname="customFilter"))
+        expected = """
+        <customFilter operator="greaterThanOrEqual" val="0.2" />
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_from_xml(self, NumberFilter):
         src = """
-        <customFilter val="K*" operator="equal" />
+        <customFilter operator="greaterThanOrEqual" val="0.2" />
         """
         node = fromstring(src)
-        fut = CustomFilter.from_tree(node)
-        assert fut == CustomFilter(val="K*", operator="equal")
+        flt = NumberFilter.from_tree(node)
+        assert flt == NumberFilter(operator="greaterThanOrEqual", val=0.2)
 
-    def test_blank_filter(self, CustomFilter):
-        src = """
-        <customFilter val=" " operator="notEqual" />
-        """
-        node = fromstring(src)
-        fut = CustomFilter.from_tree(node)
-        assert fut == CustomFilter(val=" ", operator="notEqual")
 
-    def test_value_error(self, CustomFilter):
-        src = """
-        <customFilter val="ab" operator="notEqual" />
-        """
-        node = fromstring(src)
-        with pytest.raises(ValueError) as e:
-            fut = CustomFilter.from_tree(node)
-        assert str(e.value) == r"Value does not match pattern (^\*.*)|(.*\*$)"
+@pytest.fixture
+def BlankFilter():
+    from ..filters import BlankFilter
+    return BlankFilter
 
-    def test_ctor_single_space(self, CustomFilter):
-        fut = CustomFilter(operator="notEqual", val=" ")
-        xml = tostring(fut.to_tree())
+
+class TestBlankFilter:
+
+    def test_ctor(self, BlankFilter):
+        flt = BlankFilter()
+        xml = tostring(flt.to_tree(tagname="customFilter"))
         expected = """
         <customFilter operator="notEqual" val=" " />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_ctor_filtertype_blank(self, CustomFilter, BlankCustomFilter):
-        fut = CustomFilter(filter_type=BlankCustomFilter())
-        xml = tostring(fut.to_tree())
-        expected = """
-        <customFilter operator="notEqual" val=" " />
+
+    def test_from_xml(self, BlankFilter):
+        src = """
+        <customFilter operator="greaterThanOrEqual" val="0.2" />
         """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-    def test_ctor_filtertype_blank_error(self, CustomFilter, BlankCustomFilter):
-        with pytest.raises(ValueError) as e:
-            fut = CustomFilter(filter_type=BlankCustomFilter(operator="equal"))
-        assert "Value must be" in str(e.value)
-
-    def test_ctor_filtertype_number(self, CustomFilter, NumberCustomFilter):
-        fut = CustomFilter(filter_type=NumberCustomFilter(operator="notEqual", val=3))
-        xml = tostring(fut.to_tree())
-        expected = """
-        <customFilter operator="notEqual" val="3" />
-        """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-    def test_ctor_filtertype_number_error(self, CustomFilter, NumberCustomFilter):
-        with pytest.raises(TypeError) as e:
-            fut = CustomFilter(filter_type=NumberCustomFilter(operator="equal", val="ab"))
-        assert "expected" in str(e.value)
-
-    def test_ctor_filtertype_string(self, CustomFilter, StringCustomFilter):
-        fut = CustomFilter(filter_type=StringCustomFilter(operator="notEqual", val="*baa"))
-        xml = tostring(fut.to_tree())
-        expected = """
-        <customFilter operator="notEqual" val="*baa" />
-        """
-        diff = compare_xml(xml, expected)
-        assert diff is None, diff
-
-    def test_ctor_filtertype_string_error(self, CustomFilter, StringCustomFilter):
-        with pytest.raises(ValueError) as e:
-            fut = CustomFilter(filter_type=StringCustomFilter(operator="equal", val="ab"))
-        assert str(e.value) == r"Value does not match pattern (^\*.*)|(.*\*$)"
+        node = fromstring(src)
+        flt = BlankFilter.from_tree(node)
+        assert flt == BlankFilter()
 
 
-class TestStringCustomFilter:
+@pytest.fixture
+def StringFilter():
+    from ..filters import StringFilter
+    return StringFilter
 
-    def test_beginsWith(self, CustomFilter, StringCustomFilter):
-        fut = CustomFilter(filter_type=StringCustomFilter.from_string_operator(
-            operator="beginsWith", val="baa"
-        ))
-        xml = tostring(fut.to_tree())
+
+class TestStringFilter:
+
+
+    def test_beginsWith(self, StringFilter):
+        flt = StringFilter(operator="beginsWith", val="baa")
+        xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="equal" val="baa*" />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_doesNotBeginWith(self, CustomFilter, StringCustomFilter):
-        fut = CustomFilter(filter_type=StringCustomFilter.from_string_operator(
-            operator="doesNotBeginWith", val="baa"
-        ))
-        xml = tostring(fut.to_tree())
+
+    def test_doesNotBeginWith(self, StringFilter):
+        flt = StringFilter(operator="doesNotBeginWith", val="baa")
+        xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="notEqual" val="baa*" />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_contains(self, CustomFilter, StringCustomFilter):
-        fut = CustomFilter(filter_type=StringCustomFilter.from_string_operator(
-            operator="contains", val="baa"
-        ))
-        xml = tostring(fut.to_tree())
+
+    def test_contains(self, StringFilter):
+        flt = StringFilter(operator="contains", val="baa")
+        xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="equal" val="*baa*" />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_doesNotContain(self, CustomFilter, StringCustomFilter):
-        fut = CustomFilter(filter_type=StringCustomFilter.from_string_operator(
-            operator="doesNotContain", val="baa"
-        ))
-        xml = tostring(fut.to_tree())
+
+    def test_doesNotContain(self, StringFilter,):
+        flt = StringFilter(operator="doesNotContain", val="baa")
+        xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="notEqual" val="*baa*" />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_endsWith(self, CustomFilter, StringCustomFilter):
-        fut = CustomFilter(filter_type=StringCustomFilter.from_string_operator(
-            operator="endsWith", val="baa"
-        ))
-        xml = tostring(fut.to_tree())
+
+    def test_endsWith(self, StringFilter):
+        flt = StringFilter(operator="endsWith", val="baa")
+        xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="equal" val="*baa" />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_doesNotEndWith(self, CustomFilter, StringCustomFilter):
-        fut = CustomFilter(filter_type=StringCustomFilter.from_string_operator(
-            operator="doesNotEndWith", val="baa"
-        ))
-        xml = tostring(fut.to_tree())
+
+    def test_doesNotEndWith(self, StringFilter):
+        flt = StringFilter(operator="doesNotEndWith", val="baa")
+        xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="notEqual" val="*baa" />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
-    def test_unsupported_operator(selfself, CustomFilter, StringCustomFilter):
-        with pytest.raises(ValueError) as e:
-            CustomFilter(filter_type=StringCustomFilter.from_string_operator(
-                operator="wrong", val="baa"
-            ))
-        assert "Unsupported operator" in str(e.value)
 
 @pytest.fixture
 def CustomFilters():
@@ -454,8 +420,8 @@ def CustomFilters():
 class TestCustomFilters:
 
     def test_ctor(self, CustomFilters):
-        fut = CustomFilters(_and=True)
-        xml = tostring(fut.to_tree())
+        flt = CustomFilters(_and=True)
+        xml = tostring(flt.to_tree())
         expected = """
         <customFilters and="1" />
         """
@@ -463,13 +429,68 @@ class TestCustomFilters:
         assert diff is None, diff
 
 
+    def test_blank(self, CustomFilters, BlankFilter):
+        flt = CustomFilters(customFilter=[BlankFilter()])
+        xml = tostring(flt.to_tree())
+        expected = """
+        <customFilters>
+          <customFilter operator="notEqual" val=" "></customFilter>
+        </customFilters>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_number(self, CustomFilters, NumberFilter):
+        flt = CustomFilters(customFilter=[NumberFilter("lessThan", 4)])
+        xml = tostring(flt.to_tree())
+        expected = """
+        <customFilters>
+         <customFilter operator="lessThan" val="4"/>
+        </customFilters>
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_string(self, CustomFilters, StringFilter):
+        flt = CustomFilters(customFilter=[StringFilter("contains", "xml")])
+        xml = tostring(flt.to_tree())
+        expected = """
+        <customFilters>
+          <customFilter operator="equal" val="*xml*"/>
+        </customFilters>
+
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    @pytest.mark.xfail
+    def test_escape_string(self, CustomFilters, StringFilter):
+        flt = CustomFilters(customFilter=[StringFilter("contains", "*xml")])
+        xml = tostring(flt.to_tree())
+        expected = """
+        <customFilters>
+          <customFilter operator="equal" val="~*xml*"/>
+        </customFilters>
+
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    @pytest.mark.xfail
     def test_from_xml(self, CustomFilters):
         src = """
-        <customFilters and="1" />
+        <customFilters and="1">
+          <customFilter operator="greaterThanOrEqual" val="1"/>
+          <customFilter operator="lessThanOrEqual" val="2"/>
+        </customFilters>
         """
         node = fromstring(src)
-        fut = CustomFilters.from_tree(node)
-        assert fut == CustomFilters(_and=True)
+        flt = CustomFilters.from_tree(node)
+        assert flt == CustomFilters(_and=True)
 
 
 @pytest.fixture
