@@ -15,6 +15,7 @@ Bugfixes
 * `#2106 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2106>`_ Setting Trendline.name attribute raises exception when saving
 * `#2120 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2120>`_ Timezone and Zombie formatting cannot be combined.
 * `#2107 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2107>`_ Column name generation is inefficient and slow
+* `#2122 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2122>`_ File handlers not always released in read-only mode
 * `#2149 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2149>`_ Workbook files not properly closed on Python ≥ 3.11.8 and Windows`
 
 
