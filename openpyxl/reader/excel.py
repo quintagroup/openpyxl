@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2023 openpyxl
+# Copyright (c) 2010-2024 openpyxl
 
 
 """Read an xlsx file into Python"""
@@ -235,6 +235,7 @@ class ExcelReader:
                 ws._rels = rels
                 ws_parser = WorksheetReader(ws, fh, self.shared_strings, self.data_only, self.rich_text)
                 ws_parser.bind_all()
+                fh.close()
 
             # assign any comments to cells
             for r in rels.find(COMMENTS_NS):

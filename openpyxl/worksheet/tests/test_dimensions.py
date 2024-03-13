@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2023 openpyxl
+# Copyright (c) 2010-2024 openpyxl
 
 import pytest
 
@@ -27,17 +27,31 @@ class DummyWorksheet:
         self.parent = DummyWorkbook()
 
 
-def test_dimension_interface():
-    from .. dimensions import Dimension
-    d = Dimension(1, True, 1, False, DummyWorksheet())
-    assert isinstance(d.parent, DummyWorksheet)
-    assert dict(d) == {'hidden': '1', 'outlineLevel': '1'}
+@pytest.fixture
+def Dimension():
+    from ..dimensions import Dimension
+    return Dimension
 
 
-def test_invalid_dimension_ctor():
-    from .. dimensions import Dimension
-    with pytest.raises(TypeError):
-        Dimension()
+class TestDimension:
+
+
+    def test_dimension_interface(self, Dimension):
+        d = Dimension(1, True, 1, False, DummyWorksheet())
+        assert isinstance(d.parent, DummyWorksheet)
+        assert dict(d) == {'hidden': '1', 'outlineLevel': '1'}
+
+
+    def test_invalid_dimension_ctor(self, Dimension):
+        with pytest.raises(TypeError):
+            Dimension()
+
+
+    def test_repr(self, Dimension):
+        dim = Dimension(worksheet="Sheet1", index=1, hidden=False, outlineLevel=None,
+                        collapsed=True)
+        assert repr(dim) == "<Dimension Instance, Attributes={'collapsed': '1'}>"
+
 
 
 @pytest.fixture
