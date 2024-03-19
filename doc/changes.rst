@@ -62,6 +62,7 @@ Bugfixes
 * `#1156 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1156>`_ Table filters are always overriden
 * `#1360 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1360>`_ Can't read some ScatterCharts if n
 * `#1724 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1724>`_ Problem with multilevel indices in dataframes
+* `#1763 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1763>`_ Make calculating worksheet sizes slightly faster
 * `#1772 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1772>`_ Problem with category indices in dataframes
 * `#1786 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1786>`_ NamedStyles share attributes - mutables gotcha
 * `#1851 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1851>`_ Allow print area to be set to None
