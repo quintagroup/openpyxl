@@ -481,16 +481,16 @@ class TestCustomFilters:
 
 
     @pytest.mark.xfail
-    def test_from_xml(self, CustomFilters):
+    def test_from_xml(self, CustomFilters, CustomFilter):
         src = """
-        <customFilters and="1">
+        <customFilters>
           <customFilter operator="greaterThanOrEqual" val="1"/>
-          <customFilter operator="lessThanOrEqual" val="2"/>
         </customFilters>
         """
         node = fromstring(src)
         flt = CustomFilters.from_tree(node)
-        assert flt == CustomFilters(_and=True)
+        filters = [CustomFilter("greaterThanOrEqual", "1")]
+        assert flt == CustomFilters(customFilter=filters)
 
 
 @pytest.fixture
