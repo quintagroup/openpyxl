@@ -161,6 +161,16 @@ class TestPivotCacheDefinition:
         assert cache.recordCount == 17
         assert len(cache.cacheFields) == 6
 
+    def test_read_tuple_cache(self, CacheDefinition, datadir):
+        # Different sample with use of tupleCache
+        datadir.chdir()
+        with open("pivotCacheDefinitionTupleCache.xml", "rb") as src:
+            xml = fromstring(src.read())
+
+        cache = CacheDefinition.from_tree(xml)
+        assert cache.recordCount == 0
+        assert cache.tupleCache.entries.count == 1
+
 
     def test_to_tree(self, DummyCache):
         cache = DummyCache

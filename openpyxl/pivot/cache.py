@@ -279,10 +279,10 @@ class PCDSDTCEntries(Serialisable):
 
     count = Integer()
     # some elements are choice
-    m = Typed(expected_type=Missing, )
-    n = Typed(expected_type=Number, )
-    e = Typed(expected_type=Error, )
-    s = Typed(expected_type=Text)
+    m = Typed(expected_type=Missing, allow_none=True)
+    n = Typed(expected_type=Number, allow_none=True)
+    e = Typed(expected_type=Error, allow_none=True)
+    s = Typed(expected_type=Text, allow_none=True)
 
     __elements__ = ('m', 'n', 'e', 's')
 
@@ -997,7 +997,6 @@ class CacheDefinition(Serialisable):
     minRefreshableVersion = Integer(allow_none=True)
     recordCount = Integer(allow_none=True)
     upgradeOnRefresh = Bool(allow_none=True)
-    tupleCache = Bool(allow_none=True)
     supportSubquery = Bool(allow_none=True)
     supportAdvancedDrill = Bool(allow_none=True)
     cacheSource = Typed(expected_type=CacheSource)
@@ -1063,7 +1062,6 @@ class CacheDefinition(Serialisable):
         self.minRefreshableVersion = minRefreshableVersion
         self.recordCount = recordCount
         self.upgradeOnRefresh = upgradeOnRefresh
-        self.tupleCache = tupleCache
         self.supportSubquery = supportSubquery
         self.supportAdvancedDrill = supportAdvancedDrill
         self.cacheSource = cacheSource
