@@ -231,7 +231,6 @@ class StringFilter(CustomFilter):
 
     operator = Set(values=['contains', 'doesNotContain', 'beginsWith',
                            'doesNotBeginWith', 'endsWith', 'doesNotEndWith'])
-    val = MatchPattern(pattern=r"(^\*.*)|(.*\*$)")
     val = String()
 
 
