@@ -183,7 +183,7 @@ class CustomFilter(Serialisable):
         #return super(cls, node)
 
 
-class BlankFilter(Serialisable):
+class BlankFilter(CustomFilter):
     """
     Exclude blanks
     """
@@ -204,7 +204,7 @@ class BlankFilter(Serialisable):
         return " "
 
 
-class NumberFilter(Serialisable):
+class NumberFilter(CustomFilter):
 
 
     operator = Set(values=
@@ -227,7 +227,7 @@ string_operator_mapping = {
 }
 
 
-class StringFilter(Serialisable):
+class StringFilter(CustomFilter):
 
     operator = Set(values=['contains', 'doesNotContain', 'beginsWith',
                            'doesNotBeginWith', 'endsWith', 'doesNotEndWith'])
@@ -253,8 +253,7 @@ class CustomFilters(Serialisable):
     tagname = "customFilters"
 
     _and = Bool(allow_none=True)
-    customFilter = Sequence(expected_type=(CustomFilter, BlankFilter,
-                                           NumberFilter, StringFilter)) # min 1, max 2
+    customFilter = Sequence(expected_type=CustomFilter) # min 1, max 2
 
     __elements__ = ('customFilter',)
 

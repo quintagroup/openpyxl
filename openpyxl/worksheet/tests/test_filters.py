@@ -480,7 +480,6 @@ class TestCustomFilters:
         assert diff is None, diff
 
 
-    @pytest.mark.xfail
     def test_from_xml(self, CustomFilters, CustomFilter):
         src = """
         <customFilters>

@@ -413,7 +413,6 @@ class TestPivotFilter:
         assert diff is None, diff
 
 
-    @pytest.mark.xfail
     def test_from_xml(self, PivotFilter, Autofilter):
         src = """
         <filter fld="0" type="dateBetween" evalOrder="-1" id="6">
