@@ -170,27 +170,6 @@ class ServerFormat(Serialisable):
         self.format = format
 
 
-class ServerFormatList(Serialisable):
-
-    tagname = "serverFormats"
-
-    serverFormat = Sequence(expected_type=ServerFormat, allow_none=True)
-
-    __elements__ = ('serverFormat',)
-    __attrs__ = ('count',)
-
-    def __init__(self,
-                 count=None,
-                 serverFormat=None,
-                ):
-        self.serverFormat = serverFormat
-
-
-    @property
-    def count(self):
-        return len(self.serverFormat)
-
-
 class Query(Serialisable):
 
     tagname = "query"
@@ -206,23 +185,6 @@ class Query(Serialisable):
                 ):
         self.mdx = mdx
         self.tpls = tpls
-
-
-class QueryCache(Serialisable):
-
-    tagname = "queryCache"
-
-    count = Integer()
-    query = Typed(expected_type=Query, )
-
-    __elements__ = ('query',)
-
-    def __init__(self,
-                 count=None,
-                 query=None,
-                ):
-        self.count = count
-        self.query = query
 
 
 class OLAPSet(Serialisable):
@@ -258,27 +220,13 @@ class OLAPSet(Serialisable):
         self.sortByTuple = sortByTuple
 
 
-class OLAPSets(Serialisable):
-
-    count = Integer()
-    set = Typed(expected_type=OLAPSet, )
-
-    __elements__ = ('set',)
-
-    def __init__(self,
-                 count=None,
-                 set=None,
-                ):
-        self.count = count
-        self.set = set
-
-
 class PCDSDTCEntries(Serialisable):
+    # Implements CT_PCDSDTCEntries
 
-    tagname = "pCDSDTCEntries"
+    tagname = "entries"
 
-    count = Integer()
-    # some elements are choice
+    count = Integer(allow_none=True)
+    # elements are choice
     m = Typed(expected_type=Missing, allow_none=True)
     n = Typed(expected_type=Number, allow_none=True)
     e = Typed(expected_type=Error, allow_none=True)
@@ -305,18 +253,18 @@ class TupleCache(Serialisable):
     tagname = "tupleCache"
 
     entries = Typed(expected_type=PCDSDTCEntries, allow_none=True)
-    sets = Typed(expected_type=OLAPSets, allow_none=True)
-    queryCache = Typed(expected_type=QueryCache, allow_none=True)
-    serverFormats = Typed(expected_type=ServerFormatList, allow_none=True)
+    sets = NestedSequence(expected_type=OLAPSet, count=True)
+    queryCache = NestedSequence(expected_type=Query, count=True)
+    serverFormats = NestedSequence(expected_type=ServerFormat, count=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
     __elements__ = ('entries', 'sets', 'queryCache', 'serverFormats', 'extLst')
 
     def __init__(self,
                  entries=None,
-                 sets=None,
-                 queryCache=None,
-                 serverFormats=None,
+                 sets=(),
+                 queryCache=(),
+                 serverFormats=(),
                  extLst=None,
                 ):
         self.entries = entries
