@@ -476,7 +476,7 @@ class TestOLAPKPI:
     def test_ctor(self, OLAPKPI):
         kpi = OLAPKPI(uniqueName="TestKPI",
                       caption="TestCaption",
-                      displayFolder="Folder\Display",
+                      displayFolder="Folder\\Display",
                       measureGroup="TestMeasure",
                       parent="TestParent",
                       value="TestValue",
