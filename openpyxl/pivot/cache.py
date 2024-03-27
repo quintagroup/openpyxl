@@ -274,9 +274,9 @@ class TupleCache(Serialisable):
         self.extLst = extLst
 
 
-class PCDKPI(Serialisable):
+class OLAPKPI(Serialisable):
 
-    tagname = "pCDKPI"
+    tagname = "kpi"
 
     uniqueName = String()
     caption = String(allow_none=True)
@@ -331,31 +331,16 @@ class GroupMember(Serialisable):
         self.group = group
 
 
-class GroupMembers(Serialisable):
-
-    count = Integer()
-    groupMember = Typed(expected_type=GroupMember, )
-
-    __elements__ = ('groupMember',)
-
-    def __init__(self,
-                 count=None,
-                 groupMember=None,
-                ):
-        self.count = count
-        self.groupMember = groupMember
-
-
 class LevelGroup(Serialisable):
 
-    tagname = "levelGroup"
+    tagname = "group"
 
     name = String()
     uniqueName = String()
     caption = String()
     uniqueParent = String()
     id = Integer()
-    groupMembers = Typed(expected_type=GroupMembers, )
+    groupMembers = NestedSequence(expected_type=GroupMember, count=True)
 
     __elements__ = ('groupMembers',)
 
@@ -365,7 +350,7 @@ class LevelGroup(Serialisable):
                  caption=None,
                  uniqueParent=None,
                  id=None,
-                 groupMembers=None,
+                 groupMembers=(),
                 ):
         self.name = name
         self.uniqueName = uniqueName
@@ -373,23 +358,6 @@ class LevelGroup(Serialisable):
         self.uniqueParent = uniqueParent
         self.id = id
         self.groupMembers = groupMembers
-
-
-class Groups(Serialisable):
-
-    tagname = "groups"
-
-    count = Integer()
-    group = Typed(expected_type=LevelGroup, )
-
-    __elements__ = ('group',)
-
-    def __init__(self,
-                 count=None,
-                 group=None,
-                ):
-        self.count = count
-        self.group = group
 
 
 class GroupLevel(Serialisable):
@@ -400,7 +368,7 @@ class GroupLevel(Serialisable):
     caption = String()
     user = Bool()
     customRollUp = Bool()
-    groups = Typed(expected_type=Groups, allow_none=True)
+    groups = NestedSequence(expected_type=LevelGroup, count=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
     __elements__ = ('groups', 'extLst')
@@ -410,7 +378,7 @@ class GroupLevel(Serialisable):
                  caption=None,
                  user=None,
                  customRollUp=None,
-                 groups=None,
+                 groups=(),
                  extLst=None,
                 ):
         self.uniqueName = uniqueName
@@ -419,21 +387,6 @@ class GroupLevel(Serialisable):
         self.customRollUp = customRollUp
         self.groups = groups
         self.extLst = extLst
-
-
-class GroupLevels(Serialisable):
-
-    count = Integer()
-    groupLevel = Typed(expected_type=GroupLevel, )
-
-    __elements__ = ('groupLevel',)
-
-    def __init__(self,
-                 count=None,
-                 groupLevel=None,
-                ):
-        self.count = count
-        self.groupLevel = groupLevel
 
 
 class FieldUsage(Serialisable):
@@ -446,21 +399,6 @@ class FieldUsage(Serialisable):
                  x=None,
                 ):
         self.x = x
-
-
-class FieldsUsage(Serialisable):
-
-    count = Integer()
-    fieldUsage = Typed(expected_type=FieldUsage, allow_none=True)
-
-    __elements__ = ('fieldUsage',)
-
-    def __init__(self,
-                 count=None,
-                 fieldUsage=None,
-                ):
-        self.count = count
-        self.fieldUsage = fieldUsage
 
 
 class CacheHierarchy(Serialisable):
@@ -489,8 +427,8 @@ class CacheHierarchy(Serialisable):
     unbalanced = Bool(allow_none=True)
     unbalancedGroup = Bool(allow_none=True)
     hidden = Bool()
-    fieldsUsage = Typed(expected_type=FieldsUsage, allow_none=True)
-    groupLevels = Typed(expected_type=GroupLevels, allow_none=True)
+    fieldsUsage = NestedSequence(expected_type=FieldUsage, count=True)
+    groupLevels = NestedSequence(expected_type=GroupLevel, count=True)
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
     __elements__ = ('fieldsUsage', 'groupLevels')
@@ -518,8 +456,8 @@ class CacheHierarchy(Serialisable):
                  unbalanced=None,
                  unbalancedGroup=None,
                  hidden=None,
-                 fieldsUsage=None,
-                 groupLevels=None,
+                 fieldsUsage=(),
+                 groupLevels=(),
                  extLst=None,
                 ):
         self.uniqueName = uniqueName
@@ -585,30 +523,13 @@ class GroupItems(Serialisable):
         return len(self.m + self.n + self.b + self.e + self.s + self.d)
 
 
-class DiscretePr(Serialisable):
-
-    tagname = "discretePr"
-
-    count = Integer()
-    x = NestedInteger(allow_none=True)
-
-    __elements__ = ('x',)
-
-    def __init__(self,
-                 count=None,
-                 x=None,
-                ):
-        self.count = count
-        self.x = x
-
-
 class RangePr(Serialisable):
 
     tagname = "rangePr"
 
     autoStart = Bool(allow_none=True)
     autoEnd = Bool(allow_none=True)
-    groupBy = Set(values=(['range', 'seconds', 'minutes', 'hours', 'days',
+    groupBy = NoneSet(values=(['range', 'seconds', 'minutes', 'hours', 'days',
                            'months', 'quarters', 'years']))
     startNum = Float(allow_none=True)
     endNum = Float(allow_none=True)
@@ -643,7 +564,7 @@ class FieldGroup(Serialisable):
     par = Integer(allow_none=True)
     base = Integer(allow_none=True)
     rangePr = Typed(expected_type=RangePr, allow_none=True)
-    discretePr = Typed(expected_type=DiscretePr, allow_none=True)
+    discretePr = NestedSequence(expected_type=NestedInteger, count=True)
     groupItems = Typed(expected_type=GroupItems, allow_none=True)
 
     __elements__ = ('rangePr', 'discretePr', 'groupItems')
@@ -652,7 +573,7 @@ class FieldGroup(Serialisable):
                  par=None,
                  base=None,
                  rangePr=None,
-                 discretePr=None,
+                 discretePr=(),
                  groupItems=None,
                 ):
         self.par = par
@@ -835,33 +756,12 @@ class PageItem(Serialisable):
         self.name = name
 
 
-class Page(Serialisable):
-
-    # PCDSCPage
-    tagname = "PCDSCPage"
-
-    pageItem = Sequence(expected_type=PageItem)
-
-    __elements__ = ('pageItem',)
-
-    def __init__(self,
-                 count=None,
-                 pageItem=None,
-                ):
-        self.pageItem = pageItem
-
-
-    @property
-    def count(self):
-        return len(self.pageItem)
-
-
 class Consolidation(Serialisable):
 
     tagname = "consolidation"
 
     autoPage = Bool(allow_none=True)
-    pages = NestedSequence(expected_type=Page, count=True)
+    pages = NestedSequence(expected_type=PageItem, count=True)
     rangeSets = NestedSequence(expected_type=RangeSet, count=True)
 
     __elements__ = ('pages', 'rangeSets')
@@ -950,7 +850,7 @@ class CacheDefinition(Serialisable):
     cacheSource = Typed(expected_type=CacheSource)
     cacheFields = NestedSequence(expected_type=CacheField, count=True)
     cacheHierarchies = NestedSequence(expected_type=CacheHierarchy, allow_none=True)
-    kpis = NestedSequence(expected_type=PCDKPI, allow_none=True)
+    kpis = NestedSequence(expected_type=OLAPKPI, allow_none=True)
     tupleCache = Typed(expected_type=TupleCache, allow_none=True)
     calculatedItems = NestedSequence(expected_type=CalculatedItem, count=True)
     calculatedMembers = NestedSequence(expected_type=CalculatedMember, count=True)
