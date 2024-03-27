@@ -46,9 +46,37 @@ To combine the filters::
   cfs.and_ = True
 
 
-In addition, Excel has non-standardised functionality for pattern matching with strings. The options in Excel: begins with, ends with, contains and their negatives are all implemented using the ``equal`` (or for negatives ``notEqual``) operator and wildcard in the value.
+In addition, Excel has non-standardised functionality for pattern matching with strings. The options in Excel: begins with, ends with, contains and their negatives are all implemented using the ``equal`` (or for negatives ``notEqual``) operator and wildcard in the value. For this to work properly, the value is always a string.
 
-For example: for "begins with a", use ``a*``; for "ends with a", use ``*a``; and for "contains a"", use ``*a*``.
+For example: for "begins with a", use ``a*``; for "ends with a", use ``*a``; and for "contains a"", use ``*a*``. `?` can be used to represent a single character. Wildcards are escaped with the `~` (tilde) so that "contains ~*" is serialised as `~~~*`.
+
+To simplify creating filters in client code, Openpyxl provides three specialised filters: `NumericFilter`; `BlankFilter` and `StringFilter`. These filters are all used only when **creating** filters.
+
+NumericFilter
++++++++++++++
+
+NumericFilter differs from CustomFilter only in that they are explicitly numerical::
+
+  from openpyxl.worksheet.filters import NumericFilter, CustomerFilter
+  flt1 = CustomFilter(operator="lessThan", val=10)
+  flt1.val == "10"
+  flt2 = NumericFilter(operator="lessThan", val=10)
+  flt2.val == 10.0
+
+
+BlankFilter
++++++++++++
+
+BlankFilters are used for excluding blanks and are not settable::
+
+  from openpyxl.worksheet.filters import BlankFilter
+  blank = BlankFilter()
+
+
+StringFilter
+++++++++++++
+
+ StringFilter which has the folowing operators: `'contains', 'doesNotContain', 'beginsWith', 'doesNotBeginWith', 'endsWith', 'doesNotEndWith'`; openpyxl handles escaping automatically when serialising.
 
 
 DateGroupItem
