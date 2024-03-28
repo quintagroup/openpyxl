@@ -283,9 +283,22 @@ class TestCustomFilter:
         ["ab", "StringFilter"],
     )
                              )
-    def test_dispatch(self, CustomFilter, value, typ):
-        cls = CustomFilter._get_subtype(value)
-        assert cls.__name__ == typ
+    def test_convert(self, CustomFilter, value, typ):
+        flt = CustomFilter(val=value)
+        flt = flt.convert()
+        assert flt.__class__.__name__ == typ
+
+
+    @pytest.mark.parametrize("operator, value, attrs", (
+        ["equal", "*ab", {"operator": "endswith", "val": "ab", "exclude": "0"}],
+        ["notEqual", "*ab", {"operator": "endswith", "val": "ab", "exclude": "1"}],
+        ["notEqual", "c?n", {"operator": "wildcard", "val": "c?n", "exclude": "1"}],
+    )
+                             )
+    def test_convert_string(self, CustomFilter, operator, value, attrs):
+        flt = CustomFilter(operator, value)
+        flt = flt.convert()
+        assert dict(flt) == attrs
 
 
 @pytest.fixture
@@ -351,8 +364,8 @@ def StringFilter():
 class TestStringFilter:
 
 
-    def test_beginsWith(self, StringFilter):
-        flt = StringFilter(operator="beginsWith", val="baa")
+    def test_startswith(self, StringFilter):
+        flt = StringFilter(operator="startswith", val="baa")
         xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="equal" val="baa*" />
@@ -361,8 +374,8 @@ class TestStringFilter:
         assert diff is None, diff
 
 
-    def test_doesNotBeginWith(self, StringFilter):
-        flt = StringFilter(operator="doesNotBeginWith", val="baa")
+    def test_not_startswith(self, StringFilter):
+        flt = StringFilter(operator="startswith", val="baa", exclude=True)
         xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="notEqual" val="baa*" />
@@ -381,8 +394,8 @@ class TestStringFilter:
         assert diff is None, diff
 
 
-    def test_doesNotContain(self, StringFilter,):
-        flt = StringFilter(operator="doesNotContain", val="baa")
+    def test_not_contain(self, StringFilter,):
+        flt = StringFilter(operator="contains", val="baa", exclude=True)
         xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="notEqual" val="*baa*" />
@@ -391,8 +404,8 @@ class TestStringFilter:
         assert diff is None, diff
 
 
-    def test_endsWith(self, StringFilter):
-        flt = StringFilter(operator="endsWith", val="baa")
+    def test_endswith(self, StringFilter):
+        flt = StringFilter(operator="endswith", val="baa")
         xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="equal" val="*baa" />
@@ -401,8 +414,8 @@ class TestStringFilter:
         assert diff is None, diff
 
 
-    def test_doesNotEndWith(self, StringFilter):
-        flt = StringFilter(operator="doesNotEndWith", val="baa")
+    def test_not_endswith(self, StringFilter):
+        flt = StringFilter(operator="endswith", val="baa", exclude=True)
         xml = tostring(flt.to_tree())
         expected = """
         <customFilter operator="notEqual" val="*baa" />
@@ -423,11 +436,34 @@ class TestStringFilter:
         assert out == expected
 
 
+    @pytest.mark.parametrize("expected, value", [
+        ("*n", "~*n"),
+        ("n?", "n~?"),
+        ("b~i", "b~~i"),
+        ("foo~*ba*", "foo~~~*ba~*")
+    ])
+    def test_unescape(self, StringFilter, value, expected):
+        out = StringFilter._unescape(value)
+        assert out == expected
+
+
     @pytest.mark.parametrize("value", ["c*n", "c?n", "foo~*ba*"])
     def test_dont_escape_wildcard(self, StringFilter, value):
         flt = StringFilter("wildcard", value)
         out = flt._escape()
         assert out == value
+
+
+    @pytest.mark.parametrize("value, operator, term", [
+        ("*ffg", "endswith", "ffg"),
+        ("foo*", "startswith", "foo"),
+        ("*foo*", "contains", "foo"),
+        ("c*n", "wildcard", "c*n"),
+        ("c*n", "wildcard", "c*n"),
+    ])
+    def test_guess_operator(self, StringFilter, value, operator, term):
+        op, val = StringFilter._guess_operator(value)
+        assert (op, val) == (operator, term)
 
 
 @pytest.fixture

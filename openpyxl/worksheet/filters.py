@@ -162,24 +162,29 @@ class CustomFilter(Serialisable):
         self.val = val
 
 
-    @staticmethod
-    def _get_subtype(val=None):
-        if val == " ":
+    def _get_subtype(self):
+        if self.val == " ":
             subtype = BlankFilter
         else:
             try:
-                val = float(val)
+                float(self.val)
                 subtype = NumberFilter
             except ValueError:
                 subtype = StringFilter
         return subtype
 
 
-    #@classmethod
-    #def from_tree(cls, node):
-        #val = node.attrib['val']
-        #cls = cls._get_subtype(val)
-        #return super(cls, node)
+    def convert(self):
+        """Convert to more specific filter"""
+        typ = self._get_subtype()
+        if typ in (BlankFilter, NumberFilter):
+            return typ(**dict(self))
+
+        operator, term = StringFilter._guess_operator(self.val)
+        flt = StringFilter(operator, term)
+        if self.operator == "notEqual":
+            flt.exclude = True
+        return flt
 
 
 class BlankFilter(CustomFilter):
@@ -216,28 +221,26 @@ class NumberFilter(CustomFilter):
         self.val = val
 
 
-string_operator_mapping = {
-    "contains": {"operator":"equal", "val":"*{}*"},
-    "doesNotContain": {"operator":"notEqual", "val":"*{}*"},
-    "beginsWith": {"operator":"equal", "val":"{}*"},
-    "doesNotBeginWith": {"operator":"notEqual", "val":"{}*"},
-    "endsWith": {"operator":"equal", "val":"*{}"},
-    "doesNotEndWith": {"operator":"notEqual", "val":"*{}"},
-    "wildcard": {"operator":"equal", "val": "{}",},
+string_format_mapping = {
+    "contains": "*{}*",
+    "startswith": "{}*",
+    "endswith": "*{}",
+    "wildcard":  "{}",
 }
 
 
 class StringFilter(CustomFilter):
 
-    operator = Set(values=['contains', 'doesNotContain', 'beginsWith',
-                           'doesNotBeginWith', 'endsWith', 'doesNotEndWith',
-                           'wildcard'])
-    val = String(allow_none=True)
+    operator = Set(values=['contains', 'startswith', 'endswith', 'wildcard']
+                   )
+    val = String()
+    exclude = Bool()
 
 
-    def __init__(self, operator="contains", val=None):
+    def __init__(self, operator="contains", val=None, exclude=False):
         self.operator = operator
         self.val = val
+        self.exclude = exclude
 
 
     def _escape(self):
@@ -247,10 +250,35 @@ class StringFilter(CustomFilter):
         return re.sub(r"~|\*|\?", "~\g<0>", self.val)
 
 
+    @staticmethod
+    def _unescape(value):
+        """
+        Unescape value
+        """
+        return re.sub(r"~(?P<op>[~*?])", "\g<op>", value)
+
+
+    @staticmethod
+    def _guess_operator(value):
+        value = StringFilter._unescape(value)
+        endswith = r"^(?P<endswith>\*)(?P<term>[^\*\?]*$)"
+        startswith = r"^(?P<term>[^\*\?]*)(?P<startswith>\*)$"
+        contains = r"^(?P<contains>\*)(?P<term>[^\*\?]*)\*$"
+        d = {"wildcard": True, "term": value}
+        for pat in [contains, startswith, endswith]:
+            m = re.match(pat, value)
+            if m:
+                d = m.groupdict()
+
+        term = d.pop("term")
+        op = list(d)[0]
+        return op, term
+
+
     def to_tree(self, tagname=None, idx=None, namespace=None):
-        match = string_operator_mapping[self.operator]
-        op = match["operator"]
-        value = match["val"].format(self._escape())
+        fmt = string_format_mapping[self.operator]
+        op = self.exclude and "notEqual" or "equal"
+        value = fmt.format(self._escape())
         flt = CustomFilter(op, value)
         return flt.to_tree(tagname, idx, namespace)
 
