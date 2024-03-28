@@ -15,7 +15,6 @@ from openpyxl.descriptors import (
     String,
     Sequence,
     MinMax,
-    MatchPattern,
 )
 from openpyxl.descriptors.excel import ExtensionList, CellRange
 from openpyxl.descriptors.sequence import ValueSequence
@@ -231,18 +230,24 @@ class StringFilter(CustomFilter):
 
     operator = Set(values=['contains', 'doesNotContain', 'beginsWith',
                            'doesNotBeginWith', 'endsWith', 'doesNotEndWith'])
-    val = String()
+    val = String(allow_none=True)
 
 
-    def __init__(self, operator="equal", val=None):
+    def __init__(self, operator="contains", val=None):
         self.operator = operator
         self.val = val
+
+
+    @staticmethod
+    def _escape(value):
+        """Escape wildcards ~, * ? when serialising"""
+        return re.sub(r"~|\*|\?", "~\g<0>", value)
 
 
     def to_tree(self, tagname=None, idx=None, namespace=None):
         match = string_operator_mapping[self.operator]
         op = match["operator"]
-        value = match["val"].format(self.val)
+        value = match["val"].format(self._escape(self.val))
         flt = CustomFilter(op, value)
         return flt.to_tree(tagname, idx, namespace)
 

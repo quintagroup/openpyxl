@@ -411,6 +411,18 @@ class TestStringFilter:
         assert diff is None, diff
 
 
+    @pytest.mark.parametrize("value, expected", [
+        ("*n", "~*n"),
+        ("n?", "n~?"),
+        ("b~i", "b~~i"),
+        ("foo~*ba*", "foo~~~*ba~*")
+    ])
+    def test_escape(self, StringFilter, value, expected):
+        flt = StringFilter()
+        out = flt._escape(value)
+        assert out == expected
+
+
 @pytest.fixture
 def CustomFilters():
     from ..filters import CustomFilters
@@ -466,13 +478,12 @@ class TestCustomFilters:
         assert diff is None, diff
 
 
-    @pytest.mark.xfail
     def test_escape_string(self, CustomFilters, StringFilter):
         flt = CustomFilters(customFilter=[StringFilter("contains", "*xml")])
         xml = tostring(flt.to_tree())
         expected = """
         <customFilters>
-          <customFilter operator="equal" val="~*xml*"/>
+          <customFilter operator="equal" val="*~*xml*"/>
         </customFilters>
 
         """
