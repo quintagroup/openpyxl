@@ -418,9 +418,16 @@ class TestStringFilter:
         ("foo~*ba*", "foo~~~*ba~*")
     ])
     def test_escape(self, StringFilter, value, expected):
-        flt = StringFilter()
-        out = flt._escape(value)
+        flt = StringFilter("contains", value)
+        out = flt._escape()
         assert out == expected
+
+
+    @pytest.mark.parametrize("value", ["c*n", "c?n", "foo~*ba*"])
+    def test_dont_escape_wildcard(self, StringFilter, value):
+        flt = StringFilter("wildcard", value)
+        out = flt._escape()
+        assert out == value
 
 
 @pytest.fixture
@@ -478,12 +485,26 @@ class TestCustomFilters:
         assert diff is None, diff
 
 
+
     def test_escape_string(self, CustomFilters, StringFilter):
         flt = CustomFilters(customFilter=[StringFilter("contains", "*xml")])
         xml = tostring(flt.to_tree())
         expected = """
         <customFilters>
           <customFilter operator="equal" val="*~*xml*"/>
+        </customFilters>
+
+        """
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_wildcard(self, CustomFilters, StringFilter):
+        flt = CustomFilters(customFilter=[StringFilter("wildcard", "c?n")])
+        xml = tostring(flt.to_tree())
+        expected = """
+        <customFilters>
+          <customFilter operator="equal" val="c?n"/>
         </customFilters>
 
         """

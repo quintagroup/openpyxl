@@ -48,9 +48,10 @@ To combine the filters::
 
 In addition, Excel has non-standardised functionality for pattern matching with strings. The options in Excel: begins with, ends with, contains and their negatives are all implemented using the ``equal`` (or for negatives ``notEqual``) operator and wildcard in the value. For this to work properly, the value is always a string.
 
-For example: for "begins with a", use ``a*``; for "ends with a", use ``*a``; and for "contains a"", use ``*a*``. `?` can be used to represent a single character. Wildcards are escaped with the `~` (tilde) so that "contains ~*" is serialised as `~~~*`.
+For example: for "begins with a", is actually ``a*``; for "ends with a", ``*a``; and for "contains a"",  ``*a*``. ``?`` can be used to represent a single character. In regular expressions ``*`` is called __greedy__ and ``?`` __non-greedy__. Wildcards are escaped with the `~` (tilde) so that "contains ~*" is serialised as `~~~*`.
 
-To simplify creating filters in client code, Openpyxl provides three specialised filters: `NumericFilter`; `BlankFilter` and `StringFilter`. These filters are all used only when **creating** filters.
+To simplify creating filters in client code, Openpyxl provides three specialised filters: ``NumericFilter``; ``BlankFilter`` and ``StringFilter``. These filters are all used only when **creating** filters.
+
 
 NumericFilter
 +++++++++++++
@@ -67,7 +68,7 @@ NumericFilter differs from CustomFilter only in that they are explicitly numeric
 BlankFilter
 +++++++++++
 
-BlankFilters are used for excluding blanks and are not settable::
+BlankFilters are used for excluding blanks and are not editable::
 
   from openpyxl.worksheet.filters import BlankFilter
   blank = BlankFilter()
@@ -76,7 +77,13 @@ BlankFilters are used for excluding blanks and are not settable::
 StringFilter
 ++++++++++++
 
- StringFilter which has the folowing operators: `'contains', 'doesNotContain', 'beginsWith', 'doesNotBeginWith', 'endsWith', 'doesNotEndWith'`; openpyxl handles escaping automatically when serialising.
+ StringFilter which has the folowing operators: `'contains', 'doesNotContain', 'beginsWith', 'doesNotBeginWith', 'endsWith', 'doesNotEndWith'` and `'wildcard'`; openpyxl handles escaping automatically when serialising::
+
+  from openpyxl.worksheet.filters import StringFilter
+  fil = StringFilter("contains", "xml")
+
+
+The operator ``wildcard`` allows for more sophisticated uses of the wildcards such as ``c?n`` which would match the terms "cancan" and "contains", but not "curtains" or ``c*n`` which would match all terms. Openpyxl does not escape filters that use the wildcard operator.
 
 
 DateGroupItem

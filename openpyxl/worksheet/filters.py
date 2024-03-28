@@ -222,14 +222,16 @@ string_operator_mapping = {
     "beginsWith": {"operator":"equal", "val":"{}*"},
     "doesNotBeginWith": {"operator":"notEqual", "val":"{}*"},
     "endsWith": {"operator":"equal", "val":"*{}"},
-    "doesNotEndWith": {"operator":"notEqual", "val":"*{}"}
+    "doesNotEndWith": {"operator":"notEqual", "val":"*{}"},
+    "wildcard": {"operator":"equal", "val": "{}",},
 }
 
 
 class StringFilter(CustomFilter):
 
     operator = Set(values=['contains', 'doesNotContain', 'beginsWith',
-                           'doesNotBeginWith', 'endsWith', 'doesNotEndWith'])
+                           'doesNotBeginWith', 'endsWith', 'doesNotEndWith',
+                           'wildcard'])
     val = String(allow_none=True)
 
 
@@ -238,16 +240,17 @@ class StringFilter(CustomFilter):
         self.val = val
 
 
-    @staticmethod
-    def _escape(value):
+    def _escape(self):
         """Escape wildcards ~, * ? when serialising"""
-        return re.sub(r"~|\*|\?", "~\g<0>", value)
+        if self.operator == "wildcard":
+            return self.val
+        return re.sub(r"~|\*|\?", "~\g<0>", self.val)
 
 
     def to_tree(self, tagname=None, idx=None, namespace=None):
         match = string_operator_mapping[self.operator]
         op = match["operator"]
-        value = match["val"].format(self._escape(self.val))
+        value = match["val"].format(self._escape())
         flt = CustomFilter(op, value)
         return flt.to_tree(tagname, idx, namespace)
 
