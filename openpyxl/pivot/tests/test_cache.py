@@ -370,12 +370,11 @@ class TestCalculatedMember:
 
     def test_from_xml(self, CalculatedMember):
         src = """
-        <calculatedMember hierarchy="yes" mdx="mdx" memberName="member" name="name" parent="parent" set="1" solveOrder="1" />
+        <calculatedMember mdx="mdx" name="name" set="1" solveOrder="1" />
         """
         node = fromstring(src)
         cm = CalculatedMember.from_tree(node)
-        assert cm == CalculatedMember(name="name", mdx="mdx", memberName="member",
-                              hierarchy="yes", parent="parent", solveOrder=1, set=True)
+        assert cm == CalculatedMember(name="name", mdx="mdx", solveOrder=1, set=True)
 
 
 @pytest.fixture

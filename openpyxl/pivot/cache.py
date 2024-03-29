@@ -103,10 +103,10 @@ class CalculatedMember(Serialisable):
 
     name = String()
     mdx = String()
-    memberName = String()
-    hierarchy = String()
-    parent = String()
-    solveOrder = Integer()
+    memberName = String(allow_none=True)
+    hierarchy = String(allow_none=True)
+    parent = String(allow_none=True)
+    solveOrder = Integer(allow_none=True)
     set = Bool()
     extLst = Typed(expected_type=ExtensionList, allow_none=True)
 
@@ -280,15 +280,15 @@ class OLAPKPI(Serialisable):
 
     uniqueName = String()
     caption = String(allow_none=True)
-    displayFolder = String()
-    measureGroup = String()
-    parent = String()
+    displayFolder = String(allow_none=True)
+    measureGroup = String(allow_none=True)
+    parent = String(allow_none=True)
     value = String()
-    goal = String()
-    status = String()
-    trend = String()
-    weight = String()
-    time = String()
+    goal = String(allow_none=True)
+    status = String(allow_none=True)
+    trend = String(allow_none=True)
+    weight = String(allow_none=True)
+    time = String(allow_none=True)
 
     def __init__(self,
                  uniqueName=None,
@@ -850,7 +850,7 @@ class CacheDefinition(Serialisable):
     cacheSource = Typed(expected_type=CacheSource)
     cacheFields = NestedSequence(expected_type=CacheField, count=True)
     cacheHierarchies = NestedSequence(expected_type=CacheHierarchy, allow_none=True)
-    kpis = NestedSequence(expected_type=OLAPKPI, allow_none=True)
+    kpis = NestedSequence(expected_type=OLAPKPI, count=True)
     tupleCache = Typed(expected_type=TupleCache, allow_none=True)
     calculatedItems = NestedSequence(expected_type=CalculatedItem, count=True)
     calculatedMembers = NestedSequence(expected_type=CalculatedMember, count=True)
