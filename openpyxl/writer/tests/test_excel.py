@@ -327,6 +327,25 @@ class TestExcelWriter:
         assert writer.archive.namelist() == ["xl/media/image1.wmf"]
 
 
+    def test_volatile_deps(self, ExcelWriter, archive):
+        from openpyxl.volatile.volatile_deps import VolTypesList, VolMain, VolType, VolTopic
+        archive = ZipFile(BytesIO(), "w")
+        wb = Workbook()
+        wb._volatile_deps = VolTypesList(
+            volType=[
+                VolType(
+                    main=[
+                        VolMain(first="teststring", tp=[VolTopic(t="s", v='aaa: 4447')])
+                    ],
+                    type="realTimeData")
+                ]
+            )
+        writer = ExcelWriter(wb, archive)
+        writer.write_volatile_deps()
+
+        assert writer.archive.namelist() == ["xl/volatileDependencies.xml"]
+
+
 def test_write_empty_workbook(tmpdir):
     tmpdir.chdir()
     wb = Workbook()

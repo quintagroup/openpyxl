@@ -167,6 +167,11 @@ class WorkbookWriter:
             vba.Type ='http://schemas.microsoft.com/office/2006/relationships/vbaProject'
             self.rels.append(vba)
 
+        if self.wb._volatile_deps:
+            vol_deps = Relationship(type="", Target="volatileDependencies.xml")
+            vol_deps.Type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/volatileDependencies"
+            self.rels.append(vol_deps)
+
         return tostring(self.rels.to_tree())
 
 

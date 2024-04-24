@@ -14,6 +14,7 @@ from openpyxl.xml.constants import (
     ARC_APP,
     ARC_CORE,
     ARC_CUSTOM,
+    ARC_VOLATILE_DEPENDENCIES,
     CPROPS_TYPE,
     ARC_THEME,
     ARC_STYLE,
@@ -81,6 +82,7 @@ class ExcelWriter(object):
             custom_override = CustomOverride()
             self.manifest.append(custom_override)
 
+        self.write_volatile_deps()
         self.write_worksheets()
         self.write_chartsheets()
         #self.write_images()
@@ -348,6 +350,13 @@ class ExcelWriter(object):
             rels.append(link.file_link)
             self.archive.writestr(rels_path, tostring(rels.to_tree()))
             self.manifest.append(link)
+
+
+    def write_volatile_deps(self):
+        if self.workbook._volatile_deps:
+            tree = self.workbook._volatile_deps.to_tree()
+            self.archive.writestr(ARC_VOLATILE_DEPENDENCIES, tostring(tree))
+            self.manifest.append(self.workbook._volatile_deps)
 
 
     def save(self):

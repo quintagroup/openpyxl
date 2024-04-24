@@ -278,6 +278,25 @@ def test_write_workbook_rels(datadir, vba, filename, WorkbookWriter):
         assert diff is None, diff
 
 
+@pytest.mark.parametrize("volatile_deps, filename",
+                         [
+                             (None, 'workbook.xml.rels',),
+                             (True, 'workbook_volatile_deps.xml.rels'),
+                         ]
+                         )
+def test_write_workbook_rels_metadata(datadir, volatile_deps, filename, WorkbookWriter):
+    datadir.chdir()
+    wb = Workbook()
+    wb._volatile_deps = volatile_deps
+
+    writer = WorkbookWriter(wb)
+    xml = writer.write_rels()
+
+    with open(filename) as expected:
+        diff = compare_xml(xml, expected.read())
+        assert diff is None, diff
+
+
 def test_write_root_rels(WorkbookWriter):
     wb = Workbook()
     writer = WorkbookWriter(wb)

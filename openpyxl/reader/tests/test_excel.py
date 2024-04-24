@@ -244,6 +244,17 @@ class TestExcelReader:
         assert reader.wb['chart'].title == "chart"
 
 
+    def test_read_volatile_deps(self, datadir):
+        datadir.chdir()
+        reader = ExcelReader("sample_with_volatile_deps_and_connection.xlsx")
+        reader.read_manifest()
+        reader.read_workbook()
+        reader.read_volatile_deps()
+        # Test Parse
+        assert reader.wb._volatile_deps is not None
+        assert len(reader.wb._volatile_deps.volType) == 1
+
+
 @pytest.fixture
 def WorksheetProcessor():
     from .. excel import WorksheetProcessor

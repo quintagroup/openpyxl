@@ -28,6 +28,7 @@ from openpyxl.xml.constants import (
     ARC_CONTENT_TYPES,
     ARC_WORKBOOK,
     ARC_THEME,
+    ARC_VOLATILE_DEPENDENCIES,
     SHARED_STRINGS,
     XLTM,
     XLTX,
@@ -62,6 +63,8 @@ from openpyxl.worksheet.controls import (
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.legacy import LegacyDrawing
 from openpyxl.drawing.image import Image
+
+from openpyxl.volatile.volatile_deps import VolTypesList
 
 from openpyxl.xml.functions import fromstring
 
@@ -136,6 +139,7 @@ class ExcelReader:
         self.keep_links = keep_links
         self.rich_text = rich_text
         self.shared_strings = []
+        self.volatile_deps = None
 
 
     def read_manifest(self):
@@ -255,6 +259,13 @@ class ExcelReader:
                 ws.add_table(table)
 
 
+    def read_volatile_deps(self):
+        if ARC_VOLATILE_DEPENDENCIES in self.valid_files:
+            src = self.archive.read(ARC_VOLATILE_DEPENDENCIES)
+            root = fromstring(src)
+            self.wb._volatile_deps = VolTypesList.from_tree(root)
+
+
     def read(self):
         action = "read manifest"
         try:
@@ -275,6 +286,8 @@ class ExcelReader:
             self.read_worksheets()
             action = "assign names"
             self.parser.assign_names()
+            action = "read volatile deps"
+            self.read_volatile_deps()
             if not self.read_only:
                 self.archive.close()
         except ValueError as e:
