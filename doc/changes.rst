@@ -46,7 +46,9 @@ Bugfixes
 * `#2106 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2106>`_ Setting Trendline.name attribute raises exception when saving
 * `#2120 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2120>`_ Timezone and Zombie formatting cannot be combined.
 * `#2107 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2107>`_ Column name generation is inefficient and slow
-
+* `#2122 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2122>`_ File handlers not always released in read-only mode
+* `#2149 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2149>`_ Workbook files not properly closed on Python ≥ 3.11.8 and Windows
+* `#2161 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2161>`_ Pivot cache definitions using tupleCache had serialisation issues
 
 Changes
 -------
@@ -90,6 +92,7 @@ Bugfixes
 * `#1156 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1156>`_ Table filters are always overriden
 * `#1360 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1360>`_ Can't read some ScatterCharts if n
 * `#1724 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1724>`_ Problem with multilevel indices in dataframes
+* `#1763 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1763>`_ Make calculating worksheet sizes slightly faster
 * `#1772 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1772>`_ Problem with category indices in dataframes
 * `#1786 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1786>`_ NamedStyles share attributes - mutables gotcha
 * `#1851 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1851>`_ Allow print area to be set to None
