@@ -284,7 +284,7 @@ def test_write_workbook_rels(datadir, vba, filename, WorkbookWriter):
                              (True, 'workbook_volatile_deps.xml.rels'),
                          ]
                          )
-def test_write_workbook_rels_metadata(datadir, volatile_deps, filename, WorkbookWriter):
+def test_write_workbook_rels_volatile_deps(datadir, volatile_deps, filename, WorkbookWriter):
     datadir.chdir()
     wb = Workbook()
     wb._volatile_deps = volatile_deps

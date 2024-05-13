@@ -39,7 +39,7 @@ class VolTopic(Serialisable):
     tr = Sequence(expected_type=VolTopicRef,)
     t = NoneSet(values=(["b", "n", "e", "s"]))
 
-    __elements__ = ('tr', 'v', 'stp')
+    __elements__ = ('v', 'stp', 'tr',)
 
 
     def __init__(self,
