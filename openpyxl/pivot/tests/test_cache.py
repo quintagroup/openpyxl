@@ -498,7 +498,7 @@ class TestOLAPKPI:
     def from_xml(self, OLAPKPI):
         xml = """
             <kpi uniqueName="Growth in Customer Base" caption="Growth in Customer Base"
-            displayFolder="Customer Perspective\Expand Customer Base"
+            displayFolder="Customer Perspective\\Expand Customer Base"
             measureGroup="Internet Sales" value="[Measures].[Growth in Customer Base]"
             goal="[Measures].[Growth in Customer Base Goal]"
             status="[Measures].[Growth in Customer Base Status]"
@@ -602,7 +602,7 @@ class TestGroupLevel:
         <groupLevel uniqueName="[Product].[Product Categories].[Category]"
             caption="Category">
             <groups count="1">
-                <group name="CategoryXl_Grp_1" uniqueName="[Product].[Product 
+                <group name="CategoryXl_Grp_1" uniqueName="[Product].[Product
                 Categories].[Product Categories1].
                 [GROUPMEMBER.[CategoryXl_Grp_1]].[Product]].[Product Categories]].
                 [All Products]]]" caption="Group1" uniqueParent="[Product].
