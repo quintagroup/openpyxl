@@ -12,6 +12,7 @@ Bugfixes
 * `#1987 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1987>`_ List of formulae names contains mistakes
 * `#2054 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2054>`_ Type checking increases exponentially
 * `#2057 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2057>`_ Loading pivot tables can be unnecessarily slow
+* `#2102 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2102>`_ Improve performance when reading files with lots of custom properties
 * `#2106 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2106>`_ Setting Trendline.name attribute raises exception when saving
 * `#2120 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2120>`_ Timezone and Zombie formatting cannot be combined.
 * `#2107 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2107>`_ Column name generation is inefficient and slow
