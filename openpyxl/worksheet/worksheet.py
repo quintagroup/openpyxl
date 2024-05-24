@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2023 openpyxl
+# Copyright (c) 2010-2024 openpyxl
 
 """Worksheet is the 2nd-level container in Excel."""
 
@@ -335,8 +335,7 @@ class Worksheet(_WorkbookChild):
         """
         min_row = 1
         if self._cells:
-            rows = set(c[0] for c in self._cells)
-            min_row = min(rows)
+            min_row = min(self._cells)[0]
         return min_row
 
 
@@ -348,8 +347,7 @@ class Worksheet(_WorkbookChild):
         """
         max_row = 1
         if self._cells:
-            rows = set(c[0] for c in self._cells)
-            max_row = max(rows)
+            max_row = max(self._cells)[0]
         return max_row
 
 
@@ -361,8 +359,7 @@ class Worksheet(_WorkbookChild):
         """
         min_col = 1
         if self._cells:
-            cols = set(c[1] for c in self._cells)
-            min_col = min(cols)
+            min_col = min(c[1] for c in self._cells)
         return min_col
 
 
@@ -374,8 +371,7 @@ class Worksheet(_WorkbookChild):
         """
         max_col = 1
         if self._cells:
-            cols = set(c[1] for c in self._cells)
-            max_col = max(cols)
+            max_col = max(c[1] for c in self._cells)
         return max_col
 
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2023 openpyxl
+# Copyright (c) 2010-2024 openpyxl
 
 from copy import copy
 
@@ -61,6 +61,10 @@ class Dimension(Strict, StyleableObject):
         cp.__init__(**attrib)
         cp._style = copy(self._style)
         return cp
+
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} Instance, Attributes={dict(self)}>"
 
 
 class RowDimension(Dimension):

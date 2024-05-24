@@ -71,7 +71,7 @@ Thanks to all those who participate in the project (in alphabetical order):
 * Paul Joyce
 * Paul Van Der Linden
 * Philip Roche
-* rafasan
+* Primoz Godec
 * ramn_se
 * René Neumann
 * Rick Rankin
