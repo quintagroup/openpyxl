@@ -61,7 +61,7 @@ NumericFilters differ from CustomFilters only in that they are explicitly numeri
   from openpyxl.worksheet.filters import NumberFilter, CustomerFilter
   flt1 = CustomFilter(operator="lessThan", val=10)
   flt1.val == "10"
-  flt2 = NumeberFilter(operator="lessThan", val=10)
+  flt2 = NumberFilter(operator="lessThan", val=10)
   flt2.val == 10.0
 
 
@@ -83,7 +83,11 @@ StringFilters have the folowing operators: ``contains`` ``startwith`` ``endswith
   fil = StringFilter("contains", "xml", exclude=True)
 
 
-StringFilters with the wildcard operator are the same as CustomFilters. This allows for allows for more sophisticated uses of the wildcards such as ``c?n`` which would match the terms ``cancan`` and ``contains``, but not ``curtains``; or ``c*n`` which would match all terms. Openpyxl does not escape filters that use the wildcard operator.
+StringFilters with the wildcard operator are the same as CustomFilters. This allows for allows for more sophisticated uses of the wildcards such as ``c?n`` which would match the terms ``cancan`` and ``contains``, but not ``curtains``; or ``c*n`` which would match all terms. Openpyxl does **not** escape filters that use the wildcard operator.
+
+.. note::
+
+The wildcard syntax allows for even more sophisticated patterns with multiple wildcards. This functionality cannot be easily expressed using StringFilters and is not a design goal.
 
 
 DateGroupItem
