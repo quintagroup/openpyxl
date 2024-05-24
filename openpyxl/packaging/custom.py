@@ -203,7 +203,7 @@ class CustomPropertyList(Strict):
         Create list from OOXML element
         """
         prop_list = _CustomDocumentPropertyList.from_tree(tree)
-        new_props = cls()
+        props = []
         for prop in prop_list.property:
             attr = prop.type
 
@@ -218,8 +218,11 @@ class CustomPropertyList(Strict):
                 value = prop.linkTarget
 
             new_prop = typ(name=prop.name, value=value)
-            new_props.append(new_prop)
-        return new_props
+            props.append(new_prop)
+
+        new_prop_list = cls()
+        new_prop_list.props = props
+        return new_prop_list
 
 
     def append(self, prop):
