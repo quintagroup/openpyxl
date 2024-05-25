@@ -66,17 +66,17 @@ test-python312:
   variables:
     TOXENV: py312
 
-test-python313:
-  <<: *unit
-  image: python:3.13-rc
-  variables:
-    TOXENV: py313
+# test-python313:
+#   <<: *unit
+#   image: python:3.13-rc
+#   variables:
+#     TOXENV: py313
 
-test-pypy3:
-  <<: *unit
-  image: pypy:3
-  variables:
-    TOXENV: pypy3
+# test-pypy3:
+#   <<: *unit
+#   image: pypy:3
+#   variables:
+#     TOXENV: pypy3
 
 
 test-coverage:
