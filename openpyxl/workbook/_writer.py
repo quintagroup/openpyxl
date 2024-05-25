@@ -172,6 +172,11 @@ class WorkbookWriter:
             vol_deps.Type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/volatileDependencies"
             self.rels.append(vol_deps)
 
+        if self.wb._connections:
+            connections = Relationship(type="", Target="connections.xml")
+            connections.Type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections"
+            self.rels.append(connections)
+
         return tostring(self.rels.to_tree())
 
 

@@ -286,6 +286,7 @@ def run_apidoc(_):
         '../openpyxl/chart/tests',
         '../openpyxl/chartsheet/tests',
         '../openpyxl/comments/tests',
+        '../openpyxl/connection/tests',
         '../openpyxl/compat',
         '../openpyxl/descriptors/tests',
         '../openpyxl/descriptors/slots.py',

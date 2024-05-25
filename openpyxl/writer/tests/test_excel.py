@@ -346,6 +346,21 @@ class TestExcelWriter:
         assert writer.archive.namelist() == ["xl/volatileDependencies.xml"]
 
 
+    def test_connections(self, ExcelWriter, archive):
+        from openpyxl.connection.connections import Connections, Connection
+        archive = ZipFile(BytesIO(), "w")
+        wb = Workbook()
+        wb._connections = Connections(
+            connection=[
+                Connection(id=1, refreshedVersion=8)
+                ]
+            )
+        writer = ExcelWriter(wb, archive)
+        writer.write_connections()
+
+        assert writer.archive.namelist() == ["xl/connections.xml"]
+
+
 def test_write_empty_workbook(tmpdir):
     tmpdir.chdir()
     wb = Workbook()

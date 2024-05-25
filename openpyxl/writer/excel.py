@@ -15,6 +15,7 @@ from openpyxl.xml.constants import (
     ARC_CORE,
     ARC_CUSTOM,
     ARC_VOLATILE_DEPENDENCIES,
+    ARC_CONNECTIONS,
     CPROPS_TYPE,
     ARC_THEME,
     ARC_STYLE,
@@ -83,6 +84,7 @@ class ExcelWriter(object):
             self.manifest.append(custom_override)
 
         self.write_volatile_deps()
+        self.write_connections()
         self.write_worksheets()
         self.write_chartsheets()
         #self.write_images()
@@ -357,6 +359,13 @@ class ExcelWriter(object):
             tree = self.workbook._volatile_deps.to_tree()
             self.archive.writestr(ARC_VOLATILE_DEPENDENCIES, tostring(tree))
             self.manifest.append(self.workbook._volatile_deps)
+
+
+    def write_connections(self):
+        if self.workbook._connections:
+            tree = self.workbook._connections.to_tree()
+            self.archive.writestr(ARC_CONNECTIONS, tostring(tree))
+            self.manifest.append(self.workbook._connections)
 
 
     def save(self):
