@@ -247,7 +247,7 @@ class StringFilter(CustomFilter):
         """Escape wildcards ~, * ? when serialising"""
         if self.operator == "wildcard":
             return self.val
-        return re.sub(r"~|\*|\?", "~\g<0>", self.val)
+        return re.sub(r"~|\*|\?", r"~\g<0>", self.val)
 
 
     @staticmethod
@@ -255,7 +255,7 @@ class StringFilter(CustomFilter):
         """
         Unescape value
         """
-        return re.sub(r"~(?P<op>[~*?])", "\g<op>", value)
+        return re.sub(r"~(?P<op>[~*?])", r"\g<op>", value)
 
 
     @staticmethod
