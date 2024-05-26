@@ -12,6 +12,10 @@ from openpyxl.descriptors import (
     Integer,
 )
 from openpyxl.descriptors.sequence import NestedSequence, Sequence
+from openpyxl.descriptors.nested import (
+    NestedInteger,
+    NestedString,
+)
 from openpyxl.descriptors.excel import ExtensionList
 
 from openpyxl.xml.constants import SHEET_MAIN_NS
@@ -141,8 +145,8 @@ class Tables(Serialisable):
 
     # some elements are choice
     m = Typed(expected_type=TableMissing, allow_none=True)
-    s = String(allow_none=True)
-    x = Integer(allow_none=True)
+    s = NestedString(allow_none=True, attribute="v")
+    x = NestedInteger(allow_none=True, attribute="v")
     count = Integer(allow_none=True)
 
     def __init__(self,

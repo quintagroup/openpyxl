@@ -173,21 +173,19 @@ def TableMissing():
 class TestTableMissing:
 
 
-    @pytest.mark.xfail
     def test_ctor(self, TableMissing):
         src_module = TableMissing()
         xml = tostring(src_module.to_tree())
         expected = """
-        <root />
+        <tableMissing />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
 
-    @pytest.mark.xfail
     def test_from_xml(self, TableMissing):
         src = """
-        <root />
+        <tableMissing />
         """
         node = fromstring(src)
         src_module = TableMissing.from_tree(node)
@@ -264,7 +262,9 @@ class TestTables:
         src_module = Tables(x=3)
         xml = tostring(src_module.to_tree())
         expected = """
-        <tables x="3" />
+        <tables>
+            <x v="3" />
+        </tables>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -272,11 +272,13 @@ class TestTables:
 
     def test_from_xml(self, Tables):
         src = """
-        <tables s="test" />
+        <tables count="1">
+            <s v="test" />
+        </tables>
         """
         node = fromstring(src)
         src_module = Tables.from_tree(node)
-        assert src_module == Tables(s="test")
+        assert src_module == Tables(s="test", count=1)
 
 
 @pytest.fixture
