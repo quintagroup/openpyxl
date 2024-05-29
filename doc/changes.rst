@@ -6,6 +6,7 @@ Bugfixes
 --------
 
 * `#1401 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1401>`_ Column name caches are slow and use a lot of memory
+* `#1457 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1457>`_ Improved handling of duplicate named styles
 * `#1842 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1842>`_ Rich-text can be saved if lxml is not installed
 * `#1954 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1954>`_ Documentation for sheet views is incorrect
 * `#1973 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1973>`_ Timedeltas not read properly in read-only mode
