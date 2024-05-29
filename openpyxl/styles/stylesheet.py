@@ -108,7 +108,7 @@ class Stylesheet(Serialisable):
         Merge named style names "cellStyles" with their associated styles
         "cellStyleXfs"
         """
-        named_styles = self.cellStyles.names
+        named_styles = self.cellStyles.remove_duplicates()
 
         for style in named_styles:
             self._expand_named_style(style)
