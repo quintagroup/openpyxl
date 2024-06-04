@@ -24,9 +24,9 @@ you require it they can be found as follows:
     >>> connections = wb._connections
     >>>
     >>> connections.connection[0].name
-    'ThisWorkbookDataModel'
+    'Query - Data'
     >>> connections.connection[0].description
-    'Data Model'
+    "Connection to the 'Data' query in the workbook."
 
 
 Some connections in Excel documents may have a 'type' attribute that is outside the OOXML spec.
