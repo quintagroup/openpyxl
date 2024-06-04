@@ -288,17 +288,17 @@ class TestTables:
 
 
 @pytest.fixture
-def Connections():
-    from ..connections import Connections
-    return Connections
+def ConnectionList():
+    from ..connections import ConnectionList
+    return ConnectionList
 
 
-class TestConnections:
+class TestConnectionList:
 
 
-    def test_ctor(self, Connections):
+    def test_ctor(self, ConnectionList):
         from ..connections import Connection
-        src_module = Connections(connection=[Connection(id=1, refreshedVersion=4)])
+        src_module = ConnectionList(connection=[Connection(id=1, refreshedVersion=4)])
         xml = tostring(src_module.to_tree())
         expected = """
         <connections xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
@@ -311,11 +311,11 @@ class TestConnections:
         assert diff is None, diff
 
 
-    def test_from_xml(self, Connections, datadir):
+    def test_from_xml(self, ConnectionList, datadir):
         datadir.chdir()
         with open("connections.xml", "rb") as src:
             node = fromstring(src.read())
-        src_module = Connections.from_tree(node)
+        src_module = ConnectionList.from_tree(node)
         assert len(src_module.connection) == 3
         assert src_module.connection[1].id == 2
         assert src_module.connection[2].saveData == True

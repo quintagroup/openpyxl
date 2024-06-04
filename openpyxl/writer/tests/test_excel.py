@@ -347,10 +347,10 @@ class TestExcelWriter:
 
 
     def test_connections(self, ExcelWriter, archive):
-        from openpyxl.connection.connections import Connections, Connection
+        from openpyxl.connection.connections import ConnectionList, Connection
         archive = ZipFile(BytesIO(), "w")
         wb = Workbook()
-        wb._connections = Connections(
+        wb._connections = ConnectionList(
             connection=[
                 Connection(id=1, refreshedVersion=8)
                 ]

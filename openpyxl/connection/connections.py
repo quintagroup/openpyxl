@@ -381,7 +381,7 @@ class Connection(Serialisable):
         return self.type_descriptions.get(type)
 
 
-class Connections(Serialisable):
+class ConnectionList(Serialisable):
     # Implements CT_Connections
     tagname = "connections"
     _path = "/xl/connections.xml"
@@ -400,7 +400,7 @@ class Connections(Serialisable):
 
     def to_tree(self, tagname=None, idx=None, namespace=None):
         self._validate_connection_types() # Only write valid connection types
-        tree = super(Connections, self).to_tree(tagname, idx, namespace)
+        tree = super(ConnectionList, self).to_tree(tagname, idx, namespace)
         tree.set("xmlns", SHEET_MAIN_NS)
         return tree
 
@@ -417,7 +417,7 @@ class Connections(Serialisable):
         final_types = []
 
         for connection_type in self.connection:
-            if connection_type.type_description:
+            if connection_type.type_descriptions:
                 final_types.append(connection_type)
             else:
                 warnings.warn(f"Connections type {connection_type.type} is not supported, references to it will be dropped.")

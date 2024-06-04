@@ -66,7 +66,7 @@ from openpyxl.drawing.legacy import LegacyDrawing
 from openpyxl.drawing.image import Image
 
 from openpyxl.volatile.volatile_deps import VolTypesList
-from openpyxl.connection.connections import Connections
+from openpyxl.connection.connections import ConnectionList
 from openpyxl.xml.functions import fromstring
 
 from .drawings import find_images
@@ -271,7 +271,7 @@ class ExcelReader:
         if ARC_CONNECTIONS in self.valid_files:
             src = self.archive.read(ARC_CONNECTIONS)
             root = fromstring(src)
-            self.wb._connections = Connections.from_tree(root)
+            self.wb._connections = ConnectionList.from_tree(root)
 
 
     def read(self):
