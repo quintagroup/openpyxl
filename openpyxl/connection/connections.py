@@ -363,9 +363,9 @@ class Connection(Serialisable):
 
 
     @property
-    def type_description(self):
-        # The 'type' attribute may be used in some microsoft extensions, indicate 'None' for non-OOXML defined values
-        descriptions = {
+    def type_descriptions(self):
+        # A dict mapping known OOXML connection types to a description of what it is.
+        return {
             1 : "ODBC-based source",
             2 : "DAO-based source",
             3 : "File based database source",
@@ -375,9 +375,10 @@ class Connection(Serialisable):
             7 : "ADO record set",
             8 : "DSP",
         }
-        if self.type in descriptions:
-            return descriptions[self.type]
-        return None
+
+
+    def check_connection_type(self, type):
+        return self.type_descriptions.get(type)
 
 
 class Connections(Serialisable):
@@ -398,16 +399,10 @@ class Connections(Serialisable):
 
 
     def to_tree(self, tagname=None, idx=None, namespace=None):
+        self._validate_connection_types() # Only write valid connection types
         tree = super(Connections, self).to_tree(tagname, idx, namespace)
         tree.set("xmlns", SHEET_MAIN_NS)
         return tree
-
-
-    @classmethod
-    def from_tree(self, node):
-        obj = super(Connections, self).from_tree(node)
-        obj._validate_connection_types()
-        return obj
 
 
     @property

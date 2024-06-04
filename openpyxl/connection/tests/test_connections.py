@@ -37,12 +37,12 @@ class TestConnection:
         src_module = Connection.from_tree(node)
         assert src_module.saveData == True
         assert src_module.name == "Query - Table1"
-        assert src_module.type_description == "OLE DB-based source"
+        assert src_module.check_connection_type(src_module.type) == "OLE DB-based source"
 
 
     def test_invalid_type(self, Connection):
         src_module = Connection(id=3, refreshedVersion=8, background=True, type=102)
-        assert src_module.type_description is None
+        assert src_module.check_connection_type(src_module.type) is None
 
 
 @pytest.fixture
@@ -316,7 +316,7 @@ class TestConnections:
         with open("connections.xml", "rb") as src:
             node = fromstring(src.read())
         src_module = Connections.from_tree(node)
-        assert len(src_module.connection) == 2
-        assert src_module.connection[0].id == 2
-        assert src_module.connection[1].saveData == True
+        assert len(src_module.connection) == 3
+        assert src_module.connection[1].id == 2
+        assert src_module.connection[2].saveData == True
 
