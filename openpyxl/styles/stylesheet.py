@@ -13,7 +13,7 @@ from openpyxl.xml.constants import ARC_STYLE, SHEET_MAIN_NS
 from openpyxl.xml.functions import fromstring
 
 from .builtins import styles
-from .colors import ColorList, COLOR_INDEX
+from .colors import ColorList
 from .differential import DifferentialStyle
 from .table import TableStyleList
 from .borders import Border
@@ -29,7 +29,9 @@ from .numbers import (
     builtin_format_code
 )
 from .named_styles import (
-    _NamedCellStyleList
+    _NamedCellStyleList,
+    NamedStyleList,
+    NamedStyle,
 )
 from .cell_style import CellStyle, CellStyleList
 
@@ -108,20 +110,29 @@ class Stylesheet(Serialisable):
         Merge named style names "cellStyles" with their associated styles
         "cellStyleXfs"
         """
-        named_styles = self.cellStyles.names
+        style_refs = self.cellStyles.remove_duplicates()
+        named_styles = NamedStyleList()
 
-        for style in named_styles:
-            self._expand_named_style(style)
+        for style_ref in style_refs:
+            style = self._expand_named_style(style_ref)
+            named_styles.append(style)
 
         return named_styles
 
 
-    def _expand_named_style(self, named_style):
+    def _expand_named_style(self, style_ref):
         """
-        Bind format definitions for a named style from the associated style
-        record
+        Expand a named style reference element to a
+        named style object by binding the relevant
+        objects from the stylesheet
         """
-        xf = self.cellStyleXfs[named_style.xfId]
+        xf = self.cellStyleXfs[style_ref.xfId]
+        named_style = NamedStyle(
+            name=style_ref.name,
+            hidden=style_ref.hidden,
+            builtinId=style_ref.builtinId,
+        )
+
         named_style.font = self.fonts[xf.fontId]
         named_style.fill = self.fills[xf.fillId]
         named_style.border = self.borders[xf.borderId]
@@ -129,6 +140,7 @@ class Stylesheet(Serialisable):
             formats = BUILTIN_FORMATS
         else:
             formats = self.custom_formats
+
         if xf.numFmtId in formats:
             named_style.number_format = formats[xf.numFmtId]
         if xf.alignment:
@@ -136,12 +148,15 @@ class Stylesheet(Serialisable):
         if xf.protection:
             named_style.protection = xf.protection
 
+        return named_style
+
 
     def _split_named_styles(self, wb):
         """
         Convert NamedStyle into separate CellStyle and Xf objects
+
         """
-        for style in wb._named_styles:
+        for  style in wb._named_styles:
             self.cellStyles.cellStyle.append(style.as_name())
             self.cellStyleXfs.xf.append(style.as_xf())
 

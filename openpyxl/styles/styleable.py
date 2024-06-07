@@ -1,7 +1,6 @@
 # Copyright (c) 2010-2024 openpyxl
 
 from copy import copy
-from warnings import warn
 
 from .numbers import (
     BUILTIN_FORMATS,

@@ -16,20 +16,13 @@ stages:
 test-optional:
   <<: *unit
   script:
-    tox -p auto -e lxml,nolxml,pandas,numpy,nopillow,xfail,defusedxml,keep_vba
+    tox -e lxml,nolxml,pandas,numpy,nopillow,xfail,defusedxml,keep_vba
 
 
 test-docs:
   <<: *unit
   script:
     tox -e doc,doctest
-
-
-test-python37:
-  <<: *unit
-  image: python:3.7
-  variables:
-    TOXENV: py37
 
 
 test-python38:
