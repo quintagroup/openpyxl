@@ -123,7 +123,8 @@ class Stylesheet(Serialisable):
     def _expand_named_style(self, style_ref):
         """
         Expand a named style reference element to a
-        named style object
+        named style object by binding the relevant
+        objects from the stylesheet
         """
         xf = self.cellStyleXfs[style_ref.xfId]
         named_style = NamedStyle(
@@ -139,6 +140,7 @@ class Stylesheet(Serialisable):
             formats = BUILTIN_FORMATS
         else:
             formats = self.custom_formats
+
         if xf.numFmtId in formats:
             named_style.number_format = formats[xf.numFmtId]
         if xf.alignment:
@@ -153,13 +155,9 @@ class Stylesheet(Serialisable):
         """
         Convert NamedStyle into separate CellStyle and Xf objects
 
-        Assign 0-based index from the CellStyle to the xf
         """
-        for idx, style in enumerate(wb._named_styles):
-            style.xfId = idx
-            style_ref = style.as_name()
-            style_ref.xfId = idx
-            self.cellStyles.cellStyle.append(style_ref)
+        for  style in wb._named_styles:
+            self.cellStyles.cellStyle.append(style.as_name())
             self.cellStyleXfs.xf.append(style.as_xf())
 
 

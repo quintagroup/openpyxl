@@ -42,7 +42,6 @@ class NamedStyle(Serialisable):
     protection = Typed(expected_type=Protection)
     builtinId = Integer(allow_none=True)
     hidden = Bool(allow_none=True)
-    xfId = Integer(allow_none=True)
     name = String()
     _wb = None
     _style = StyleArray()
@@ -58,7 +57,6 @@ class NamedStyle(Serialisable):
                  protection=None,
                  builtinId=None,
                  hidden=False,
-                 xfId=0,
                  ):
         self.name = name
         self.font = font or Font()
@@ -69,7 +67,6 @@ class NamedStyle(Serialisable):
         self.protection = protection or Protection()
         self.builtinId = builtinId
         self.hidden = hidden
-        self.xfId = xfId
         self._wb = None
         self._style = StyleArray()
 
@@ -80,15 +77,6 @@ class NamedStyle(Serialisable):
            'font', 'fill', 'border', 'alignment', 'number_format', 'protection',
             ):
             self._recalculate()
-
-    @property
-    def xfId(self):
-        return self._style.xfId
-
-
-    @xfId.setter
-    def xfId(self, value):
-        self._style.xfId = int(value)
 
 
     def __iter__(self):
@@ -150,7 +138,7 @@ class NamedStyle(Serialisable):
             name=self.name,
             builtinId=self.builtinId,
             hidden=self.hidden,
-            xfId=self.xfId
+            xfId=self._style.xfId
         )
         return named
 
@@ -174,21 +162,19 @@ class NamedStyleList(list):
         if isinstance(key, int):
             return super(NamedStyleList, self).__getitem__(key)
 
-        names = self.names
-        if key not in names:
-            raise KeyError("No named style with the name{0} exists".format(key))
 
-        for idx, name in enumerate(names):
+        for idx, name in enumerate(self.names):
             if name == key:
                 return self[idx]
 
+        raise KeyError("No named style with the name{0} exists".format(key))
 
     def append(self, style):
         if not isinstance(style, NamedStyle):
             raise TypeError("""Only NamedStyle instances can be added""")
         elif style.name in self.names:
             raise ValueError("""Style {0} exists already""".format(style.name))
-        style.xfId = (len(self))
+        style._style.xfId = (len(self))
         super(NamedStyleList, self).append(style)
 
 

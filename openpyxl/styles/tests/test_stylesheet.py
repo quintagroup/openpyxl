@@ -59,7 +59,14 @@ class TestStylesheet:
         node = fromstring(xml)
         stylesheet = Stylesheet.from_tree(node)
         named_styles = stylesheet._merge_named_styles()
-        assert [s.xfId for s in named_styles] == list(range(12))
+        assert [s.name for s in named_styles] == ["Normal",
+                                                  "Hyperlink", "Followed Hyperlink",
+                                                  "Hyperlink2", "Followed Hyperlink2",
+                                                  "Hyperlink3", "Followed Hyperlink3",
+                                                  "Hyperlink4", "Followed Hyperlink4",
+                                                  "Hyperlink5", "Followed Hyperlink5",
+                                                  "Style With NumFmt",
+                                                  ]
 
 
     def test_unprotected_cell(self, Stylesheet, datadir):
@@ -207,7 +214,6 @@ class TestStylesheet:
         stylesheet = Stylesheet.from_tree(node)
 
         followed = stylesheet.named_styles['Followed Hyperlink']
-        assert followed.xfId == 2
         assert followed.name == "Followed Hyperlink"
         assert followed.font == stylesheet.fonts[2]
         assert followed.fill == DEFAULT_EMPTY_FILL
