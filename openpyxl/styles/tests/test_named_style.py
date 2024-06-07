@@ -39,11 +39,11 @@ class TestNamedStyle:
 
     def test_dict(self, NamedStyle):
         style = NamedStyle()
-        assert dict(style) == {'name':'Normal', 'hidden':'0',}
+        assert dict(style) == {'name':'Normal', 'hidden':'0', }
 
 
     def test_bind(self, NamedStyle):
-        style = NamedStyle(xfId=0)
+        style = NamedStyle()
 
         wb = Workbook()
         style.bind(wb)
@@ -57,7 +57,7 @@ class TestNamedStyle:
 
 
     def test_as_xf(self, NamedStyle):
-        style = NamedStyle(xfId=0)
+        style = NamedStyle()
         style.alignment = Alignment(horizontal="left")
 
         xf = style.as_xf()
@@ -74,7 +74,7 @@ class TestNamedStyle:
 
 
     def test_as_name(self, NamedStyle, _NamedCellStyle):
-        style = NamedStyle(xfId=0)
+        style = NamedStyle()
 
         name = style.as_name()
         assert name == _NamedCellStyle(name='Normal', xfId=0, hidden=False)
@@ -91,7 +91,7 @@ class TestNamedStyle:
                              ]
                              )
     def test_recalculate(self, NamedStyle, attr, key, collection, expected):
-        style = NamedStyle(xfId=0)
+        style = NamedStyle()
         wb = Workbook()
         wb._number_formats.append("###")
         style.bind(wb)
