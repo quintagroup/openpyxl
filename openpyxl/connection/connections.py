@@ -377,8 +377,9 @@ class Connection(Serialisable):
         }
 
 
-    def check_connection_type(self, type):
-        return self.type_descriptions.get(type)
+    @property
+    def is_known_connection(self):
+        return self.type in self.type_descriptions
 
 
 class ConnectionList(Serialisable):
@@ -416,11 +417,12 @@ class ConnectionList(Serialisable):
         """
         final_types = []
 
-        for connection_type in self.connection:
-            if connection_type.type_descriptions:
-                final_types.append(connection_type)
+        for cxn in self.connection:
+            if not cxn.type or cxn.is_known_connection:
+                final_types.append(cxn)
             else:
-                warnings.warn(f"Connections type {connection_type.type} is not supported, references to it will be dropped.")
+                warnings.warn(
+        f"Connections type {cxn.type} is not supported, references to it will be dropped to keep the Workbook valid.")
 
         # Update with usable types
         self.connection = final_types

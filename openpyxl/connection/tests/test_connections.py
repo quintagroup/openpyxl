@@ -37,12 +37,17 @@ class TestConnection:
         src_module = Connection.from_tree(node)
         assert src_module.saveData == True
         assert src_module.name == "Query - Table1"
-        assert src_module.check_connection_type(src_module.type) == "OLE DB-based source"
+        assert src_module.type_descriptions[src_module.type] == "OLE DB-based source"
 
 
-    def test_invalid_type(self, Connection):
-        src_module = Connection(id=3, refreshedVersion=8, background=True, type=102)
-        assert src_module.check_connection_type(src_module.type) is None
+    @pytest.mark.parametrize("type, result", [
+        (8, True),
+        (102, False),
+    ]
+                        )
+    def test_known_type(self, Connection, type, result):
+        src_module = Connection(id=3, refreshedVersion=8, background=True, type=type)
+        assert src_module.is_known_connection is result
 
 
 @pytest.fixture
@@ -296,8 +301,8 @@ def ConnectionList():
 class TestConnectionList:
 
 
-    def test_ctor(self, ConnectionList):
-        from ..connections import Connection
+    def test_ctor(self, ConnectionList, Connection):
+
         src_module = ConnectionList(connection=[Connection(id=1, refreshedVersion=4)])
         xml = tostring(src_module.to_tree())
         expected = """
@@ -320,3 +325,7 @@ class TestConnectionList:
         assert src_module.connection[1].id == 2
         assert src_module.connection[2].saveData == True
 
+
+    @pytest.mark.xfail
+    def test_warn_on_unknown(self, ConnectionList, recwarn):
+        assert False
