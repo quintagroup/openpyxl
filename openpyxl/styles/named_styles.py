@@ -58,7 +58,7 @@ class NamedStyle(Serialisable):
                  protection=None,
                  builtinId=None,
                  hidden=False,
-                 xfId=None,
+                 xfId=0,
                  ):
         self.name = name
         self.font = font or Font()
@@ -80,6 +80,15 @@ class NamedStyle(Serialisable):
            'font', 'fill', 'border', 'alignment', 'number_format', 'protection',
             ):
             self._recalculate()
+
+    @property
+    def xfId(self):
+        return self._style.xfId
+
+
+    @xfId.setter
+    def xfId(self, value):
+        self._style.xfId = int(value)
 
 
     def __iter__(self):
@@ -254,8 +263,9 @@ class _NamedCellStyleList(Serialisable):
         referenced style.
 
         As the references are 0-based indices, styles are sorted by
-        and assigned new indices after sorting.
+        index.
 
+        Returns a list of style references with duplicates removed
         """
 
         def sort_fn(v):
@@ -268,16 +278,9 @@ class _NamedCellStyleList(Serialisable):
         for ns in sorted(self.cellStyle, key=sort_fn):
             if ns.xfId in ids or ns.name in names: # skip duplicates
                 continue
-
-            style = NamedStyle(
-                name=ns.name,
-                hidden=ns.hidden,
-                builtinId=ns.builtinId,
-                xfId=ns.xfId,
-            )
             ids.add(ns.xfId)
             names.add(ns.name)
 
-            styles.append(style)
+            styles.append(ns)
 
-        return NamedStyleList(styles)
+        return styles
