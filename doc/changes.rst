@@ -1,6 +1,9 @@
 3.1.4 (unreleased)
 ==================
 
+* `#2189 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2189>`_ Assigning named styles doesn't work
+* `#2190 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2190>`_ Problems caused when saving workbooks created by LibreOffice
+
 
 3.1.3 (2024-05-29)
 ==================
