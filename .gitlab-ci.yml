@@ -25,13 +25,6 @@ test-docs:
     tox -e doc,doctest
 
 
-test-python37:
-  <<: *unit
-  image: python:3.7
-  variables:
-    TOXENV: py37
-
-
 test-python38:
   <<: *unit
   image: python:3.8
