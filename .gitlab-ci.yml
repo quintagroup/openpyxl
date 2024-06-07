@@ -16,7 +16,7 @@ stages:
 test-optional:
   <<: *unit
   script:
-    tox -p auto -e lxml,nolxml,pandas,numpy,nopillow,xfail,defusedxml,keep_vba
+    tox -e lxml,nolxml,pandas,numpy,nopillow,xfail,defusedxml,keep_vba
 
 
 test-docs:
