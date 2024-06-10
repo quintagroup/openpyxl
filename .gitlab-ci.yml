@@ -21,7 +21,7 @@ test-optional:
 test-docs:
   <<: *unit
   script:
-   - apt-get install -y --no-install-recommends zip
+   - apt-get update && apt-get install -y --no-install-recommends zip
    - tox -e doc,doctest
    -  zip -r docs.zip .tox/doc/tmp/html
   artifacts:
