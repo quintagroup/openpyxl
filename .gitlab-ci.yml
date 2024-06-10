@@ -22,6 +22,10 @@ test-docs:
   <<: *unit
   script:
     tox -e doc,doctest
+    zip -r docs.zip .tox/doc/tmp/html
+  artefacts:
+    paths:
+      docs.zip
 
 test-python38:
   <<: *unit
