@@ -23,7 +23,7 @@ test-docs:
   script:
     tox -e doc,doctest
     zip -r docs.zip .tox/doc/tmp/html
-  artefacts:
+  artifacts:
     paths:
       docs.zip
 
