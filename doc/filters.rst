@@ -87,7 +87,7 @@ StringFilters with the wildcard operator are the same as CustomFilters. This all
 
 .. note::
 
-The wildcard syntax allows for even more sophisticated patterns with multiple wildcards. This functionality cannot be easily expressed using StringFilters and is not a design goal.
+  The wildcard syntax allows for even more sophisticated patterns with multiple wildcards. This functionality cannot be easily expressed using StringFilters and is not a design goal.
 
 
 DateGroupItem
