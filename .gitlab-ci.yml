@@ -86,11 +86,11 @@ test-docs:
   #   - tox -e cov
   # coverage: '/^TOTAL.+?(\d+\%)$/'
 
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
+  # artifacts:
+  #   reports:
+  #     coverage_report:
+  #       coverage_format: cobertura
+  #       path: coverage.xml
 
 docs:
   stage: deploy
