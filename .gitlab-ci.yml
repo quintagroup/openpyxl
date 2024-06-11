@@ -97,8 +97,8 @@ docs:
   image: python:3
 
   script:
-    - unzip -d tmp docs.zip
-    - mv tmp/html/* public
+    - unzip -d docs.zip
+    - mv .tox/doc/tmp/html/* public
 
   artifacts:
     paths:
