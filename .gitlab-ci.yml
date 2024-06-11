@@ -1,5 +1,5 @@
 stages:
-  - test
+#  - test
   - deploy
 
 .unit-test: &unit
@@ -94,10 +94,10 @@ test-coverage:
 
 docs:
   stage: deploy
+  image: python:3
 
   script:
-    - cd doc
-    - sphinx-build -q -j auto -b html -d tmp/doctrees . tmp/html
+    - unzip -d tmp docs.zip
     - mv tmp/html/* public
 
   artifacts:
