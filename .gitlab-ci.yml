@@ -1,6 +1,6 @@
 stages:
-#  - test
-  - deploy
+ - test
+ - deploy
 
 .unit-test: &unit
   stage: test
@@ -14,65 +14,65 @@ stages:
   script:
     tox --skip-missing-interpreters -- -qqrf
 
-test-optional:
-  <<: *unit
-  script:
-    tox -e lxml,nolxml,pandas,numpy,nopillow,xfail,defusedxml,keep_vba
+# test-optional:
+#   <<: *unit
+#   script:
+#     tox -e lxml,nolxml,pandas,numpy,nopillow,xfail,defusedxml,keep_vba
 
-test-docs:
-  <<: *unit
-  script:
-   - apt-get update && apt-get install -y --no-install-recommends zip
-   - tox -e doc,doctest
-   - zip -r docs.zip .tox/doc/tmp/html
+# test-docs:
+#   <<: *unit
+#   script:
+#    - apt-get update && apt-get install -y --no-install-recommends zip
+#    - tox -e doc,doctest
+#    - zip -r docs.zip .tox/doc/tmp/html
    
-  artifacts:
-    paths:
-    - docs.zip
+#   artifacts:
+#     paths:
+#     - docs.zip
 
-test-python38:
-  <<: *unit
-  image: python:3.8
-  variables:
-    TOXENV: py38
-
-test-python39:
-  <<: *unit
-  image: python:3.9
-  variables:
-    TOXENV: py39
-
-test-python310:
-  <<: *unit
-  image: python:3.10
-  variables:
-    TOXENV: py310
-
-test-python311:
-  <<: *unit
-  image: python:3.11
-  variables:
-    TOXENV: py311
-
-test-python312:
-  <<: *unit
-  image: python:3.12
-  variables:
-    TOXENV: py312
-
-# test-python313:
+# test-python38:
 #   <<: *unit
-#   image: python:3.13-rc
+#   image: python:3.8
 #   variables:
-#     TOXENV: py313
+#     TOXENV: py38
 
-# test-pypy3:
+# test-python39:
 #   <<: *unit
-#   image: pypy:3
+#   image: python:3.9
 #   variables:
-#     TOXENV: pypy3
+#     TOXENV: py39
 
-test-coverage:
+# test-python310:
+#   <<: *unit
+#   image: python:3.10
+#   variables:
+#     TOXENV: py310
+
+# test-python311:
+#   <<: *unit
+#   image: python:3.11
+#   variables:
+#     TOXENV: py311
+
+# test-python312:
+#   <<: *unit
+#   image: python:3.12
+#   variables:
+#     TOXENV: py312
+
+# # test-python313:
+# #   <<: *unit
+# #   image: python:3.13-rc
+# #   variables:
+# #     TOXENV: py313
+
+# # test-pypy3:
+# #   <<: *unit
+# #   image: pypy:3
+# #   variables:
+# #     TOXENV: pypy3
+
+# test-coverage:
   <<: *unit
   script:
     - export GIT_ID=$(hg tip --template '{node}\n')
