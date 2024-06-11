@@ -98,9 +98,8 @@ docs:
 
   script:
     - unzip docs.zip
-    - mv .tox/doc/tmp/html/* public
 
   artifacts:
     paths:
-    - public
+    - .tox/doc/tmp/html
   
