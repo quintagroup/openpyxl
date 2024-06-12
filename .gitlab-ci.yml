@@ -1,5 +1,6 @@
 stages:
-  - test
+ - test
+ - deploy
 
 .unit-test: &unit
   stage: test
@@ -20,9 +21,15 @@ test-optional:
 
 
 test-docs:
-  <<: *unit
-  script:
-    tox -e doc,doctest
+   <<: *unit
+   script:
+    - apt-get update && apt-get install -y --no-install-recommends zip
+    - tox -e doc,doctest
+    - zip -r docs.zip .tox/doc/tmp/html
+
+   artifacts:
+     paths:
+     - docs.zip
 
 
 test-python38:
@@ -91,3 +98,20 @@ test-coverage:
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
+
+pages:
+  stage: deploy
+  image: python:3
+
+  script:
+    - unzip docs.zip
+    - mv .tox/doc/tmp/html public
+
+  artifacts:
+    paths:
+    - public
+
+  rules:
+    # This ensures that only pushes to the default branch will trigger
+    # a pages deploy
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH

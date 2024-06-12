@@ -12,11 +12,13 @@ from openpyxl.descriptors.nested import (
 from openpyxl.xml.constants import XPROPS_NS
 
 
-def get_version():
-    from openpyxl import __version__
 
-    VERSION = ".".join(__version__.split(".")[:2])
-    return VERSION
+def get_version():
+    """
+    Deferred import.
+    """
+    from openpyxl import __version__
+    return __version__
 
 
 class DigSigBlob(Serialisable):
@@ -100,7 +102,7 @@ class ExtendedProperties(Serialisable):
                  HLinks=None,
                  HyperlinksChanged=None,
                  DigSig=None,
-                 Application="Microsoft Excel",
+                 Application=None,
                  AppVersion=None,
                  DocSecurity=None,
                 ):
@@ -128,9 +130,9 @@ class ExtendedProperties(Serialisable):
         self.HLinks = None
         self.HyperlinksChanged = HyperlinksChanged
         self.DigSig = None
-        self.Application = Application
+        self.Application = f"Microsoft Excel Compatible / Openpyxl"
         if AppVersion is None:
-            AppVersion = get_version()
+            AppVersion = get_version() # Excel doesn't like any text.
         self.AppVersion = AppVersion
         self.DocSecurity = DocSecurity
 
