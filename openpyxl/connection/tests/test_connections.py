@@ -302,7 +302,6 @@ class TestConnectionList:
 
 
     def test_ctor(self, ConnectionList, Connection):
-
         src_module = ConnectionList(connection=[Connection(id=1, refreshedVersion=4)])
         xml = tostring(src_module.to_tree())
         expected = """
@@ -326,6 +325,9 @@ class TestConnectionList:
         assert src_module.connection[2].saveData == True
 
 
-    @pytest.mark.xfail
-    def test_warn_on_unknown(self, ConnectionList, recwarn):
-        assert False
+    def test_warn_on_unknown(self, ConnectionList, Connection, recwarn):
+        con_list = ConnectionList(connection=[Connection(id=1, refreshedVersion=4, type=205)])
+        con_list._validate_connection_types()
+
+        w = recwarn.pop()
+        assert issubclass(w.category, UserWarning)
