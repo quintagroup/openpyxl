@@ -17,12 +17,12 @@ class TestExtendedProperties:
         from ..extended import get_version
         props = ExtendedProperties()
         xml = tostring(props.to_tree())
-        expected = """
+        expected = f"""
         <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-        <Application>Microsoft Excel</Application>
-        <AppVersion>{0}</AppVersion>
+        <Application>Microsoft Excel Compatible / Openpyxl</Application>
+        <AppVersion>{get_version()}</AppVersion>
         </Properties>
-        """.format(get_version())
+        """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
