@@ -20,6 +20,7 @@ from openpyxl.descriptors.nested import (
 from openpyxl.descriptors.excel import ExtensionList
 
 from openpyxl.xml.constants import SHEET_MAIN_NS
+from openpyxl.xml.functions import Element
 
 
 class Parameter(Serialisable):
@@ -405,10 +406,21 @@ class ConnectionList(Serialisable):
         self.connection = connection
 
 
+    def __iter__(self):
+        """
+        Iterate directly over the connections
+        """
+        return iter(self.connection)
+
+
     def to_tree(self, tagname=None, idx=None, namespace=None):
-        self._validate_connection_types() # Only write valid connection types
-        tree = super(ConnectionList, self).to_tree(tagname, idx, namespace)
+        self._validate_connection_types() # Only write known connection types
+        tree = Element("connections")
         tree.set("xmlns", SHEET_MAIN_NS)
+
+        for cxn in self:
+            tree.append(cxn.to_tree())
+
         return tree
 
 
@@ -421,14 +433,14 @@ class ConnectionList(Serialisable):
         """
         Check connections have a valid type, otherwise they need to be dropped
         """
-        final_types = []
+        known_cxn = []
 
-        for cxn in self.connection:
+        for cxn in self:
             if not cxn.type or cxn.is_known_connection:
-                final_types.append(cxn)
+                known_cxn.append(cxn)
             else:
                 warnings.warn(
         f"Connections type {cxn.type} is not supported, references to it will be dropped to keep the Workbook valid.")
 
         # Update with usable types
-        self.connection = final_types
+        self.connection = known_cxn
