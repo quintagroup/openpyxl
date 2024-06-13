@@ -23,7 +23,8 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
 class Parameter(Serialisable):
-    # Implements CT_Parameter
+    """Parameter Properties"""
+
     tagname = "parameter"
 
     name = String(allow_none=True)
@@ -77,7 +78,8 @@ class TextField(Serialisable):
 
 
 class TextPr(Serialisable):
-    # Implements
+    """Text Import Properties"""
+
     tagname = "textPr"
 
     textFields = NestedSequence(expected_type=TextField, count=True)
@@ -136,7 +138,8 @@ class TextPr(Serialisable):
 
 
 class TableMissing(Serialisable):
-    # Implements CT_TableMissing??
+    """Empty element denoting a missing table"""
+
     tagname = "tableMissing"
     pass
 
@@ -163,7 +166,8 @@ class Tables(Serialisable):
 
 
 class WebPr(Serialisable):
-    # Implements CT_WebPr
+    """Web Properties"""
+
     tagname = "webPr"
 
     tables = Typed(expected_type=Tables, allow_none=True)
@@ -216,7 +220,8 @@ class WebPr(Serialisable):
 
 
 class OlapPr(Serialisable):
-    # Implements CT_OlapPr
+    """OLAP Properties"""
+
     tagname = "olapPr"
 
     local = Bool(allow_none=True)
@@ -252,7 +257,8 @@ class OlapPr(Serialisable):
 
 
 class DbPr(Serialisable):
-    # Implements CT_DbPr
+    """Database Properties"""
+
     tagname = "dbPr"
 
     connection = String()
