@@ -29,6 +29,9 @@ you require it they can be found as follows:
     "Connection to the 'Data' query in the workbook."
 
 
+Some connections in Excel documents may have a 'type' attribute that is outside the OOXML spec.
+When this happens a warning is emitted and the connection will be dropped in the resulting xml.
+
 .. testcleanup:: connections
 
    import os

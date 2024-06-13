@@ -15,8 +15,8 @@ class TestConnection:
 
 
     def test_ctor(self, Connection):
-        src_module = Connection(id=3, refreshedVersion=8, background=True, keepAlive=True)
-        xml = tostring(src_module.to_tree())
+        connection = Connection(id=3, refreshedVersion=8, background=True, keepAlive=True)
+        xml = tostring(connection.to_tree())
         expected = """
         <connection id="3" keepAlive="1" refreshedVersion="8" background="1"
          interval="0" reconnectionMethod="1" minRefreshableVersion="0" savePassword="0"
@@ -34,9 +34,20 @@ class TestConnection:
         type="5" refreshedVersion="8" background="1" saveData="1" />
         """
         node = fromstring(src)
-        src_module = Connection.from_tree(node)
-        assert src_module.saveData == True
-        assert src_module.name == "Query - Table1"
+        connection = Connection.from_tree(node)
+        assert connection.saveData == True
+        assert connection.name == "Query - Table1"
+        assert connection.type_descriptions[connection.type] == "OLE DB-based source"
+
+
+    @pytest.mark.parametrize("type, result", [
+        (8, True),
+        (102, False),
+    ]
+                        )
+    def test_known_type(self, Connection, type, result):
+        connection = Connection(id=3, refreshedVersion=8, background=True, type=type)
+        assert connection.is_known_connection is result
 
 
 @pytest.fixture
@@ -49,8 +60,8 @@ class TestDbPr:
 
 
     def test_ctor(self, DbPr):
-        src_module = DbPr(connection="Data Model Connection", command="Model", commandType=True)
-        xml = tostring(src_module.to_tree())
+        db_props = DbPr(connection="Data Model Connection", command="Model", commandType=True)
+        xml = tostring(db_props.to_tree())
         expected = """
         <dbPr connection="Data Model Connection" command="Model" commandType="1" />
         """
@@ -64,8 +75,8 @@ class TestDbPr:
             command="SELECT * FROM [Table2]" />
         """
         node = fromstring(src)
-        src_module = DbPr.from_tree(node)
-        assert src_module.command == "SELECT * FROM [Table2]"
+        db_props = DbPr.from_tree(node)
+        assert db_props.command == "SELECT * FROM [Table2]"
 
 
 @pytest.fixture
@@ -78,8 +89,8 @@ class TestOlapPr:
 
 
     def test_ctor(self, OlapPr):
-        src_module = OlapPr(sendLocale=True, rowDrillCount=1000)
-        xml = tostring(src_module.to_tree())
+        olap_props = OlapPr(sendLocale=True, rowDrillCount=1000)
+        xml = tostring(olap_props.to_tree())
         expected = """
         <olapPr local="0" sendLocale="1" rowDrillCount="1000" localRefresh="1" serverFill="1" serverNumberFormat="1" serverFont="1" serverFontColor="1" />
         """
@@ -92,8 +103,8 @@ class TestOlapPr:
         <olapPr serverFill="1" localRefresh="1" serverFontColor="1"/>
         """
         node = fromstring(src)
-        src_module = OlapPr.from_tree(node)
-        assert src_module == OlapPr(
+        olap_props = OlapPr.from_tree(node)
+        assert olap_props == OlapPr(
             serverFill=True,
             localRefresh=True,
             serverFontColor=True
@@ -110,8 +121,8 @@ class TestTextField:
 
 
     def test_ctor(self, TextField):
-        src_module = TextField(type="text")
-        xml = tostring(src_module.to_tree())
+        text = TextField(type="text")
+        xml = tostring(text.to_tree())
         expected = """
             <textField type="text" position="0"/>
         """
@@ -125,8 +136,8 @@ class TestTextField:
             <textField type="DMY" position="2" />
         """
         node = fromstring(src)
-        src_module = TextField.from_tree(node)
-        assert src_module == TextField(type="DMY", position=2)
+        text = TextField.from_tree(node)
+        assert text == TextField(type="DMY", position=2)
 
 
 @pytest.fixture
@@ -139,8 +150,8 @@ class TestTextPr:
 
 
     def test_ctor(self, TextPr):
-        src_module = TextPr(prompt=False, codePage=437, sourceFile="C:\\Desktop\\text data.txt", delimiter="|")
-        xml = tostring(src_module.to_tree())
+        text_props = TextPr(prompt=False, codePage=437, sourceFile="C:\\Desktop\\text data.txt", delimiter="|")
+        xml = tostring(text_props.to_tree())
         expected = """
         <textPr prompt="0" codePage="437" sourceFile="C:\\Desktop\\text data.txt" delimiter="|"
          fileType="win" firstRow="1" delimited="1" decimal="." thousands="," tab="1" qualifier="doubleQuote"
@@ -160,8 +171,8 @@ class TestTextPr:
         </textPr>
         """
         node = fromstring(src)
-        src_module = TextPr.from_tree(node)
-        assert src_module == TextPr(space=True, firstRow=13, sourceFile="C:\\Desktop\\text data.txt", delimiter="|", textFields=[TextField()])
+        text_props = TextPr.from_tree(node)
+        assert text_props == TextPr(space=True, firstRow=13, sourceFile="C:\\Desktop\\text data.txt", delimiter="|", textFields=[TextField()])
 
 
 @pytest.fixture
@@ -173,25 +184,23 @@ def TableMissing():
 class TestTableMissing:
 
 
-    @pytest.mark.xfail
     def test_ctor(self, TableMissing):
-        src_module = TableMissing()
-        xml = tostring(src_module.to_tree())
+        missing_table = TableMissing()
+        xml = tostring(missing_table.to_tree())
         expected = """
-        <root />
+        <tableMissing />
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
 
 
-    @pytest.mark.xfail
     def test_from_xml(self, TableMissing):
         src = """
-        <root />
+        <tableMissing />
         """
         node = fromstring(src)
-        src_module = TableMissing.from_tree(node)
-        assert src_module == TableMissing()
+        missing_table = TableMissing.from_tree(node)
+        assert missing_table == TableMissing()
 
 
 @pytest.fixture
@@ -204,8 +213,8 @@ class TestParameter:
 
 
     def test_ctor(self, Parameter):
-        src_module = Parameter(name="TestName", boolean=True, sqlType=4)
-        xml = tostring(src_module.to_tree())
+        param = Parameter(name="TestName", boolean=True, sqlType=4)
+        xml = tostring(param.to_tree())
         expected = """
         <parameter name="TestName" boolean="1" sqlType="4" parameterType="prompt" refreshOnChange="0"/>
         """
@@ -218,8 +227,8 @@ class TestParameter:
         <parameter name="user" refreshOnChange="1" parameterType="cell" cell="Sheet1!$C$1"/>
         """
         node = fromstring(src)
-        src_module = Parameter.from_tree(node)
-        assert src_module == Parameter(name="user", refreshOnChange=True, parameterType="cell", cell="Sheet1!$C$1")
+        param = Parameter.from_tree(node)
+        assert param == Parameter(name="user", refreshOnChange=True, parameterType="cell", cell="Sheet1!$C$1")
 
 
 @pytest.fixture
@@ -232,8 +241,8 @@ class TestWebPr:
 
 
     def test_ctor(self, WebPr):
-        src_module = WebPr(xml=True, firstRow=True, htmlTables=True)
-        xml = tostring(src_module.to_tree())
+        web_props = WebPr(xml=True, firstRow=True, htmlTables=True)
+        xml = tostring(web_props.to_tree())
         expected = """
         <webPr xml="1" firstRow="1" htmlTables="1" sourceData="0" parsePre="0" consecutive="0" xl97="0" textDates="0" xl2000="0"/>
         """
@@ -247,8 +256,8 @@ class TestWebPr:
         consecutive="1" url="http://ServerName/" htmlTables="1" />
         """
         node = fromstring(src)
-        src_module = WebPr.from_tree(node)
-        assert src_module == WebPr(sourceData=True, parsePre=True, consecutive=True, url="http://ServerName/", htmlTables=True)
+        web_props = WebPr.from_tree(node)
+        assert web_props == WebPr(sourceData=True, parsePre=True, consecutive=True, url="http://ServerName/", htmlTables=True)
 
 
 @pytest.fixture
@@ -261,10 +270,12 @@ class TestTables:
 
 
     def test_ctor(self, Tables):
-        src_module = Tables(x=3)
-        xml = tostring(src_module.to_tree())
+        tables = Tables(x=3)
+        xml = tostring(tables.to_tree())
         expected = """
-        <tables x="3" />
+        <tables>
+            <x v="3" />
+        </tables>
         """
         diff = compare_xml(xml, expected)
         assert diff is None, diff
@@ -272,26 +283,27 @@ class TestTables:
 
     def test_from_xml(self, Tables):
         src = """
-        <tables s="test" />
+        <tables count="1">
+            <s v="test" />
+        </tables>
         """
         node = fromstring(src)
-        src_module = Tables.from_tree(node)
-        assert src_module == Tables(s="test")
+        tables = Tables.from_tree(node)
+        assert tables == Tables(s="test", count=1)
 
 
 @pytest.fixture
-def Connections():
-    from ..connections import Connections
-    return Connections
+def ConnectionList():
+    from ..connections import ConnectionList
+    return ConnectionList
 
 
-class TestConnections:
+class TestConnectionList:
 
 
-    def test_ctor(self, Connections):
-        from ..connections import Connection
-        src_module = Connections(connection=[Connection(id=1, refreshedVersion=4)])
-        xml = tostring(src_module.to_tree())
+    def test_ctor(self, ConnectionList, Connection):
+        connections = ConnectionList(connection=[Connection(id=1, refreshedVersion=4)])
+        xml = tostring(connections.to_tree())
         expected = """
         <connections xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
             <connection id="1" refreshedVersion="4" background="0" credentials="integrated" deleted="0"
@@ -303,12 +315,19 @@ class TestConnections:
         assert diff is None, diff
 
 
-    def test_from_xml(self, Connections, datadir):
+    def test_from_xml(self, ConnectionList, datadir):
         datadir.chdir()
         with open("connections.xml", "rb") as src:
             node = fromstring(src.read())
-        src_module = Connections.from_tree(node)
-        assert len(src_module.connection) == 3
-        assert src_module.connection[1].id == 2
-        assert src_module.connection[2].saveData == True
+        connections = ConnectionList.from_tree(node)
+        assert len(connections.connection) == 3
+        assert connections.connection[1].id == 2
+        assert connections.connection[2].saveData == True
 
+
+    def test_warn_on_unknown(self, ConnectionList, Connection, recwarn):
+        con_list = ConnectionList(connection=[Connection(id=1, refreshedVersion=4, type=205)])
+        con_list._validate_connection_types()
+
+        w = recwarn.pop()
+        assert issubclass(w.category, UserWarning)
