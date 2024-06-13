@@ -228,7 +228,7 @@ class TestParameter:
         """
         node = fromstring(src)
         param = Parameter.from_tree(node)
-        assert web_props == Parameter(name="user", refreshOnChange=True, parameterType="cell", cell="Sheet1!$C$1")
+        assert param == Parameter(name="user", refreshOnChange=True, parameterType="cell", cell="Sheet1!$C$1")
 
 
 @pytest.fixture
