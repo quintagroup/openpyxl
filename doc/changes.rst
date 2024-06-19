@@ -1,6 +1,8 @@
 3.1.5 (unreleased)
 ==================
 
+* `#2198 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2198>`_ Excel is very fussy about the version number
+
 
 3.1.4 (2024-06-12)
 ==================

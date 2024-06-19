@@ -10,15 +10,7 @@ from openpyxl.descriptors.nested import (
 )
 
 from openpyxl.xml.constants import XPROPS_NS
-
-
-
-def get_version():
-    """
-    Deferred import.
-    """
-    from openpyxl import __version__
-    return __version__
+from openpyxl import __version__
 
 
 class DigSigBlob(Serialisable):
@@ -41,7 +33,11 @@ class ExtendedProperties(Serialisable):
     """
     See 22.2
 
-    Most of this is irrelevant
+    Most of this is irrelevant but Excel is very picky about the version number
+
+    It uses XX.YYYY (Version.Build) and expects everyone else to
+
+    We provide Major.Minor and the full version in the application name
     """
 
     tagname = "Properties"
@@ -130,10 +126,8 @@ class ExtendedProperties(Serialisable):
         self.HLinks = None
         self.HyperlinksChanged = HyperlinksChanged
         self.DigSig = None
-        self.Application = f"Microsoft Excel Compatible / Openpyxl"
-        if AppVersion is None:
-            AppVersion = get_version() # Excel doesn't like any text.
-        self.AppVersion = AppVersion
+        self.Application = f"Microsoft Excel Compatible / Openpyxl {__version__}"
+        self.AppVersion = ".".join(__version__.split(".")[:-1])
         self.DocSecurity = DocSecurity
 
 
