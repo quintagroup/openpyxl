@@ -1,6 +1,8 @@
 3.1.5 (unreleased)
 ==================
 
+
+* `#2187 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2187>`_ Test fails due to change in Numpy API
 * `#2198 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2198>`_ Excel is very fussy about the version number
 
 
