@@ -10,7 +10,7 @@ def Drawing():
     return Drawing
 
 
-class TestDrawing(object):
+class TestDrawing:
 
 
     def test_ctor(self, Drawing):

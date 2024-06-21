@@ -13,7 +13,7 @@ from openpyxl.descriptors.excel import (
 from openpyxl.utils.protection import hash_password
 
 
-class _Protected(object):
+class _Protected:
     _password = None
 
     def set_password(self, value='', already_hashed=False):

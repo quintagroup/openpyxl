@@ -258,7 +258,7 @@ def test_get_sheet_names(Workbook):
 
 def test_add_invalid_worksheet_class_instance(Workbook):
 
-    class AlternativeWorksheet(object):
+    class AlternativeWorksheet:
         def __init__(self, parent_workbook, title=None):
             self.parent_workbook = parent_workbook
             if not title:

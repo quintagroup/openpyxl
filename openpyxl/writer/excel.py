@@ -34,7 +34,7 @@ from openpyxl.workbook._writer import WorkbookWriter
 from .theme import theme_xml
 
 
-class ExcelWriter(object):
+class ExcelWriter:
     """Write a workbook object to an Excel file."""
 
     def __init__(self, workbook, archive):

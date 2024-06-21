@@ -14,7 +14,7 @@ from openpyxl.utils.datetime import from_ISO8601
 
 from .namespace import namespaced
 
-class Descriptor(object):
+class Descriptor:
 
     def __init__(self, name=None, **kw):
         self.name = name

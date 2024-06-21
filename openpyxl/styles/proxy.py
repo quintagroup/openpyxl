@@ -5,7 +5,7 @@ from copy import copy
 from openpyxl.compat import deprecated
 
 
-class StyleProxy(object):
+class StyleProxy:
     """
     Proxy formatting objects so that they cannot be altered
     """

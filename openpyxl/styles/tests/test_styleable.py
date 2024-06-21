@@ -14,7 +14,7 @@ def test_descriptor(Worksheet):
     from ..cell_style import StyleArray
     from ..fonts import Font
 
-    class Styled(object):
+    class Styled:
 
         font = StyleDescriptor('_fonts', "fontId")
 
