@@ -113,9 +113,12 @@ class Stylesheet(Serialisable):
         style_refs = self.cellStyles.remove_duplicates()
         named_styles = NamedStyleList()
 
-        for style_ref in style_refs:
-            style = self._expand_named_style(style_ref)
-            named_styles.append(style)
+        #for style_ref in style_refs:
+            #style = self._expand_named_style(style_ref)
+            #named_styles.append(style)
+
+        from_ref = [self._expand_named_style(style_ref) for style_ref in style_refs]
+        named_styles.extend(from_ref)
 
         return named_styles
 
