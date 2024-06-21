@@ -4,6 +4,7 @@
 
 * `#2187 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2187>`_ Test fails due to change in Numpy API
 * `#2198 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2198>`_ Excel is very fussy about the version number
+* `#2200 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2200>`_ Poor perfomance when reading workbooks with lots of named styles
 
 
 3.1.4 (2024-06-12)
