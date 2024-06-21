@@ -172,7 +172,7 @@ class NamedStyleList(list):
     def append(self, style):
         if not isinstance(style, NamedStyle):
             raise TypeError("""Only NamedStyle instances can be added""")
-        elif style.name in self.names:
+        elif style.name in self.names: # hotspot
             raise ValueError("""Style {0} exists already""".format(style.name))
         style._style.xfId = (len(self))
         super().append(style)
