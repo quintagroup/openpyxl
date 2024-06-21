@@ -103,7 +103,7 @@ class SheetProtection(Serialisable, _Protected):
 
 
     def set_password(self, value='', already_hashed=False):
-        super(SheetProtection, self).set_password(value, already_hashed)
+        super().set_password(value, already_hashed)
         self.enable()
 
 

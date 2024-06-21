@@ -132,6 +132,6 @@ class ExtendedProperties(Serialisable):
 
 
     def to_tree(self):
-        tree = super(ExtendedProperties, self).to_tree()
+        tree = super().to_tree()
         tree.set("xmlns", XPROPS_NS)
         return tree
