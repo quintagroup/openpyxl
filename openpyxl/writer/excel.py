@@ -33,14 +33,13 @@ from openpyxl.packaging.relationship import (
     Relationship,
 )
 from openpyxl.comments.comment_sheet import CommentSheet
-from openpyxl.packaging.extended import ExtendedProperties
 from openpyxl.styles.stylesheet import write_stylesheet
 from openpyxl.worksheet._writer import WorksheetWriter
 from openpyxl.workbook._writer import WorkbookWriter
 from .theme import theme_xml
 
 
-class ExcelWriter(object):
+class ExcelWriter:
     """Write a workbook object to an Excel file."""
 
 
@@ -61,6 +60,7 @@ class ExcelWriter(object):
 
 
     def write_data(self):
+        from openpyxl.packaging.extended import ExtendedProperties
         """Write the various xml files into the zip archive."""
         # cleanup all worksheets
         archive = self.archive

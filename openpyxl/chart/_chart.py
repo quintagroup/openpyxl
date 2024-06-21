@@ -87,7 +87,7 @@ class ChartBase(Serialisable):
         self.graphical_properties = None
         self.hidden = None
         self.hide_title = None
-        super(ChartBase, self).__init__()
+        super().__init__()
 
 
     def __hash__(self):
@@ -111,7 +111,7 @@ class ChartBase(Serialisable):
         if self.ser is not None:
             for s in self.ser:
                 s.__elements__ = attribute_mapping[self._series_type]
-        return super(ChartBase, self).to_tree(tagname, idx)
+        return super().to_tree(tagname, idx)
 
 
     def _reindex(self):

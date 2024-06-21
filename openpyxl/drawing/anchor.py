@@ -140,7 +140,7 @@ class AbsoluteAnchor(_AnchorBase):
         if ext is None:
             ext = XDRPositiveSize2D(0, 0)
         self.ext = ext
-        super(AbsoluteAnchor, self).__init__(**kw)
+        super().__init__(**kw)
 
 
 class OneCellAnchor(_AnchorBase):
@@ -172,7 +172,7 @@ class OneCellAnchor(_AnchorBase):
         if ext is None:
             ext = XDRPositiveSize2D(0, 0)
         self.ext = ext
-        super(OneCellAnchor, self).__init__(**kw)
+        super().__init__(**kw)
 
 
 class TwoCellAnchor(_AnchorBase):
@@ -206,4 +206,4 @@ class TwoCellAnchor(_AnchorBase):
         if to is None:
             to = AnchorMarker()
         self.to = to
-        super(TwoCellAnchor, self).__init__(**kw)
+        super().__init__(**kw)

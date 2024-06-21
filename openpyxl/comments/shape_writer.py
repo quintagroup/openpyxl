@@ -22,7 +22,7 @@ VML_ROOT = """
  xmlns:x="urn:schemas-microsoft-com:office:excel" />
 """
 
-class ShapeWriter(object):
+class ShapeWriter:
     """
     Create VML for comments
     """

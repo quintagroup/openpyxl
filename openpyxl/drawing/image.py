@@ -29,7 +29,7 @@ def _import_image(img):
     return img
 
 
-class Image(object):
+class Image:
     """Image in a spreadsheet"""
 
     _id = 1

@@ -58,7 +58,7 @@ class _BarChartBase(ChartBase):
         self.varyColors = varyColors
         self.ser = ser
         self.dLbls = dLbls
-        super(_BarChartBase, self).__init__(**kw)
+        super().__init__(**kw)
 
 
 class BarChart(_BarChartBase):
@@ -95,7 +95,7 @@ class BarChart(_BarChartBase):
         self.x_axis = TextAxis()
         self.y_axis = NumericAxis()
         self.legend = Legend()
-        super(BarChart, self).__init__(**kw)
+        super().__init__(**kw)
 
 
 class BarChart3D(_BarChartBase, _3DBase):
@@ -141,4 +141,4 @@ class BarChart3D(_BarChartBase, _3DBase):
         self.y_axis = NumericAxis()
         self.z_axis = SeriesAxis()
 
-        super(BarChart3D, self).__init__(**kw)
+        super().__init__(**kw)

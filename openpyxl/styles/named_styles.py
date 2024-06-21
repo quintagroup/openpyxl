@@ -72,7 +72,7 @@ class NamedStyle(Serialisable):
 
 
     def __setattr__(self, attr, value):
-        super(NamedStyle, self).__setattr__(attr, value)
+        super().__setattr__(attr, value)
         if getattr(self, '_wb', None) and attr in (
            'font', 'fill', 'border', 'alignment', 'number_format', 'protection',
             ):
@@ -160,7 +160,7 @@ class NamedStyleList(list):
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return super(NamedStyleList, self).__getitem__(key)
+            return super().__getitem__(key)
 
 
         for idx, name in enumerate(self.names):
@@ -172,10 +172,16 @@ class NamedStyleList(list):
     def append(self, style):
         if not isinstance(style, NamedStyle):
             raise TypeError("""Only NamedStyle instances can be added""")
-        elif style.name in self.names:
+        elif style.name in self.names: # hotspot
             raise ValueError("""Style {0} exists already""".format(style.name))
         style._style.xfId = (len(self))
-        super(NamedStyleList, self).append(style)
+        super().append(style)
+
+
+    def extend(self, styles):
+        for idx, s in enumerate(styles, len(self)):
+            s._style.xfId = idx
+        super().extend(styles)
 
 
 class _NamedCellStyle(Serialisable):

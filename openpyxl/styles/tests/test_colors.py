@@ -77,7 +77,7 @@ class TestColor:
 def test_color_descriptor():
     from ..colors import ColorDescriptor
 
-    class DummyStyle(object):
+    class DummyStyle:
 
         value = ColorDescriptor('value')
 

@@ -109,7 +109,7 @@ class VolTypesList(Serialisable):
 
 
     def to_tree(self, tagname=None, idx=None, namespace=None):
-        tree = super(VolTypesList, self).to_tree(tagname, idx, namespace)
+        tree = super().to_tree(tagname, idx, namespace)
         tree.set("xmlns", SHEET_MAIN_NS)
         return tree
 
