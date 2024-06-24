@@ -153,6 +153,16 @@ class NamedStyleList(list):
     Returns a list of NamedStyles
     """
 
+    def __init__(self, iterable=()):
+        """
+        Allow a list of named styles to be passed in and index them.
+        """
+
+        for idx, s in enumerate(iterable, len(self)):
+            s._style.xfId = idx
+        super().__init__(iterable)
+
+
     @property
     def names(self):
         return [s.name for s in self]
@@ -176,12 +186,6 @@ class NamedStyleList(list):
             raise ValueError("""Style {0} exists already""".format(style.name))
         style._style.xfId = (len(self))
         super().append(style)
-
-
-    def extend(self, styles):
-        for idx, s in enumerate(styles, len(self)):
-            s._style.xfId = idx
-        super().extend(styles)
 
 
 class _NamedCellStyle(Serialisable):
