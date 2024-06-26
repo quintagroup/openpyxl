@@ -15,7 +15,7 @@ from openpyxl.xml.constants import SHEET_MAIN_NS
 
 
 class VolTopicRef(Serialisable):
-    # Implements CT_VolTopicRef
+
     tagname = "tr"
 
     r = String()
@@ -31,7 +31,7 @@ class VolTopicRef(Serialisable):
 
 
 class VolTopic(Serialisable):
-    # Implements CT_VolTopic
+
     tagname = "tp"
 
     v = NestedText(expected_type=str,)
@@ -55,7 +55,7 @@ class VolTopic(Serialisable):
 
 
 class VolMain(Serialisable):
-    # Implements CT_VolMain
+
     tagname = "main"
 
     tp = Sequence(expected_type=VolTopic,)
@@ -71,7 +71,7 @@ class VolMain(Serialisable):
 
 
 class VolType(Serialisable):
-    # Implements CT_VolType
+
     tagname = "volType"
 
     main = Sequence(expected_type=VolMain)
@@ -89,7 +89,7 @@ class VolType(Serialisable):
 
 
 class VolTypesList(Serialisable):
-    # Implements CT_VolTypes
+
     tagname = "volTypes"
     _path = "/xl/volatileDependencies.xml"
     mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.volatileDependencies+xml"

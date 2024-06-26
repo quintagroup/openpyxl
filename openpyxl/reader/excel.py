@@ -65,7 +65,7 @@ from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.legacy import LegacyDrawing
 from openpyxl.drawing.image import Image
 
-from openpyxl.volatile.volatile_deps import VolTypesList
+from openpyxl.volatile.volatile import VolTypesList
 from openpyxl.connection.connections import ConnectionList
 from openpyxl.xml.functions import fromstring
 

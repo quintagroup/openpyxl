@@ -328,7 +328,7 @@ class TestExcelWriter:
 
 
     def test_volatile_deps(self, ExcelWriter, archive):
-        from openpyxl.volatile.volatile_deps import VolTypesList, VolMain, VolType, VolTopic
+        from openpyxl.volatile.volatile import VolTypesList, VolMain, VolType, VolTopic
         archive = ZipFile(BytesIO(), "w")
         wb = Workbook()
         wb._volatile_deps = VolTypesList(

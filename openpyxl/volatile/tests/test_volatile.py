@@ -7,7 +7,7 @@ from openpyxl.tests.helper import compare_xml
 
 @pytest.fixture
 def VolTopicRef():
-    from ..volatile_deps import VolTopicRef
+    from ..volatile import VolTopicRef
     return VolTopicRef
 
 
@@ -35,7 +35,7 @@ class TestVolTopicRef:
 
 @pytest.fixture
 def VolMain():
-    from ..volatile_deps import VolMain
+    from ..volatile import VolMain
     return VolMain
 
 
@@ -54,7 +54,7 @@ class TestVolMain:
 
 
     def test_from_xml(self, VolMain):
-        from ..volatile_deps import VolTopic
+        from ..volatile import VolTopic
         src = """
         <main first="ThisWorkbookDataModel">
             <tp t="e">
@@ -69,7 +69,7 @@ class TestVolMain:
 
 @pytest.fixture
 def VolType():
-    from ..volatile_deps import VolType
+    from ..volatile import VolType
     return VolType
 
 
@@ -77,7 +77,7 @@ class TestVolType:
 
 
     def test_ctor(self, VolType):
-        from ..volatile_deps import VolMain, VolTopic
+        from ..volatile import VolMain, VolTopic
         typ = VolType(main=[VolMain(first="teststring", tp=[VolTopic(t="s", v='aaa: 4447')])], type="realTimeData")
         xml = tostring(typ.to_tree())
         expected = """
@@ -113,7 +113,7 @@ class TestVolType:
 
 @pytest.fixture
 def VolTopic():
-    from ..volatile_deps import VolTopic
+    from ..volatile import VolTopic
     return VolTopic
 
 
@@ -133,7 +133,7 @@ class TestVolTopic:
 
 
     def test_from_xml(self, VolTopic):
-        from ..volatile_deps import VolTopicRef
+        from ..volatile import VolTopicRef
         src = """
             <tp t="e">
                 <v>#N/A</v>
@@ -148,7 +148,7 @@ class TestVolTopic:
 
 @pytest.fixture
 def VolTypes():
-    from ..volatile_deps import VolTypesList
+    from ..volatile import VolTypesList
     return VolTypesList
 
 
@@ -156,7 +156,7 @@ class TestVolTypes:
 
 
     def test_ctor(self, VolTypes):
-        from ..volatile_deps import VolMain, VolTopic, VolType
+        from ..volatile import VolMain, VolTopic, VolType
 
         typ = VolTypes(volType=[VolType(main=[VolMain(first="teststring", tp=[VolTopic(t="s", v='aaa: 4447')])], type="realTimeData")])
         xml = tostring(typ.to_tree())
