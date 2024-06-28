@@ -24,7 +24,7 @@ def DummyWorksheet():
     from openpyxl.utils.datetime  import CALENDAR_WINDOWS_1900
     from openpyxl.cell import Cell
 
-    class Wb(object):
+    class Wb:
         epoch = CALENDAR_WINDOWS_1900
         _fonts = IndexedList()
         _fills = IndexedList()
@@ -35,7 +35,7 @@ def DummyWorksheet():
         _cell_styles = IndexedList()
 
 
-    class Ws(object):
+    class Ws:
 
         encoding = 'utf-8'
         parent = Wb()
