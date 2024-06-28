@@ -96,8 +96,7 @@ class Cell(StyleableObject):
 
     """
     __slots__ = (
-        'row',
-        'column',
+        '_coord',
         '_value',
         'data_type',
         'parent',
@@ -107,11 +106,7 @@ class Cell(StyleableObject):
 
     def __init__(self, worksheet, row=None, column=None, value=None, style_array=None):
         super().__init__(worksheet, style_array)
-        self.row = row
-        """Row number of this cell (1-based)"""
-        self.column = column
-        """Column number of this cell (1-based)"""
-        # _value is the stored value, while value is the displayed value
+        self._coord = (row, column) #1-based index
         self._value = None
         self._hyperlink = None
         self.data_type = 'n'
@@ -121,21 +116,26 @@ class Cell(StyleableObject):
 
 
     @property
-    def coordinate(self):
-        """This cell's coordinate (ex. 'A5')"""
-        col = get_column_letter(self.column)
-        return f"{col}{self.row}"
+    def column(self):
+        return self._coord[1]
 
+    col_idx = column
 
     @property
-    def col_idx(self):
-        """The numerical index of the column"""
-        return self.column
+    def row(self):
+        return self._coord[0]
+
+    @property
+    def coordinate(self):
+        """This cell's coordinate (ex. 'A5')"""
+        r, c = self._coord
+        col = get_column_letter(c)
+        return f"{col}{self._coord[0]}"
 
 
     @property
     def column_letter(self):
-        return get_column_letter(self.column)
+        return get_column_letter(self._coord[1])
 
 
     @property
@@ -268,9 +268,9 @@ class Cell(StyleableObject):
 
         :rtype: :class:`openpyxl.cell.Cell`
         """
-        offset_column = self.col_idx + column
-        offset_row = self.row + row
-        return self.parent.cell(column=offset_column, row=offset_row)
+        r, c = self._coord
+
+        return self.parent.cell(row=r + row, column=c + column)
 
 
     @property
@@ -306,7 +306,7 @@ class MergedCell(StyleableObject):
     The value of a MergedCell is always None.
     """
 
-    __slots__ = ('row', 'column')
+    __slots__ = ('_coord',)
 
     _value = None
     data_type = "n"
@@ -316,14 +316,17 @@ class MergedCell(StyleableObject):
 
     def __init__(self, worksheet, row=None, column=None):
         super().__init__(worksheet)
-        self.row = row
-        self.column = column
+        self._coord = (row, column)
+        #self.row = row
+        #self.column = column
 
 
     def __repr__(self):
         return "<MergedCell {0!r}.{1}>".format(self.parent.title, self.coordinate)
 
     coordinate = Cell.coordinate
+    row = Cell.row
+    column = Cell.column
     _comment = comment
     value = _value
 

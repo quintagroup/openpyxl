@@ -137,8 +137,7 @@ class WriteOnlyWorksheet(_WorkbookChild):
                 else:
                     raise ValueError
 
-            cell.column = col_idx
-            cell.row = row_idx
+            cell._coord = (row_idx, col_idx)
 
             if cell.hyperlink is not None:
                 cell.hyperlink.ref = cell.coordinate

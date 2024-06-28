@@ -9,13 +9,12 @@ from openpyxl.styles.numbers import BUILTIN_FORMATS, BUILTIN_FORMATS_MAX_SIZE
 
 class ReadOnlyCell:
 
-    __slots__ =  ('parent', 'row', 'column', '_value', 'data_type', '_style_id')
+    __slots__ =  ('parent', "_coord", '_value', 'data_type', '_style_id')
 
     def __init__(self, sheet, row, column, value, data_type='n', style_id=0):
         self.parent = sheet
         self._value = None
-        self.row = row
-        self.column = column
+        self._coord = (row, column)
         self.data_type = data_type
         self.value = value
         self._style_id = style_id
@@ -35,20 +34,10 @@ class ReadOnlyCell:
         return "<ReadOnlyCell {0!r}.{1}>".format(self.parent.title, self.coordinate)
 
 
-    @property
-    def coordinate(self):
-        column = get_column_letter(self.column)
-        return "{1}{0}".format(self.row, column)
-
-
-    @property
-    def coordinate(self):
-        return Cell.coordinate.__get__(self)
-
-
-    @property
-    def column_letter(self):
-        return Cell.column_letter.__get__(self)
+    row = Cell.row
+    column = Cell.column
+    column_letter = Cell.column_letter
+    coordinate = Cell.coordinate
 
 
     @property

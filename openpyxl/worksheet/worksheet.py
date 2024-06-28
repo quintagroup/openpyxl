@@ -670,8 +670,7 @@ class Worksheet(_WorkbookChild):
                     if cell.parent and cell.parent != self:
                         raise ValueError("Cells cannot be copied from other worksheets")
                     cell.parent = self
-                    cell.column = col_idx
-                    cell.row = row_idx
+                    cell._coord = (row_idx, col_idx)
                 else:
                     cell = Cell(self, row=row_idx, column=col_idx, value=content)
                 self._cells[(row_idx, col_idx)] = cell
@@ -812,8 +811,8 @@ class Worksheet(_WorkbookChild):
         new_col = cell.column + col_offset
         self._cells[new_row, new_col] = cell
         del self._cells[(cell.row, cell.column)]
-        cell.row = new_row
-        cell.column = new_col
+        cell._coord = (new_row, new_col)
+
         if translate and cell.data_type == "f":
             t = Translator(cell.value, cell.coordinate)
             cell.value = t.translate_formula(row_delta=row_offset, col_delta=col_offset)
