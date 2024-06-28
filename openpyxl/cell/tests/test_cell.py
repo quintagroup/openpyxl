@@ -235,7 +235,7 @@ def test_repr_object(dummy_cell):
 
     cell = dummy_cell
     try:
-        cell._bind_value(Dummy())
+        cell.value = Dummy()
     except ValueError as err:
         assert "something" not in str(err)
 
@@ -271,13 +271,8 @@ def test_cell_offset(dummy_cell):
 
 class TestEncoding:
 
-    try:
-        # Python 2
-        pound = unichr(163)
-    except NameError:
-        # Python 3
-        pound = chr(163)
-    test_string = ('Compound Value (' + pound + ')').encode('latin1')
+    pound = chr(163)
+    test_string = f"Compound Value {pound}".encode('latin1')
 
     def test_bad_encoding(self):
         from openpyxl import Workbook

@@ -173,9 +173,19 @@ class Cell(StyleableObject):
             return u'#N/A'
 
 
-    def _bind_value(self, value):
-        """Given a value, infer the correct data type"""
+    @property
+    def value(self):
+        """Get or set the value held in the cell.
 
+        :type: depends on the value (string, float, int or
+            :class:`datetime.datetime`)
+        """
+        return self._value
+
+
+    @value.setter
+    def value(self, value):
+        """Set the value and infer type and display options."""
         self.data_type = "n"
         t = type(value)
         try:
@@ -201,21 +211,6 @@ class Cell(StyleableObject):
                 self.data_type = 'e'
 
         self._value = value
-
-
-    @property
-    def value(self):
-        """Get or set the value held in the cell.
-
-        :type: depends on the value (string, float, int or
-            :class:`datetime.datetime`)
-        """
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        """Set the value and infer type and display options."""
-        self._bind_value(value)
 
     @property
     def internal_value(self):
