@@ -30,7 +30,11 @@ Bugfixes
 * `#1855 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1855>`_ Openpyxl implicitly allows 1900-02-29
 
 
-3.1.5 (unreleased)
+3.1.6 (unreleased)
+==================
+
+
+3.1.5 (2024-06-28)
 ==================
 
 
