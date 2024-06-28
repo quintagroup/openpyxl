@@ -212,10 +212,6 @@ class Cell(StyleableObject):
 
         self._value = value
 
-    @property
-    def internal_value(self):
-        """Always returns the value for excel."""
-        return self._value
 
     @property
     def hyperlink(self):

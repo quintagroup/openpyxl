@@ -91,10 +91,6 @@ class ReadOnlyCell:
 
 
     @property
-    def internal_value(self):
-        return self._value
-
-    @property
     def value(self):
         return self._value
 

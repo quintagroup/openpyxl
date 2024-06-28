@@ -15,6 +15,7 @@ Deprecations
 ------------
 
 * Python 3.6 is no longer supported
+* Cell.internal_value has been removed
 
 
 Changes
