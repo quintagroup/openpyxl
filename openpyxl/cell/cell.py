@@ -28,6 +28,7 @@ from openpyxl.styles.styleable import StyleableObject
 from openpyxl.worksheet.hyperlink import Hyperlink
 from openpyxl.worksheet.formula import DataTableFormula, ArrayFormula
 from openpyxl.cell.rich_text import CellRichText
+from . coordinate import Coordinate
 
 # constants
 
@@ -106,7 +107,7 @@ class Cell(StyleableObject):
 
     def __init__(self, worksheet, row=None, column=None, value=None, style_array=None):
         super().__init__(worksheet, style_array)
-        self._coord = (row, column) #1-based index
+        self._coord = Coordinate(row, column) #1-based index
         self._value = None
         self._hyperlink = None
         self.data_type = 'n'
@@ -117,25 +118,23 @@ class Cell(StyleableObject):
 
     @property
     def column(self):
-        return self._coord[1]
+        return self._coord.column
 
     col_idx = column
 
     @property
     def row(self):
-        return self._coord[0]
+        return self._coord.row
 
     @property
     def coordinate(self):
         """This cell's coordinate (ex. 'A5')"""
-        r, c = self._coord
-        col = get_column_letter(c)
-        return f"{col}{self._coord[0]}"
+        return str(self._coord)
 
 
     @property
     def column_letter(self):
-        return get_column_letter(self._coord[1])
+        return self._coord.column_letter
 
 
     @property
@@ -259,9 +258,10 @@ class Cell(StyleableObject):
 
         :rtype: :class:`openpyxl.cell.Cell`
         """
-        r, c = self._coord
 
-        return self.parent.cell(row=r + row, column=c + column)
+
+        return self.parent.cell(row=self._coord.row+row,
+                                column=self._coord.column+column)
 
 
     @property
@@ -307,9 +307,7 @@ class MergedCell(StyleableObject):
 
     def __init__(self, worksheet, row=None, column=None):
         super().__init__(worksheet)
-        self._coord = (row, column)
-        #self.row = row
-        #self.column = column
+        self._coord = Coordinate(row, column)
 
 
     def __repr__(self):

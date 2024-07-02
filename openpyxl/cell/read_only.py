@@ -1,10 +1,8 @@
 # Copyright (c) 2010-2024 openpyxl
 
-from openpyxl.cell import Cell
-from openpyxl.utils import get_column_letter
-from openpyxl.utils.datetime import from_excel
-from openpyxl.styles import is_date_format
 from openpyxl.styles.numbers import BUILTIN_FORMATS, BUILTIN_FORMATS_MAX_SIZE
+from .cell import Cell
+from .coordinate import Coordinate
 
 
 class ReadOnlyCell:
@@ -14,7 +12,7 @@ class ReadOnlyCell:
     def __init__(self, sheet, row, column, value, data_type='n', style_id=0):
         self.parent = sheet
         self._value = None
-        self._coord = (row, column)
+        self._coord = Coordinate(row, column)
         self.data_type = data_type
         self.value = value
         self._style_id = style_id

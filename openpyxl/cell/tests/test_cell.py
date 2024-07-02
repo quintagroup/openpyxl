@@ -383,7 +383,7 @@ def test_remove_hyperlink(dummy_cell):
 @pytest.fixture
 def MergedCell(DummyWorksheet):
     from ..cell import MergedCell
-    return MergedCell(DummyWorksheet)
+    return MergedCell(DummyWorksheet, 1, 4)
 
 
 class TestMergedCell:
@@ -405,14 +405,12 @@ class TestMergedCell:
 
     def test_coordinate(self, MergedCell):
         cell = MergedCell
-        cell._coord = (1, 1)
-        assert cell.coordinate == "A1"
+        assert cell.coordinate == "D1"
 
 
     def test_repr(self, MergedCell):
         cell = MergedCell
-        cell._coord = (1, 1)
-        assert repr(cell) == "<MergedCell 'Dummy Worksheet'.A1>"
+        assert repr(cell) == "<MergedCell 'Dummy Worksheet'.D1>"
 
 
     def test_hyperlink(self, MergedCell):

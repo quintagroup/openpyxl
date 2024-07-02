@@ -303,7 +303,7 @@ class WorkSheetParser:
             # don't create dimension objects unless they have relevant information
             self.row_dimensions[str(self.row_counter)] = attrs
 
-        cells = [self.parse_cell(el) for el in row]
+        cells = (self.parse_cell(el) for el in row)
         return self.row_counter, cells
 
 
