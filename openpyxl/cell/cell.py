@@ -15,14 +15,10 @@ from copy import copy
 import datetime
 import re
 
-
-from openpyxl.compat import (
-    NUMERIC_TYPES,
-)
+from openpyxl.compat import  NUMERIC_TYPES
 
 from openpyxl.utils.exceptions import IllegalCharacterError
 
-from openpyxl.utils import get_column_letter
 from openpyxl.styles import numbers, is_date_format
 from openpyxl.styles.styleable import StyleableObject
 from openpyxl.worksheet.hyperlink import Hyperlink
