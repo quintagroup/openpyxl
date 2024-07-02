@@ -21,6 +21,7 @@ from openpyxl.utils import (
     range_boundaries,
     coordinate_to_tuple,
 )
+from openpyxl.cell.coordinate import Coordinate
 from openpyxl.cell import Cell, MergedCell
 from openpyxl.formatting.formatting import ConditionalFormattingList
 from openpyxl.packaging.relationship import RelationshipList
@@ -811,7 +812,7 @@ class Worksheet(_WorkbookChild):
         new_col = cell.column + col_offset
         self._cells[new_row, new_col] = cell
         del self._cells[(cell.row, cell.column)]
-        cell._coord = (new_row, new_col)
+        cell._coord = Coordinate(new_row, new_col)
 
         if translate and cell.data_type == "f":
             t = Translator(cell.value, cell.coordinate)
