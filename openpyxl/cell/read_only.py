@@ -14,7 +14,7 @@ class ReadOnlyCell:
         self._value = None
         self._coord = Coordinate(row, column)
         self.data_type = data_type
-        self.value = value
+        self._value = value
         self._style_id = style_id
 
 
@@ -36,7 +36,7 @@ class ReadOnlyCell:
     column = Cell.column
     column_letter = Cell.column_letter
     coordinate = Cell.coordinate
-
+    is_date = Cell.is_date
 
     @property
     def style_array(self):
@@ -62,20 +62,24 @@ class ReadOnlyCell:
         _id = self.style_array.fontId
         return self.parent.parent._fonts[_id]
 
+
     @property
     def fill(self):
         _id = self.style_array.fillId
         return self.parent.parent._fills[_id]
+
 
     @property
     def border(self):
         _id = self.style_array.borderId
         return self.parent.parent._borders[_id]
 
+
     @property
     def alignment(self):
         _id = self.style_array.alignmentId
         return self.parent.parent._alignments[_id]
+
 
     @property
     def protection(self):
@@ -84,19 +88,8 @@ class ReadOnlyCell:
 
 
     @property
-    def is_date(self):
-        return Cell.is_date.__get__(self)
-
-
-    @property
     def value(self):
         return self._value
-
-    @value.setter
-    def value(self, value):
-        if self._value is not None:
-            raise AttributeError("Cell is read only")
-        self._value = value
 
 
 class EmptyCell:
