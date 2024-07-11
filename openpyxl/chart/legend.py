@@ -3,7 +3,6 @@
 from openpyxl.descriptors.serialisable import Serialisable
 from openpyxl.descriptors import (
     Typed,
-    Integer,
     Alias,
     Sequence,
 )
@@ -62,7 +61,7 @@ class Legend(Serialisable):
                  legendPos="r",
                  legendEntry=(),
                  layout=None,
-                 overlay=None,
+                 overlay=False,
                  spPr=None,
                  txPr=None,
                  extLst=None,
