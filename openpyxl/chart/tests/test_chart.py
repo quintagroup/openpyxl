@@ -124,6 +124,7 @@ class TestChartBase:
                </plotArea>
                <legend>
                  <legendPos val="r"></legendPos>
+                 <overlay val="0" />
                </legend>
                <plotVisOnly val="0"></plotVisOnly>
                <dispBlanksAs val="gap"></dispBlanksAs>
@@ -150,6 +151,7 @@ class TestChartBase:
                </plotArea>
                <legend>
                  <legendPos val="r"></legendPos>
+                 <overlay val="0" />
                </legend>
                <plotVisOnly val="1"></plotVisOnly>
                <dispBlanksAs val="gap"></dispBlanksAs>
@@ -179,6 +181,7 @@ class TestChartBase:
                </plotArea>
                <legend>
                  <legendPos val="r"></legendPos>
+                 <overlay val="0" />
                </legend>
                <plotVisOnly val="1"></plotVisOnly>
                <dispBlanksAs val="gap"></dispBlanksAs>
@@ -205,6 +208,7 @@ class TestChartBase:
                </plotArea>
                <legend>
                  <legendPos val="r"></legendPos>
+                 <overlay val="0" />
                </legend>
                <plotVisOnly val="1"></plotVisOnly>
                <dispBlanksAs val="gap"></dispBlanksAs>
@@ -237,6 +241,7 @@ class TestChartBase:
                </plotArea>
                <legend>
                  <legendPos val="r"></legendPos>
+                 <overlay val="0" />
                </legend>
                <plotVisOnly val="1"></plotVisOnly>
                <dispBlanksAs val="gap"></dispBlanksAs>
@@ -267,6 +272,7 @@ class TestChartBase:
                </plotArea>
                <legend>
                  <legendPos val="r"></legendPos>
+                 <overlay val="0" />
                </legend>
                <plotVisOnly val="1"></plotVisOnly>
                <dispBlanksAs val="gap"></dispBlanksAs>

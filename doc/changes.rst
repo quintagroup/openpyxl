@@ -35,9 +35,18 @@ Bugfixes
 ==================
 
 
+Bugfixes
+--------
+
+* Make title and legend default settings explicit to workaround weird Excel bugs
+
+
 3.1.5 (2024-06-28)
 ==================
 
+
+Bugfixes
+--------
 
 * `#2187 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2187>`_ Test fails due to change in Numpy API
 * `#2198 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2198>`_ Excel is very fussy about the version number
@@ -46,6 +55,10 @@ Bugfixes
 
 3.1.4 (2024-06-12)
 ==================
+
+
+Bugfixes
+--------
 
 * `#2189 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2189>`_ Assigning named styles doesn't work
 * `#2190 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2190>`_ Problems caused when saving workbooks created by LibreOffice
