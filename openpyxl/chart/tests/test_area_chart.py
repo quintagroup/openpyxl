@@ -110,6 +110,7 @@ class TestAreaChart:
            </plotArea>
            <legend>
              <legendPos val="r"></legendPos>
+             <overlay val="0" />
            </legend>
            <plotVisOnly val="1" />
            <dispBlanksAs val="gap"></dispBlanksAs>
