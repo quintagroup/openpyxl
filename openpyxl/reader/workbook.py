@@ -123,11 +123,13 @@ class WorkbookParser:
         """
         Get PivotCache objects
         """
-        d = {}
+        d = CacheDefinitionCollection()
         for c in self.caches:
             cache = get_rel(self.archive, self.rels, id=c.id, cls=CacheDefinition)
             if cache.deps:
                 records = get_rel(self.archive, cache.deps, cache.id, RecordList)
                 cache.records = records
-            d[c.cacheId] = cache
+            d.append(cache)
         return d
+
+from openpyxl.pivot.cache import CacheDefinitionCollection

@@ -100,7 +100,7 @@ class AreaChart3D(AreaChart):
 
     def __init__(self, gapDepth=None, **kw):
         self.gapDepth = gapDepth
-        super(AreaChart3D, self).__init__(**kw)
+        super().__init__(**kw)
         self.x_axis = TextAxis()
         self.y_axis = NumericAxis()
         self.z_axis = SeriesAxis()

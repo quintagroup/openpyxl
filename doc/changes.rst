@@ -1,3 +1,36 @@
+3.2.0 (unreleased)
+==================
+
+
+New Features
+------------
+
+* Support Active X elements
+* Support Form Controls
+* Support for documents with volatile dependencies
+* Support for documents with external connections
+
+
+Deprecations
+------------
+
+* Python 3.6 is no longer supported
+* Cell.internal_value has been removed
+
+
+Changes
+-------
+
+* Workbooks use ISO dates by default
+* Workbooks no longer load external links by default `load_workbook(keep_links=False)`
+
+
+Bugfixes
+--------
+
+* `#1855 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1855>`_ Openpyxl implicitly allows 1900-02-29
+
+
 3.1.6 (unreleased)
 ==================
 
@@ -72,7 +105,6 @@ Changes
 
 * `#1963 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1963>`_ Cannot read worksheets in read-only mode with locally scoped definitions
 * `#1974 <https://foss.heptapod.net/openpyxl/openpyxl/-/issues/1974>`_ Empty custom properties cause invalid files
-
 
 
 

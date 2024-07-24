@@ -1,5 +1,6 @@
 # Copyright (c) 2010-2024 openpyxl
 
+from io import BytesIO
 from zipfile import ZipFile
 
 import pytest
@@ -57,6 +58,7 @@ class TestRelationshipList:
 
 
     def test_read(self, RelationshipList):
+
         xml = """
         <Relationships>
           <Relationship Id="rId3"
@@ -81,7 +83,8 @@ class TestRelationshipList:
         assert len(rels) == 5
 
 
-    def test_to_dict(self, RelationshipList):
+    def test_types(self, RelationshipList):
+
         xml = """
         <Relationships>
           <Relationship Id="rId3"
@@ -103,7 +106,14 @@ class TestRelationshipList:
         """
         node = fromstring(xml)
         rels = RelationshipList.from_tree(node)
-        assert set(rels.to_dict()) == {"rId3", "rId2", "rId1", "rId4", "rId5"}
+        rels.get_types()
+        assert len(rels.worksheet) == 1
+
+
+@pytest.fixture
+def get_dependents():
+    from .. relationship import get_dependents
+    return get_dependents
 
 
 @pytest.mark.parametrize("filename, expected",

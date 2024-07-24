@@ -5,6 +5,7 @@
 
 from inspect import isgenerator
 
+from openpyxl.cell.coordinate import Coordinate
 from openpyxl.cell import Cell, WriteOnlyCell
 from openpyxl.workbook.child import _WorkbookChild
 from .worksheet import Worksheet
@@ -137,8 +138,7 @@ class WriteOnlyWorksheet(_WorkbookChild):
                 else:
                     raise ValueError
 
-            cell.column = col_idx
-            cell.row = row_idx
+            cell._coord = Coordinate(row_idx, col_idx)
 
             if cell.hyperlink is not None:
                 cell.hyperlink.ref = cell.coordinate

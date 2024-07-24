@@ -14,7 +14,6 @@ from openpyxl.descriptors import (
 )
 
 from openpyxl.descriptors.excel import (
-    HexBinary,
     ExtensionList,
     Relation,
 )
@@ -34,7 +33,6 @@ from openpyxl.packaging.relationship import (
 
 from .table import (
     PivotArea,
-    Reference,
 )
 from .fields import (
     Boolean,
@@ -714,6 +712,25 @@ class CacheField(Serialisable):
         self.memberPropertyField = memberPropertyField
 
 
+
+class CacheFieldList(Serialisable):
+
+    tagname = "cacheFields"
+
+    cacheField = Sequence(expected_type=CacheField)
+
+    __elements__ = ("cacheField", )
+    __attrs__ = ("count", )
+
+    def __init__(self, cacheField=(), count=None):
+        self.cacheField = cacheField
+
+
+    @property
+    def count(self):
+        return len(self.cacheField)
+
+
 class RangeSet(Serialisable):
 
     tagname = "rangeSet"
@@ -848,7 +865,7 @@ class CacheDefinition(Serialisable):
     supportSubquery = Bool(allow_none=True)
     supportAdvancedDrill = Bool(allow_none=True)
     cacheSource = Typed(expected_type=CacheSource)
-    cacheFields = NestedSequence(expected_type=CacheField, count=True)
+    cacheFields = Typed(expected_type=CacheFieldList)
     cacheHierarchies = NestedSequence(expected_type=CacheHierarchy, allow_none=True)
     kpis = NestedSequence(expected_type=OLAPKPI, count=True)
     tupleCache = Typed(expected_type=TupleCache, allow_none=True)
@@ -936,6 +953,18 @@ class CacheDefinition(Serialisable):
         return self._path.format(self._id)
 
 
+    @property
+    def has_olap_cache(self):
+        return self.tupleCache is not None
+
+
+    def __iter__(self):
+        for k, v in super().__iter__():
+            yield k, v
+            if self.has_olap_cache:
+                yield "tupleCache", "1"
+
+
     def _write(self, archive, manifest):
         """
         Add to zipfile and update manifest
@@ -963,3 +992,25 @@ class CacheDefinition(Serialisable):
         path = get_rels_path(self.path)
         xml = tostring(rels.to_tree())
         archive.writestr(path[1:], xml)
+
+
+from itertools import groupby
+
+
+class CacheDefinitionCollection(list):
+
+    """
+    Collection for cache definition instances
+    """
+
+    def by_type(self):
+        """
+        Sort caches and return them by type
+
+        """
+
+        def sort(cache):
+            return cache.cacheSource.type
+
+        caches = sorted(self, key=sort)
+        return groupby(caches, key=sort)

@@ -268,12 +268,88 @@ def test_write_hidden_single_worksheet():
 def test_write_workbook_rels(datadir, vba, filename, WorkbookWriter):
     datadir.chdir()
     wb = Workbook()
-    wb.vba_archive = vba
+    wb._vba = vba
 
     writer = WorkbookWriter(wb)
     xml = writer.write_rels()
 
     with open(filename) as expected:
+        diff = compare_xml(xml, expected.read())
+        assert diff is None, diff
+
+
+@pytest.mark.parametrize("volatile_deps, filename",
+                         [
+                             (None, 'workbook.xml.rels',),
+                             (True, 'workbook_volatile_deps.xml.rels'),
+                         ]
+                         )
+def test_write_workbook_rels_volatile_deps(datadir, volatile_deps, filename, WorkbookWriter):
+    datadir.chdir()
+    wb = Workbook()
+    wb._volatile_deps = volatile_deps
+
+    writer = WorkbookWriter(wb)
+    xml = writer.write_rels()
+
+    with open(filename) as expected:
+        diff = compare_xml(xml, expected.read())
+        assert diff is None, diff
+
+
+@pytest.mark.parametrize("connections, filename",
+                         [
+                             (None, 'workbook.xml.rels',),
+                             (True, 'workbook_connections.xml.rels'),
+                         ]
+                         )
+def test_write_workbook_rels_connections(datadir, connections, filename, WorkbookWriter):
+    datadir.chdir()
+    wb = Workbook()
+    wb._connections = connections
+
+    writer = WorkbookWriter(wb)
+    xml = writer.write_rels()
+
+    with open(filename) as expected:
+        diff = compare_xml(xml, expected.read())
+        assert diff is None, diff
+
+
+def test_write_workbook_with_workbook_pivots(datadir, WorkbookWriter):
+
+    from openpyxl.pivot.cache import CacheDefinition, CacheSource, CacheFieldList
+    datadir.chdir()
+    wb = Workbook()
+    cache = CacheDefinition(
+            cacheSource=CacheSource(type="worksheet"),
+            cacheFields=CacheFieldList(),
+        )
+    writer = WorkbookWriter(wb)
+    writer.pivot_caches.add(cache)
+    writer.write_pivot_caches()
+    xml = writer.write_rels()
+
+    with open("workbook_pivot.xml.rels") as expected:
+        diff = compare_xml(xml, expected.read())
+        assert diff is None, diff
+
+
+def test_write_workbook_with_connection_pivots(datadir, WorkbookWriter):
+
+    from openpyxl.pivot.cache import CacheDefinition, CacheSource,  CacheFieldList
+    datadir.chdir()
+    wb = Workbook()
+    cache = CacheDefinition(
+                cacheSource=CacheSource(type="external"),
+                cacheFields=CacheFieldList(),
+            )
+    writer = WorkbookWriter(wb)
+    writer.pivot_caches.add(cache)
+    writer.write_pivot_caches()
+    xml = writer.write_rels()
+
+    with open("workbook_connections_and_cache.xml.rels") as expected:
         diff = compare_xml(xml, expected.read())
         assert diff is None, diff
 

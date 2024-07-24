@@ -235,7 +235,7 @@ def test_repr_object(dummy_cell):
 
     cell = dummy_cell
     try:
-        cell._bind_value(Dummy())
+        cell.value = Dummy()
     except ValueError as err:
         assert "something" not in str(err)
 
@@ -271,13 +271,8 @@ def test_cell_offset(dummy_cell):
 
 class TestEncoding:
 
-    try:
-        # Python 2
-        pound = unichr(163)
-    except NameError:
-        # Python 3
-        pound = chr(163)
-    test_string = ('Compound Value (' + pound + ')').encode('latin1')
+    pound = chr(163)
+    test_string = f"Compound Value {pound}".encode('latin1')
 
     def test_bad_encoding(self):
         from openpyxl import Workbook
@@ -388,7 +383,7 @@ def test_remove_hyperlink(dummy_cell):
 @pytest.fixture
 def MergedCell(DummyWorksheet):
     from ..cell import MergedCell
-    return MergedCell(DummyWorksheet)
+    return MergedCell(DummyWorksheet, 1, 4)
 
 
 class TestMergedCell:
@@ -410,16 +405,12 @@ class TestMergedCell:
 
     def test_coordinate(self, MergedCell):
         cell = MergedCell
-        cell.row = 1
-        cell.column = 1
-        assert cell.coordinate == "A1"
+        assert cell.coordinate == "D1"
 
 
     def test_repr(self, MergedCell):
         cell = MergedCell
-        cell.row = 1
-        cell.column = 1
-        assert repr(cell) == "<MergedCell 'Dummy Worksheet'.A1>"
+        assert repr(cell) == "<MergedCell 'Dummy Worksheet'.D1>"
 
 
     def test_hyperlink(self, MergedCell):

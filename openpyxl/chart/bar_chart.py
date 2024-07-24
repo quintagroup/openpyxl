@@ -141,4 +141,4 @@ class BarChart3D(_BarChartBase, _3DBase):
         self.y_axis = NumericAxis()
         self.z_axis = SeriesAxis()
 
-        super(BarChart3D, self).__init__(**kw)
+        super().__init__(**kw)

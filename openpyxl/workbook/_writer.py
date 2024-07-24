@@ -54,6 +54,7 @@ class WorkbookWriter:
         self.package = WorkbookPackage()
         self.package.workbookProtection = wb.security
         self.package.calcPr = wb.calculation
+        self.pivot_caches = set()
 
 
     def write_properties(self):
@@ -120,17 +121,14 @@ class WorkbookWriter:
         self.package.definedNames = DefinedNameList(definedName=defined_names)
 
 
-    def write_pivots(self):
-        pivot_caches = set()
-        for pivot in self.wb._pivots:
-            if pivot.cache not in pivot_caches:
-                pivot_caches.add(pivot.cache)
-                c = PivotCache(cacheId=pivot.cacheId)
-                self.package.pivotCaches.append(c)
-                rel = Relationship(Type=pivot.cache.rel_type, Target=pivot.cache.path)
-                self.rels.append(rel)
-                c.id = rel.id
-        #self.wb._pivots = [] # reset
+    def write_pivot_caches(self):
+
+        for cache in self.pivot_caches:
+            c = PivotCache(cache._id)
+            self.package.pivotCaches.append(c)
+            rel = Relationship(Type=cache.rel_type, Target=cache.path)
+            self.rels.append(rel)
+            c.id = rel.id
 
 
     def write_views(self):
@@ -146,7 +144,7 @@ class WorkbookWriter:
         self.write_properties()
         self.write_worksheets()
         self.write_names()
-        self.write_pivots()
+        self.write_pivot_caches()
         self.write_views()
         self.write_refs()
 
@@ -162,10 +160,20 @@ class WorkbookWriter:
         theme =  Relationship(type='theme', Target='theme/theme1.xml')
         self.rels.append(theme)
 
-        if self.wb.vba_archive:
+        if self.wb._vba:
             vba =  Relationship(type='', Target='vbaProject.bin')
             vba.Type ='http://schemas.microsoft.com/office/2006/relationships/vbaProject'
             self.rels.append(vba)
+
+        if self.wb._volatile_deps:
+            vol_deps = Relationship(type="", Target="volatileDependencies.xml")
+            vol_deps.Type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/volatileDependencies"
+            self.rels.append(vol_deps)
+
+        if self.wb._connections:
+            connections = Relationship(type="", Target="connections.xml")
+            connections.Type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/connections"
+            self.rels.append(connections)
 
         return tostring(self.rels.to_tree())
 

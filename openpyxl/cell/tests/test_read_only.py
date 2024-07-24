@@ -1,7 +1,5 @@
-
 # Copyright (c) 2010-2024 openpyxl
 
-import datetime
 import pytest
 
 from openpyxl.cell.read_only import ReadOnlyCell
@@ -68,7 +66,6 @@ class TestStyle:
 
 
     def test_has_style(self, DummyCell):
-        cell = DummyCell
         assert DummyCell.has_style
 
 

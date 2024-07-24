@@ -21,6 +21,7 @@ from openpyxl.utils import (
     range_boundaries,
     coordinate_to_tuple,
 )
+from openpyxl.cell.coordinate import Coordinate
 from openpyxl.cell import Cell, MergedCell
 from openpyxl.formatting.formatting import ConditionalFormattingList
 from openpyxl.packaging.relationship import RelationshipList
@@ -50,6 +51,7 @@ from .views import (
     Selection,
     SheetViewList,
 )
+from .controls import ControlList
 from .cell_range import MultiCellRange, CellRange
 from .merge import MergedCellRange
 from .properties import WorksheetProperties
@@ -116,6 +118,7 @@ class Worksheet(_WorkbookChild):
         self._cells = {}
         self._charts = []
         self._images = []
+        self._shapes = []
         self._rels = RelationshipList()
         self._drawing = None
         self._comments = []
@@ -142,6 +145,7 @@ class Worksheet(_WorkbookChild):
         self.sheet_properties = WorksheetProperties()
         self.sheet_format = SheetFormatProperties()
         self.scenarios = ScenarioList()
+        self.controls = ControlList()
 
 
     @property
@@ -667,8 +671,7 @@ class Worksheet(_WorkbookChild):
                     if cell.parent and cell.parent != self:
                         raise ValueError("Cells cannot be copied from other worksheets")
                     cell.parent = self
-                    cell.column = col_idx
-                    cell.row = row_idx
+                    cell._coord = (row_idx, col_idx)
                 else:
                     cell = Cell(self, row=row_idx, column=col_idx, value=content)
                 self._cells[(row_idx, col_idx)] = cell
@@ -809,8 +812,8 @@ class Worksheet(_WorkbookChild):
         new_col = cell.column + col_offset
         self._cells[new_row, new_col] = cell
         del self._cells[(cell.row, cell.column)]
-        cell.row = new_row
-        cell.column = new_col
+        cell._coord = Coordinate(new_row, new_col)
+
         if translate and cell.data_type == "f":
             t = Translator(cell.value, cell.coordinate)
             cell.value = t.translate_formula(row_delta=row_offset, col_delta=col_offset)

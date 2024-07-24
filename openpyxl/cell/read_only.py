@@ -1,23 +1,20 @@
 # Copyright (c) 2010-2024 openpyxl
 
-from openpyxl.cell import Cell
-from openpyxl.utils import get_column_letter
-from openpyxl.utils.datetime import from_excel
-from openpyxl.styles import is_date_format
 from openpyxl.styles.numbers import BUILTIN_FORMATS, BUILTIN_FORMATS_MAX_SIZE
+from .cell import Cell
+from .coordinate import Coordinate
 
 
 class ReadOnlyCell:
 
-    __slots__ =  ('parent', 'row', 'column', '_value', 'data_type', '_style_id')
+    __slots__ =  ('parent', "_coord", '_value', 'data_type', '_style_id')
 
     def __init__(self, sheet, row, column, value, data_type='n', style_id=0):
         self.parent = sheet
         self._value = None
-        self.row = row
-        self.column = column
+        self._coord = Coordinate(row, column)
         self.data_type = data_type
-        self.value = value
+        self._value = value
         self._style_id = style_id
 
 
@@ -35,21 +32,11 @@ class ReadOnlyCell:
         return "<ReadOnlyCell {0!r}.{1}>".format(self.parent.title, self.coordinate)
 
 
-    @property
-    def coordinate(self):
-        column = get_column_letter(self.column)
-        return "{1}{0}".format(self.row, column)
-
-
-    @property
-    def coordinate(self):
-        return Cell.coordinate.__get__(self)
-
-
-    @property
-    def column_letter(self):
-        return Cell.column_letter.__get__(self)
-
+    row = Cell.row
+    column = Cell.column
+    column_letter = Cell.column_letter
+    coordinate = Cell.coordinate
+    is_date = Cell.is_date
 
     @property
     def style_array(self):
@@ -75,20 +62,24 @@ class ReadOnlyCell:
         _id = self.style_array.fontId
         return self.parent.parent._fonts[_id]
 
+
     @property
     def fill(self):
         _id = self.style_array.fillId
         return self.parent.parent._fills[_id]
+
 
     @property
     def border(self):
         _id = self.style_array.borderId
         return self.parent.parent._borders[_id]
 
+
     @property
     def alignment(self):
         _id = self.style_array.alignmentId
         return self.parent.parent._alignments[_id]
+
 
     @property
     def protection(self):
@@ -97,23 +88,8 @@ class ReadOnlyCell:
 
 
     @property
-    def is_date(self):
-        return Cell.is_date.__get__(self)
-
-
-    @property
-    def internal_value(self):
-        return self._value
-
-    @property
     def value(self):
         return self._value
-
-    @value.setter
-    def value(self, value):
-        if self._value is not None:
-            raise AttributeError("Cell is read only")
-        self._value = value
 
 
 class EmptyCell:

@@ -15,19 +15,16 @@ from copy import copy
 import datetime
 import re
 
-
-from openpyxl.compat import (
-    NUMERIC_TYPES,
-)
+from openpyxl.compat import  NUMERIC_TYPES
 
 from openpyxl.utils.exceptions import IllegalCharacterError
 
-from openpyxl.utils import get_column_letter
 from openpyxl.styles import numbers, is_date_format
 from openpyxl.styles.styleable import StyleableObject
 from openpyxl.worksheet.hyperlink import Hyperlink
 from openpyxl.worksheet.formula import DataTableFormula, ArrayFormula
 from openpyxl.cell.rich_text import CellRichText
+from . coordinate import Coordinate
 
 # constants
 
@@ -96,8 +93,7 @@ class Cell(StyleableObject):
 
     """
     __slots__ = (
-        'row',
-        'column',
+        '_coord',
         '_value',
         'data_type',
         'parent',
@@ -107,11 +103,7 @@ class Cell(StyleableObject):
 
     def __init__(self, worksheet, row=None, column=None, value=None, style_array=None):
         super().__init__(worksheet, style_array)
-        self.row = row
-        """Row number of this cell (1-based)"""
-        self.column = column
-        """Column number of this cell (1-based)"""
-        # _value is the stored value, while value is the displayed value
+        self._coord = Coordinate(row, column) #1-based index
         self._value = None
         self._hyperlink = None
         self.data_type = 'n'
@@ -121,21 +113,24 @@ class Cell(StyleableObject):
 
 
     @property
-    def coordinate(self):
-        """This cell's coordinate (ex. 'A5')"""
-        col = get_column_letter(self.column)
-        return f"{col}{self.row}"
+    def column(self):
+        return self._coord.column
 
+    col_idx = column
 
     @property
-    def col_idx(self):
-        """The numerical index of the column"""
-        return self.column
+    def row(self):
+        return self._coord.row
+
+    @property
+    def coordinate(self):
+        """This cell's coordinate (ex. 'A5')"""
+        return str(self._coord)
 
 
     @property
     def column_letter(self):
-        return get_column_letter(self.column)
+        return self._coord.column_letter
 
 
     @property
@@ -173,9 +168,19 @@ class Cell(StyleableObject):
             return u'#N/A'
 
 
-    def _bind_value(self, value):
-        """Given a value, infer the correct data type"""
+    @property
+    def value(self):
+        """Get or set the value held in the cell.
 
+        :type: depends on the value (string, float, int or
+            :class:`datetime.datetime`)
+        """
+        return self._value
+
+
+    @value.setter
+    def value(self, value):
+        """Set the value and infer type and display options."""
         self.data_type = "n"
         t = type(value)
         try:
@@ -202,25 +207,6 @@ class Cell(StyleableObject):
 
         self._value = value
 
-
-    @property
-    def value(self):
-        """Get or set the value held in the cell.
-
-        :type: depends on the value (string, float, int or
-            :class:`datetime.datetime`)
-        """
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        """Set the value and infer type and display options."""
-        self._bind_value(value)
-
-    @property
-    def internal_value(self):
-        """Always returns the value for excel."""
-        return self._value
 
     @property
     def hyperlink(self):
@@ -268,9 +254,10 @@ class Cell(StyleableObject):
 
         :rtype: :class:`openpyxl.cell.Cell`
         """
-        offset_column = self.col_idx + column
-        offset_row = self.row + row
-        return self.parent.cell(column=offset_column, row=offset_row)
+
+
+        return self.parent.cell(row=self._coord.row+row,
+                                column=self._coord.column+column)
 
 
     @property
@@ -306,7 +293,7 @@ class MergedCell(StyleableObject):
     The value of a MergedCell is always None.
     """
 
-    __slots__ = ('row', 'column')
+    __slots__ = ('_coord',)
 
     _value = None
     data_type = "n"
@@ -316,14 +303,15 @@ class MergedCell(StyleableObject):
 
     def __init__(self, worksheet, row=None, column=None):
         super().__init__(worksheet)
-        self.row = row
-        self.column = column
+        self._coord = Coordinate(row, column)
 
 
     def __repr__(self):
         return "<MergedCell {0!r}.{1}>".format(self.parent.title, self.coordinate)
 
     coordinate = Cell.coordinate
+    row = Cell.row
+    column = Cell.column
     _comment = comment
     value = _value
 

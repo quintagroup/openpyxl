@@ -102,4 +102,4 @@ class _3DBase(Serialisable):
         if backWall is None:
             backWall = Surface()
         self.backWall = backWall
-        super(_3DBase, self).__init__()
+        super().__init__()

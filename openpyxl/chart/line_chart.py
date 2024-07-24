@@ -126,4 +126,4 @@ class LineChart3D(_LineChartBase):
         self.x_axis = TextAxis()
         self.y_axis = NumericAxis()
         self.z_axis = SeriesAxis()
-        super(LineChart3D, self).__init__(**kw)
+        super().__init__(**kw)

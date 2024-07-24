@@ -95,7 +95,7 @@ class SurfaceChart3D(_SurfaceChartBase, _3DBase):
         self.x_axis = TextAxis()
         self.y_axis = NumericAxis()
         self.z_axis = SeriesAxis()
-        super(SurfaceChart3D, self).__init__(**kw)
+        super().__init__(**kw)
 
 
 class SurfaceChart(SurfaceChart3D):
