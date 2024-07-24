@@ -309,6 +309,7 @@ class Connection(Serialisable):
     saveData = Bool(allow_none=True)
     credentials = NoneSet(values=(['integrated', 'stored', 'prompt']))
     singleSignOnId = String(allow_none=True)
+    _cache = None # Any pivot caches attached to this connection
 
     __elements__ = ('dbPr', 'olapPr', 'webPr', 'textPr', 'parameters')
 
@@ -367,6 +368,7 @@ class Connection(Serialisable):
         self.credentials = credentials
         self.singleSignOnId = singleSignOnId
         self.extLst = None
+        self._cache = None
 
 
     @property
@@ -389,13 +391,30 @@ class Connection(Serialisable):
         return self.type in self.type_descriptions
 
 
+class ConnectionSequenceDescriptor(Sequence):
+
+
+    expected_type = Connection
+
+
+    def __set__(self, instance, seq):
+        cxns = []
+        for cxn in seq:
+            if cxn.type and not cxn.is_known_connection:
+                warnings.warn(
+        f"Connections type {cxn.type} is not supported, references to it will be dropped to keep the Workbook valid.")
+                continue
+            cxns.append(cxn)
+        super().__set__(instance, cxns)
+
+
 class ConnectionList(Serialisable):
-    # Implements CT_Connections
+
     tagname = "connections"
     _path = "/xl/connections.xml"
     mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml"
 
-    connection = Sequence(expected_type=Connection)
+    connection = ConnectionSequenceDescriptor()
 
     __elements__ = ('connection',)
 
@@ -406,21 +425,9 @@ class ConnectionList(Serialisable):
         self.connection = connection
 
 
-    def __iter__(self):
-        """
-        Iterate directly over the connections
-        """
-        return iter(self.connection)
-
-
     def to_tree(self, tagname=None, idx=None, namespace=None):
-        self._validate_connection_types() # Only write known connection types
-        tree = Element("connections")
+        tree = super().to_tree()
         tree.set("xmlns", SHEET_MAIN_NS)
-
-        for cxn in self:
-            tree.append(cxn.to_tree())
-
         return tree
 
 
@@ -429,18 +436,26 @@ class ConnectionList(Serialisable):
         return self._path
 
 
-    def _validate_connection_types(self):
+    @property
+    def caches(self):
         """
-        Check connections have a valid type, otherwise they need to be dropped
+        Return a list of caches indexed to the relevant connection
         """
-        known_cxn = []
+        cached = []
+        for idx, cxn in enumerate(self.connection, 1):
+            cxn.id = idx
+            cache = cxn._cache
+            if cache:
+                cache.cacheSource.connectionId = idx
+                cached.append(cache)
+        return cached
 
-        for cxn in self:
-            if not cxn.type or cxn.is_known_connection:
-                known_cxn.append(cxn)
-            else:
-                warnings.warn(
-        f"Connections type {cxn.type} is not supported, references to it will be dropped to keep the Workbook valid.")
 
-        # Update with usable types
-        self.connection = known_cxn
+    def __getitem__(self, idx):
+        """
+        Find connection by id
+        """
+        for conn in self.connection:
+            if conn.id == idx:
+                return conn
+        raise IndexError(f"Connection {idx} does not exist")

@@ -315,19 +315,46 @@ class TestConnectionList:
         assert diff is None, diff
 
 
-    def test_from_xml(self, ConnectionList, datadir):
+    def test_from_xml(self, ConnectionList, datadir, recwarn):
         datadir.chdir()
         with open("connections.xml", "rb") as src:
             node = fromstring(src.read())
         connections = ConnectionList.from_tree(node)
-        assert len(connections.connection) == 3
-        assert connections.connection[1].id == 2
-        assert connections.connection[2].saveData == True
-
-
-    def test_warn_on_unknown(self, ConnectionList, Connection, recwarn):
-        con_list = ConnectionList(connection=[Connection(id=1, refreshedVersion=4, type=205)])
-        con_list._validate_connection_types()
+        assert len(connections.connection) == 2
+        assert connections.connection[0].id == 2
+        assert connections.connection[1].saveData == True
 
         w = recwarn.pop()
         assert issubclass(w.category, UserWarning)
+
+
+    def test_access_by_id(self, ConnectionList, datadir):
+        datadir.chdir()
+        with open("connections.xml", "rb") as src:
+            node = fromstring(src.read())
+        connections = ConnectionList.from_tree(node)
+        conn = connections[2]
+        assert conn.name == "ThisWorkbookDataModel"
+
+
+    def test_connection_not_found(self, ConnectionList, datadir):
+        datadir.chdir()
+        with open("connections.xml", "rb") as src:
+            node = fromstring(src.read())
+        connections = ConnectionList.from_tree(node)
+        with pytest.raises(IndexError):
+            connections[7]
+
+
+    def test_caches(self, ConnectionList, Connection):
+        from openpyxl.pivot.cache import CacheSource, CacheDefinition, CacheFieldList
+        cxn1 = Connection(id=5, refreshedVersion=4)
+        cxn2 = Connection(id=7, refreshedVersion=4)
+        cxn2._cache = CacheDefinition(cacheSource=CacheSource(type="external"),
+                                      cacheFields=CacheFieldList(),
+                                      )
+        cxns = ConnectionList(connection=[cxn1, cxn2])
+
+        assert cxns.caches == [cxn2._cache]
+        assert cxn2.id == 2
+        assert cxn2._cache.cacheSource.connectionId == 2
