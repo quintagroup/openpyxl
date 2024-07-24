@@ -263,7 +263,10 @@ class TestExcelReader:
         reader.read_connections()
         # Test Parse
         assert reader.wb._connections is not None
-        assert len(reader.wb._connections.connection) == 3
+        assert len(reader.wb._connections.connection) == 2
+        # Check cache got assigned
+        assert reader.wb._connections[3]._cache is not None
+        assert reader.wb._connections[2]._cache is None
 
 
 @pytest.fixture

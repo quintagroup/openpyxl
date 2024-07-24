@@ -39,6 +39,26 @@ class TestCacheField:
 
 
 @pytest.fixture
+def CacheFieldList():
+    from ..cache import CacheFieldList
+    return CacheFieldList
+
+
+class TestCacheFieldList:
+
+    def test_from_xml(self, CacheFieldList):
+        src = """
+        <cacheFields count="6">
+          <cacheField name="ID" numFmtId="0">
+          </cacheField>
+        </cacheFields>
+        """
+        node = fromstring(src)
+        fields = CacheFieldList.from_tree(node)
+        assert len(fields.cacheField) == 1
+
+
+@pytest.fixture
 def SharedItems():
     from ..cache import SharedItems
     return SharedItems
@@ -136,17 +156,126 @@ class TestCacheSource:
 
 
 @pytest.fixture
+def Query():
+    from ..cache import Query
+    return Query
+
+
+class TestQuery:
+
+    def test_ctor(self, Query):
+        query = Query(mdx="[Description]")
+        xml = tostring(query.to_tree())
+
+        expected = """<query mdx="[Description]"/>"""
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_from_xml(self, Query):
+        src = """
+            <query mdx="[Plant]">
+                <tpls c="1">
+                    <tpl hier="1" item="4294967295" />
+                </tpls>
+            </query>
+        """
+
+        node = fromstring(src)
+        query = Query.from_tree(node)
+        assert query.mdx == "[Plant]"
+        assert query.tpls.c == 1
+
+
+@pytest.fixture
+def TupleCache():
+    from ..cache import TupleCache
+    return TupleCache
+
+
+class TestTupleCache:
+
+    def test_ctor(self, TupleCache, Query):
+        cache = TupleCache(queryCache=[Query(mdx="[Plant]")])
+        xml = tostring(cache.to_tree())
+        expected = """
+            <tupleCache>
+                <queryCache count="1">
+                    <query mdx="[Plant]"/>
+                </queryCache>
+            </tupleCache>
+        """
+
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_from_xml(self, TupleCache):
+        src = """
+            <tupleCache>
+                <queryCache count="1">
+                    <query mdx="[Description]">
+                        <tpls c="1">
+                            <tpl hier="1" item="4294967295" />
+                        </tpls>
+                    </query>
+                </queryCache>
+            </tupleCache>
+        """
+
+        node = fromstring(src)
+        cache = TupleCache.from_tree(node)
+        assert len(cache.queryCache) == 1
+
+
+@pytest.fixture
+def PCDSDTCEntries():
+    from ..cache import PCDSDTCEntries
+    return PCDSDTCEntries
+
+
+class TestPCDSDTCEntries:
+
+    def test_ctor(self, PCDSDTCEntries):
+        from ..fields import Number
+        entries = PCDSDTCEntries(n=Number(v=1))
+        xml = tostring(entries.to_tree())
+        expected = """
+            <entries>
+                <n v="1"/>
+            </entries>
+        """
+
+        diff = compare_xml(xml, expected)
+        assert diff is None, diff
+
+
+    def test_from_xml(self, PCDSDTCEntries):
+        from ..fields import Text
+        src = """
+            <entries>
+                <s v="test"/>
+            </entries>
+        """
+
+        node = fromstring(src)
+        entries = PCDSDTCEntries.from_tree(node)
+        assert entries == PCDSDTCEntries(s=Text(v="test"))
+
+
+@pytest.fixture
 def CacheDefinition():
     from ..cache import CacheDefinition
     return CacheDefinition
 
 
 @pytest.fixture
-def DummyCache(CacheDefinition, WorksheetSource, CacheSource, CacheField):
+def DummyCache(CacheDefinition, WorksheetSource, CacheSource, CacheField, CacheFieldList, TupleCache):
     ws = WorksheetSource(name="Sheet1")
     source = CacheSource(type="worksheet", worksheetSource=ws)
-    fields = [CacheField(name="field1")]
-    cache = CacheDefinition(cacheSource=source, cacheFields=fields)
+    fields = CacheFieldList(cacheField=[CacheField(name="field1")])
+    tuples = TupleCache()
+    cache = CacheDefinition(cacheSource=source, cacheFields=fields, tupleCache=tuples, saveData=True)
     return cache
 
 
@@ -159,7 +288,7 @@ class TestPivotCacheDefinition:
 
         cache = CacheDefinition.from_tree(xml)
         assert cache.recordCount == 17
-        assert len(cache.cacheFields) == 6
+        assert cache.cacheFields.count == 6
 
 
     def test_read_tuple_cache(self, CacheDefinition, datadir):
@@ -171,19 +300,21 @@ class TestPivotCacheDefinition:
         cache = CacheDefinition.from_tree(xml)
         assert cache.recordCount == 0
         assert cache.tupleCache.entries.count == 1
+        assert cache.has_olap_cache == True
 
 
     def test_to_tree(self, DummyCache):
         cache = DummyCache
 
         expected = """
-        <pivotCacheDefinition xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <pivotCacheDefinition xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" tupleCache="1" saveData="1">
                <cacheSource type="worksheet">
                        <worksheetSource name="Sheet1"/>
                </cacheSource>
                <cacheFields count="1">
                        <cacheField databaseField="1" hierarchy="0" level="0" name="field1" sqlType="0" uniqueList="1"/>
                </cacheFields>
+               <tupleCache/>
        </pivotCacheDefinition>
        """
 
@@ -823,3 +954,26 @@ class TestConsolidation:
         assert cons.autoPage is None
         assert len(cons.pages) == 1
         assert len(cons.rangeSets) == 1
+
+
+@pytest.fixture
+def CacheDefinitionCollection():
+    from ..cache import CacheDefinitionCollection
+    return CacheDefinitionCollection
+
+
+class TestCacheDefinitionCollection:
+
+
+    def test_sort(self, CacheSource, CacheDefinition, CacheFieldList, CacheDefinitionCollection):
+
+        caches = CacheDefinitionCollection()
+
+        for possible in ['worksheet', 'external', 'consolidation', 'scenario']:
+            source = CacheSource(type=possible)
+
+            cache = CacheDefinition(cacheSource=source, cacheFields=CacheFieldList())
+            caches.append(cache)
+
+        entries = caches.by_type()
+        assert [source for source, group in entries] == ["consolidation", "external", "scenario", "worksheet"]

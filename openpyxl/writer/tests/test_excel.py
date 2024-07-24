@@ -11,6 +11,7 @@ import pytest
 
 from openpyxl import load_workbook, Workbook
 from openpyxl.chart import BarChart
+from openpyxl.connection.connections import ConnectionList, Connection
 from openpyxl.comments import Comment
 from openpyxl.drawing.spreadsheet_drawing import SpreadsheetDrawing
 from openpyxl.drawing.legacy import LegacyDrawing
@@ -18,6 +19,8 @@ from openpyxl.drawing.image import Image
 from openpyxl.packaging.relationship import RelationshipList, Relationship
 from openpyxl.worksheet.table import Table
 from openpyxl.utils.exceptions import InvalidFileException
+from openpyxl.pivot.table import TableDefinition, Location
+from openpyxl.pivot.cache import CacheDefinition, CacheSource, CacheFieldList
 
 
 @pytest.fixture
@@ -50,6 +53,28 @@ class TestExcelWriter:
 
         assert ws.path[1:] in archive.namelist()
         assert ws.path in writer.manifest.filenames
+
+    def test_worksheet_with_pivot_cache(self, ExcelWriter, archive):
+        wb = Workbook()
+        ws = wb.active
+        ws._pivots = [TableDefinition(name="TestTable",
+                                     cacheId=1,
+                                     dataCaption="TestCap",
+                                     location=Location(ref="Test", firstHeaderRow=1, firstDataRow=1, firstDataCol=1))]
+        ws._pivots[0].cache = CacheDefinition(
+                cacheSource=CacheSource(type="worksheet"),
+                cacheFields=CacheFieldList(),
+            )
+        writer = ExcelWriter(wb, archive)
+        writer.write_worksheets()
+
+        assert writer.archive.namelist() == [
+            "xl/worksheets/sheet1.xml",
+            "xl/pivotCache/pivotCacheDefinition1.xml",
+            "xl/pivotTables/_rels/pivotTable1.xml.rels",
+            "xl/pivotTables/pivotTable1.xml",
+            "xl/worksheets/_rels/sheet1.xml.rels",
+        ]
 
 
     def test_tables(self, ExcelWriter, archive):
@@ -161,7 +186,6 @@ class TestExcelWriter:
 
 
     def test_merge_vba(self, ExcelWriter, archive, datadir):
-        from openpyxl import load_workbook
         datadir.chdir()
         wb = load_workbook("vba+comments.xlsm")
 
@@ -347,7 +371,7 @@ class TestExcelWriter:
 
 
     def test_connections(self, ExcelWriter, archive):
-        from openpyxl.connection.connections import ConnectionList, Connection
+
         archive = ZipFile(BytesIO(), "w")
         wb = Workbook()
         wb._connections = ConnectionList(
@@ -359,6 +383,24 @@ class TestExcelWriter:
         writer.write_connections()
 
         assert writer.archive.namelist() == ["xl/connections.xml"]
+
+
+    def test_connection_with_cache(self, ExcelWriter, archive):
+        archive = ZipFile(BytesIO(), "w")
+        wb = Workbook()
+        wb._connections = ConnectionList(
+            connection=[
+                Connection(id=1, refreshedVersion=8)
+                ]
+            )
+        wb._connections[1]._cache = CacheDefinition(
+            cacheSource=CacheSource(type="external"),
+            cacheFields=CacheFieldList(),
+            )
+        writer = ExcelWriter(wb, archive)
+        writer.write_connections()
+
+        assert writer.archive.namelist() == ["xl/pivotCache/pivotCacheDefinition1.xml", "xl/connections.xml",]
 
 
 def test_write_empty_workbook(tmpdir):
