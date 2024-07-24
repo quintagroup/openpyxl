@@ -316,6 +316,44 @@ def test_write_workbook_rels_connections(datadir, connections, filename, Workboo
         assert diff is None, diff
 
 
+def test_write_workbook_with_workbook_pivots(datadir, WorkbookWriter):
+
+    from openpyxl.pivot.cache import CacheDefinition, CacheSource, CacheFieldList
+    datadir.chdir()
+    wb = Workbook()
+    cache = CacheDefinition(
+            cacheSource=CacheSource(type="worksheet"),
+            cacheFields=CacheFieldList(),
+        )
+    writer = WorkbookWriter(wb)
+    writer.pivot_caches.add(cache)
+    writer.write_pivot_caches()
+    xml = writer.write_rels()
+
+    with open("workbook_pivot.xml.rels") as expected:
+        diff = compare_xml(xml, expected.read())
+        assert diff is None, diff
+
+
+def test_write_workbook_with_connection_pivots(datadir, WorkbookWriter):
+
+    from openpyxl.pivot.cache import CacheDefinition, CacheSource,  CacheFieldList
+    datadir.chdir()
+    wb = Workbook()
+    cache = CacheDefinition(
+                cacheSource=CacheSource(type="external"),
+                cacheFields=CacheFieldList(),
+            )
+    writer = WorkbookWriter(wb)
+    writer.pivot_caches.add(cache)
+    writer.write_pivot_caches()
+    xml = writer.write_rels()
+
+    with open("workbook_connections_and_cache.xml.rels") as expected:
+        diff = compare_xml(xml, expected.read())
+        assert diff is None, diff
+
+
 def test_write_root_rels(WorkbookWriter):
     wb = Workbook()
     writer = WorkbookWriter(wb)

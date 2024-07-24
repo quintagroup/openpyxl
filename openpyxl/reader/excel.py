@@ -271,7 +271,17 @@ class ExcelReader:
         if ARC_CONNECTIONS in self.valid_files:
             src = self.archive.read(ARC_CONNECTIONS)
             root = fromstring(src)
-            self.wb._connections = ConnectionList.from_tree(root)
+            connections = ConnectionList.from_tree(root)
+
+            cached_connections = self.parser.pivot_caches.by_type()
+            for source, group in cached_connections:
+                if source == "external":
+                    break
+
+            for cache in group:
+                connections[cache.cacheSource.connectionId]._cache = cache
+
+            self.wb._connections = connections
 
 
     def read(self):
@@ -381,7 +391,7 @@ class WorksheetProcessor:
             for ref, comment in comment_sheet.comments:
                 try:
                     self.ws[ref].comment = comment
-                except AttributeError as e:
+                except AttributeError:
                     c = self.ws[ref]
                     if isinstance(c, MergedCell):
                         warnings.warn(comment_warning.format(self.ws.title, c.coordinate))

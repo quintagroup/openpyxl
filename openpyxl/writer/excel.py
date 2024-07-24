@@ -53,7 +53,7 @@ class ExcelWriter:
         self._images = []
         self._drawings = []
         self._comments = []
-        self._pivots = []
+        self.pivot_caches = set()
         self.activex = []
         self.legacy = []
         self.form_controls = []
@@ -96,6 +96,7 @@ class ExcelWriter:
         archive.writestr(ARC_STYLE, tostring(stylesheet))
 
         writer = WorkbookWriter(self.workbook)
+        writer.pivot_caches = self.pivot_caches
         archive.writestr(ARC_ROOT_RELS, writer.write_root_rels())
         archive.writestr(ARC_WORKBOOK, writer.write())
         archive.writestr(ARC_WORKBOOK_RELS, writer.write_rels())
@@ -314,21 +315,21 @@ class ExcelWriter:
 
     def write_worksheets(self):
 
-        pivot_caches = set()
+        pivots = []
 
         for idx, ws in enumerate(self.workbook.worksheets, 1):
             ws._id = idx
             self.write_worksheet(ws)
 
             for p in ws._pivots:
-                if p.cache not in pivot_caches:
-                    pivot_caches.add(p.cache)
-                    p.cache._id = len(pivot_caches)
+                if p.cache not in self.pivot_caches:
+                    self.pivot_caches.add(p.cache)
+                    p.cache._id = p.cacheId = len(self.pivot_caches)
+                    p.cache._write(self.archive, self.manifest)
 
-                self._pivots.append(p)
-                p._id = len(self._pivots)
+                pivots.append(p)
+                p._id = len(pivots)
                 p._write(self.archive, self.manifest)
-                self.workbook._pivots.append(p)
                 r = Relationship(Type=p.rel_type, Target=p.path)
                 ws._rels.append(r)
 
@@ -362,10 +363,17 @@ class ExcelWriter:
 
 
     def write_connections(self):
-        if self.workbook._connections:
-            tree = self.workbook._connections.to_tree()
+
+        conns = self.workbook._connections
+        if conns:
+            for cache in conns.caches:
+                self.pivot_caches.add(cache)
+                cache._id = len(self.pivot_caches)
+                cache._write(self.archive, self.manifest)
+
+            tree = conns.to_tree()
             self.archive.writestr(ARC_CONNECTIONS, tostring(tree))
-            self.manifest.append(self.workbook._connections)
+            self.manifest.append(conns)
 
 
     def save(self):
