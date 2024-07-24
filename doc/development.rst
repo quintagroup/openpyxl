@@ -15,12 +15,12 @@ Getting the source
 
 The source code of openpyxl is hosted on `Heptapod <https://foss.heptapod.net/openpyxl/openpyxl>`_
 as a Mercurial project which you can download using e.g. the GUI client
-`SourceTree <http://www.sourcetreeapp.com>`_ by Atlassian. If you prefer working
+`TortoiseHg <https://www.mercurial-scm.org/downloads>`_ . If you prefer working
 with the command line you can use the following:
 
 .. parsed-literal::
 
-    $ hg clone \https://foss.heptapod.net/openpyxl/openpyxl
+    $ hg clone https://foss.heptapod.net/openpyxl/openpyxl
     $ hg up |version|
 
 Please note that the default branch should never be used for development
@@ -29,13 +29,18 @@ of the current release, e.g |version|. New features should generally be based
 on the development branch of the **next** minor version. If in doubt get in
 touch with the openpyxl development team.
 
-It is worthwhile to add an upstream remote reference to the
-original repository to update your fork with the latest changes, by adding
-to the :code:`./hg/hgrc` file the following::
 
-    [paths]
-    default = ...
-    openpyxl-master = https://foss.heptapod.net/openpyxl/openpyxl
+Required extensions
+-------------------
+
+You will need at least the evolve extension for Mercurial. Check for this using
+the command `hg topic` and download it if necessary for your system. You will also need
+the eol extension, which is part of Mercurial. Extensions are enabled in
+:code:`.hg/hgrc`::
+
+    [extensions]
+    evolve =
+    eol =
 
 You can then grab any new changes using::
 
@@ -57,70 +62,6 @@ Install the dev and prod dependencies and the package itself using::
     (openpyxl-env) $ pip install -e .
 
 
-Running tests
--------------
-
-Note that contributions to the project without tests will **not** be accepted.
-
-We use :code:`pytest` as the test runner with :code:`pytest-cov` for coverage information and
-:code:`pytest-flakes` for static code analysis.
-
-To run all the tests you need to either execute::
-
-    (openpxyl-env) $ pytest -xrf openpyxl  # the flags will stop testing at the first error
-
-Or use :code:`tox` to run the tests on different Python versions and
-configurations::
-
-    $ tox openpyxl
-
-
-Coverage
-++++++++
-
-The goal is 100 % coverage for unit tests - data types and utility functions.
-Coverage information can be obtained using::
-
-    py.test --cov openpyxl
-
-
-Organisation
-++++++++++++
-
-Tests should be preferably at package / module level e.g :code:`openpyxl/cell`. This
-makes testing and getting statistics for code under development easier::
-
-    py.test --cov openpyxl/cell openpyxl/cell
-
-
-Checking XML
-++++++++++++
-
-Use the :code:`openpyxl.tests.helper.compare_xml` function to compare
-generated and expected fragments of XML.
-
-
-Schema validation
-+++++++++++++++++
-
-When working on code to generate XML it is possible to validate that the
-generated XML conforms to the published specification. Note, this won't
-necessarily guarantee that everything is fine but is preferable to reverse
-engineering!
-
-
-Microsoft Tools
-+++++++++++++++
-
-Along with the SDK, Microsoft also has a `"Productivity Tool"
-<http://www.microsoft.com/en-us/download/details.aspx?id=30425>`_ for working
-with Office OpenXML.
-
-This allows you to quickly inspect or compare whole Excel files.
-Unfortunately, validation errors contain many false positives. The tool also
-contain links to the specification and implementers' notes.
-
-
 File Support and Specifications
 -------------------------------
 
@@ -134,28 +75,6 @@ programs, but can't guarantee it, because often these do not strictly adhere
 to the above format.
 
 
-Support of Python Versions
---------------------------
-
-Python 3.6 and upwards are supported
-
-
-Coding style
-------------
-
-We orient ourselves at PEP-8 for the coding style, except when implementing
-attributes for round tripping. Despite that you are encouraged to use Python
-data conventions (boolean, None, etc.). Note exceptions from this convention
-in docstrings.
-
-
-Contributing
-------------
-
-Contributions in the form of pull requests are always welcome. Don't forget
-to add yourself to the list of authors!
-
-
 Branch naming convention
 ------------------------
 
@@ -166,32 +85,139 @@ API changes to the mailing list before making them. If you are changing an
 API try and an implement a fallback (with deprecation warning) for the old
 behaviour.
 
-The "default branch" is used for releases and always has changes from a
-development branch merged in. It should never be the target for a pull
-request.
+.. note::
+
+    The "default branch" is used for releases and always has changes from a
+    development branch merged in. It should never be the target for a pull
+    request.
+
+
+Coding style
+------------
+
+We orient ourselves at PEP-8 for the coding style, except when implementing
+the OOXML specification which uses camelCase for attribute and child object names.
+Don't be afraid to use whitespace to make code easier to read: separate parts
+of functions using a separate line and use two lines between functions, methods
+and classes.
+
+
+Contributing
+------------
+
+Contributions in the form of pull requests are always welcome. Don't forget
+to add yourself to the list of authors!
 
 
 Pull Requests
--------------
++++++++++++++
 
-Pull requests should be submitted to the current, unreleased development
-branch. Eg. if the current release is |release|, pull requests should be made
-to the |version| branch. Exceptions are bug fixes to released versions which
-should be made to the relevant release branch and merged upstream into
-development.
+New features should generally be based on the current, unreleased development
+branch, and bug fixes should be made to the relevant release branch
+development. Eg. if the current release is |release|, changes should be made
+based on the |version| branch, and new features to the development, or
+|version| + 0.1 branch. Please ask on the mailing list or bug report if
+you're not sure.
+
+
+Support of Python Versions
+++++++++++++++++++++++++++
+
+Make sure that you can test different versions of Python. Currently,
+Python 3.8 and upwards is supported.
+
+
+Topics
+++++++
+
+Mercurial uses topics to manage branches for pull requests. Switch to relevant
+branch for your work and create a suitable topic. This can be using a bug
+number or a brief description of the topic. :code:`hg topic add-text-formatting`.
+You switch between topics as you would be between branches.
+:code: `hg up add-text-formatting`
+
+Testing
++++++++
+
+Note that contributions to the project without tests will **not** be accepted, but
+the focus is very much on unit tests, ie. tests for the lowest level of code.
+
+We use :code:`pytest` as the test runner with :code:`pytest-cov` for coverage
+information and :code:`pytest-flakes` for static code analysis.
+
+To run all the tests you need to run::
+
+    (openpxyl-env) $ pytest -xrf openpyxl # this will stop testing at the first error
 
 Please use :code:`tox` to test code for different submissions **before**
-making a pull request. This is especially important for picking up problems
-across Python versions.
+submitting a pull request. This is especially important for picking up problems
+across Python versions::
+
+    $ tox openpyxl
 
 
-Documentation
-+++++++++++++
+Organisation
+~~~~~~~~~~~~
+
+Tests should be preferably at package / module level e.g for :code:`openpyxl/cell`, the
+tests will be in :code:`openpyxl/cell/tests`. Keeping the tests close to the code
+generally makes it easier.
+
+Coverage
+~~~~~~~~
+
+The goal is 100 % coverage for unit tests - data types and utility functions.
+Coverage information can be obtained using::
+
+    py.test --cov openpyxl/cell openpyxl/cell --cov-report=term-missing openpyxl/cell
+
+This will tell you the coverage for the cell module and a list of lines without test coverage.
+
+Document the changes
+++++++++++++++++++++
 
 Remember to update the documentation when adding or changing features. Check
 that documentation is syntactically correct.::
 
     tox -e doc
+
+
+Checking XML
+++++++++++++
+
+Use the :code:`openpyxl.tests.helper.compare_xml` function to compare
+generated and expected fragments of XML.
+
+
+Microsoft Tools
+~~~~~~~~~~~~~~~
+
+Along with the SDK, Microsoft also has a `"Productivity Tool"
+<https://github.com/dotnet/Open-XML-SDK/releases/tag/v2.5>`_ for working
+with Office OpenXML.
+
+This allows you to quickly inspect or compare whole Excel files.
+Unfortunately, validation errors contain many false positives. The tool also
+contain links to the specification and implementers' notes.
+
+
+Schema validation
+~~~~~~~~~~~~~~~~~
+
+When working on code to generate XML it is possible to validate that the
+generated XML conforms to the published specification. Note, this won't
+necessarily guarantee that everything is fine but is preferable to reverse
+engineering!
+
+
+Documentation
+-------------
+
+Any software is only as good as its documentation. We try and provide
+documentation that is usable for Python developers but this can always
+been improved upon, especially as you become more familiar with the code.
+Please get in touch and submit a pull request if you think something is missing
+or poorly explained.
 
 
 Benchmarking
