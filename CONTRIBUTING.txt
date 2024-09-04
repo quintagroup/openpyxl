@@ -2,5 +2,5 @@ Contributing
 ============
 
 Contributions to openpyxl are welcome.
-Please see the [developer documentation](https://openpyxl.readthedocs.io/en/stable/development.html)
+Please see the [developer documentation](https://openpyxl.pages.heptapod.net/openpyxl/development.html)
 for further information.

@@ -79,7 +79,7 @@ setup(
         'et_xmlfile',
         ],
     project_urls={
-        'Documentation': 'https://openpyxl.readthedocs.io/en/stable/',
+        'Documentation': 'https://openpyxl.pages.heptapod.net/openpyxl/',
         'Source': 'https://foss.heptapod.net/openpyxl/openpyxl',
         'Tracker': 'https://foss.heptapod.net/openpyxl/openpyxl/-/issues',
     },

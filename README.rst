@@ -50,10 +50,10 @@ Sample code::
 Documentation
 -------------
 
-The documentation is at: https://openpyxl.readthedocs.io
+The documentation is at: https://openpyxl.pages.heptapod.net/openpyxl/index.html
 
 * installation methods
 * code examples
 * instructions for contributing
 
-Release notes: https://openpyxl.readthedocs.io/en/stable/changes.html
+Release notes: https://openpyxl.pages.heptapod.net/openpyxl/changes.html
