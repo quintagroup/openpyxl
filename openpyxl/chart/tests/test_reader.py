@@ -6,6 +6,7 @@ from .. bar_chart import BarChart
 from .. line_chart import LineChart
 from .. axis import NumericAxis, DateAxis
 from .. chartspace import ChartSpace, ChartContainer
+from ..plotarea import PlotArea, DataTable
 
 
 def test_read(datadir):
@@ -65,3 +66,20 @@ def test_read_chart_with_shapes(datadir):
     assert chart.graphical_properties.noFill
     assert chart.graphical_properties.line.noFill
 
+
+def test_read_chart_plot_area():
+    from ..reader import read_chart
+
+    container = ChartContainer()
+    plot_area = PlotArea()
+    plot_area._charts = [BarChart()]
+    plot_area.dTable = DataTable()
+    container.plotArea = plot_area
+    cs = ChartSpace(chart=container)
+
+    chart = read_chart(cs)
+
+    assert chart.plot_area is not None
+    assert chart.plot_area == cs.chart.plotArea
+    assert chart.plot_area._charts == [chart]
+    assert chart.plot_area.dTable == cs.chart.plotArea.dTable
