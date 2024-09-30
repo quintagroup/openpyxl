@@ -2,7 +2,8 @@
 
 from openpyxl.xml.functions import fromstring
 
-from .. bar_chart import BarChart
+from .._3d import View3D
+from ..bar_chart import BarChart, BarChart3D
 from .. line_chart import LineChart
 from .. axis import NumericAxis, DateAxis
 from .. chartspace import ChartSpace, ChartContainer
@@ -83,3 +84,23 @@ def test_read_chart_plot_area():
     assert chart.plot_area == cs.chart.plotArea
     assert chart.plot_area._charts == [chart]
     assert chart.plot_area.dTable == cs.chart.plotArea.dTable
+
+
+def test_read_chart_view3D():
+    from ..reader import read_chart
+
+    container = ChartContainer()
+    view3D = View3D()
+    container.view3D = view3D
+    plot_area = PlotArea()
+    plot_area._charts = [BarChart3D()]
+    container.plotArea = plot_area
+    cs = ChartSpace(chart=container)
+
+    chart = read_chart(cs)
+
+    assert chart.view3D is not None
+    assert chart.view3D == cs.chart.view3D
+    assert chart.view3D.rotX == 15
+    assert chart.view3D.perspective is None
+    assert chart.view3D.hPercent is None
