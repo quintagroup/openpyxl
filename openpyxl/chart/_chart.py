@@ -147,6 +147,9 @@ class ChartBase(Serialisable):
         cs.roundedCorners = self.roundedCorners
         cs.pivotSource = self.pivotSource
         cs.spPr = self.graphical_properties
+        view3D = getattr(self, "view3D", None)
+        if view3D is not None:
+            cs.chart.view3D = view3D
         return cs.to_tree()
 
 
