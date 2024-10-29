@@ -19,6 +19,9 @@ from openpyxl.xml.constants import (
     ACTIVEX,
     CTRL,
     VBA,
+    VBA_SIG,
+    VBA_SIG_V3,
+    VBA_SIG_AGILE,
 )
 from openpyxl.xml.functions import tostring
 
@@ -188,7 +191,7 @@ class Manifest(Serialisable):
             mf = Manifest.from_tree(node)
             filenames = self.filenames
             for override in mf.Override:
-                if override.PartName not in (ACTIVEX, CTRL, VBA):
+                if override.ContentType not in (ACTIVEX, CTRL, VBA, VBA_SIG, VBA_SIG_V3, VBA_SIG_AGILE):
                     continue
                 if override.PartName not in filenames:
                     self.Override.append(override)

@@ -100,7 +100,8 @@ class ExcelWriter:
         """
         ARC_VBA = re.compile("|".join(
             ('xl/vba', r'xl/drawings/.*vmlDrawing\d\.vml',
-             'xl/ctrlProps', 'customUI', 'xl/activeX', r'xl/media/.*\.emf')
+             'xl/ctrlProps', 'customUI', 'xl/activeX', r'xl/media/.*\.emf', 'xl/_rels/vbaProject.bin.rels'
+             )
         )
                              )
 

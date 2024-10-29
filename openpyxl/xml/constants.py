@@ -127,3 +127,6 @@ EXT_TYPES = {
 CTRL = "application/vnd.ms-excel.controlproperties+xml"
 ACTIVEX = "application/vnd.ms-office.activeX+xml"
 VBA = "application/vnd.ms-office.vbaProject"
+VBA_SIG = "application/vnd.ms-office.vbaProjectSignature"
+VBA_SIG_AGILE = "application/vnd.ms-office.vbaProjectSignatureAgile"
+VBA_SIG_V3 = "application/vnd.ms-office.vbaProjectSignatureV3"
